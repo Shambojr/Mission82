@@ -1,0 +1,2409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Mission OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --bg:#F5F0E8;
+  --bg-raised:#EDE8DF;
+  --bg-card:#E8E2D8;
+  --bg-input:#EDEAE3;
+  --text-hero:#1A1714;
+  --text-body:#4A4540;
+  --text-label:#8A827A;
+  --text-dim:#C0B8B0;
+  --accent:#8B6914;
+  --accent-warm:#C4960A;
+  --accent-light:rgba(139,105,20,0.12);
+  --sacred:#6B5B4E;
+  --border:rgba(26,23,20,0.08);
+  --border-strong:rgba(26,23,20,0.14);
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'DM Sans',sans-serif;
+  --positive:#2D6A4F;
+  --negative:#4A1C1C;
+}
+.dark-mode{
+  --bg:#141312;
+  --bg-raised:#1C1B1A;
+  --bg-card:#232220;
+  --bg-input:#2A2927;
+  --text-hero:#F0EBE3;
+  --text-body:#B8B0A8;
+  --text-label:#6B6560;
+  --text-dim:#3A3836;
+  --accent:#D4A853;
+  --accent-warm:#D4A853;
+  --accent-light:rgba(212,168,83,0.10);
+  --sacred:#B8A99A;
+  --border:rgba(255,255,255,0.06);
+  --border-strong:rgba(255,255,255,0.11);
+  --positive:#52B788;
+  --negative:#C9636B;
+}
+
+html,body{
+  background:#0E0D0C;
+  font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+}
+.phone{
+  width:100%;max-width:390px;min-height:100vh;
+  background:var(--bg);
+  position:relative;
+  transition:background .5s ease;
+  overflow:hidden;
+}
+.screen{
+  display:none;height:100vh;
+  overflow-y:auto;padding-bottom:104px;
+  -webkit-overflow-scrolling:touch;
+}
+.screen.active{
+  display:block;
+  animation:pageIn .3s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── NAV ── */
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:390px;
+  padding:10px 16px 34px;
+  background:linear-gradient(to top,var(--bg) 56%,transparent);
+  display:flex;justify-content:space-around;
+  z-index:50;transition:background .5s ease;
+}
+.nav-item{
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  opacity:.22;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:opacity .2s;padding:4px 12px;
+}
+.nav-item.active{opacity:1;}
+.nav-pip{width:4px;height:4px;border-radius:50%;background:var(--text-body);transition:background .2s;}
+.nav-item.active .nav-pip{background:var(--accent);}
+.nav-lbl{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-body);}
+.nav-item.active .nav-lbl{color:var(--accent);}
+
+/* ── THEME TOGGLE ── */
+.theme-toggle{
+  position:fixed;top:16px;
+  right:max(18px,calc(50% - 177px));
+  z-index:100;display:flex;align-items:center;gap:7px;cursor:pointer;
+}
+.toggle-label{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-label);}
+.toggle-pill{width:32px;height:18px;border-radius:9px;background:var(--border-strong);position:relative;transition:background .3s;}
+.toggle-knob{width:12px;height:12px;border-radius:50%;background:var(--accent);position:absolute;top:3px;left:3px;transition:transform .3s;}
+.dark-mode .toggle-knob{transform:translateX(14px);}
+
+/* ── SHARED ── */
+.section-header{display:flex;align-items:center;gap:12px;padding:28px 24px 0;}
+.section-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-label);white-space:nowrap;flex-shrink:0;}
+.section-line{flex:1;height:1px;background:var(--border-strong);}
+
+.insight-block{
+  margin:0 24px;padding:13px 16px;
+  background:var(--bg-raised);border:1px solid var(--border);
+  border-left:2px solid var(--accent);border-radius:2px;
+}
+.insight-from{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;}
+.insight-body{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--text-body);line-height:1.55;}
+
+
+/* ══════════════════════════════════
+   PROFILE SETUP MODAL
+══════════════════════════════════ */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(14,13,12,.85);
+  z-index:200;display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s ease;
+}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal-sheet{
+  width:100%;max-width:390px;
+  background:var(--bg);border-radius:12px 12px 0 0;
+  padding:28px 24px 48px;
+  transform:translateY(100%);transition:transform .4s cubic-bezier(.16,1,.3,1);
+}
+.modal-overlay.open .modal-sheet{transform:translateY(0);}
+.modal-title{font-family:var(--serif);font-size:28px;font-weight:300;color:var(--text-hero);margin-bottom:6px;}
+.modal-sub{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--text-label);margin-bottom:28px;line-height:1.4;}
+.modal-fields{display:flex;flex-direction:column;gap:18px;}
+.modal-field{}
+.modal-field-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-label);margin-bottom:7px;}
+.modal-input{
+  background:var(--bg-input);border:1px solid var(--border-strong);border-radius:2px;
+  padding:11px 14px;width:100%;
+  font-family:var(--serif);font-size:22px;font-weight:300;color:var(--text-hero);
+  outline:none;transition:border-color .2s;
+}
+.modal-input:focus{border-color:var(--accent);}
+.modal-input::placeholder{color:var(--text-dim);}
+.modal-row{display:flex;gap:10px;}
+.modal-row .modal-field{flex:1;}
+.modal-seg{display:flex;gap:0;border:1px solid var(--border-strong);border-radius:2px;overflow:hidden;}
+.modal-seg-btn{
+  flex:1;padding:11px;background:var(--bg-input);border:none;outline:none;
+  font-family:var(--sans);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-label);cursor:pointer;transition:all .2s;
+}
+.modal-seg-btn.active{background:var(--accent);color:#fff;}
+.modal-save-btn{
+  margin-top:24px;width:100%;padding:15px;
+  background:var(--accent);border:none;border-radius:2px;
+  font-family:var(--sans);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:#fff;cursor:pointer;transition:opacity .2s;
+}
+.modal-save-btn:hover{opacity:.85;}
+
+
+/* ══════════════════════════════════
+   TODAY
+══════════════════════════════════ */
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:18px 24px 0;}
+.status-time{font-size:12px;color:var(--text-label);letter-spacing:.07em;}
+.muhurta{display:flex;align-items:center;gap:7px;opacity:0;transition:opacity .5s;}
+.muhurta.visible{opacity:1;}
+.muhurta-pulse{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:pulse 3s ease-in-out infinite;}
+.muhurta-text{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);}
+@keyframes pulse{0%,100%{opacity:.35;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+
+.mission-hero{padding:32px 24px 0;}
+.mission-eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-label);margin-bottom:10px;}
+.mission-title{font-family:var(--serif);font-size:52px;font-weight:300;line-height:.97;color:var(--text-hero);margin-bottom:18px;letter-spacing:-.01em;}
+.mission-title em{font-style:italic;color:var(--accent);}
+.mission-purpose{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--text-body);line-height:1.55;padding-left:13px;border-left:2px solid var(--accent);margin-bottom:20px;}
+
+.dest-strip{display:flex;align-items:center;gap:12px;padding:12px 15px;background:var(--bg-card);border:1px solid var(--border-strong);border-radius:2px;}
+.dest-glyph{font-size:13px;opacity:.5;flex-shrink:0;}
+.dest-label{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-label);margin-bottom:3px;}
+.dest-value{font-family:var(--serif);font-size:17px;font-weight:400;color:var(--text-hero);}
+.dest-sub{font-size:10px;color:var(--text-label);margin-top:1px;}
+
+.pattern-insight-today{
+  margin:20px 24px 0;padding:13px 16px;
+  background:var(--bg-raised);border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:2px;
+}
+.pit-label{font-size:9px;letter-spacing:.17em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;}
+.pit-text{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--text-body);line-height:1.55;}
+
+/* Disciplines */
+.disciplines{padding:12px 24px 0;}
+.discipline-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 0;border-bottom:1px solid var(--border);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.discipline-item:first-child{border-top:1px solid var(--border);}
+.disc-left{display:flex;align-items:center;gap:14px;}
+.disc-marker{
+  width:9px;height:9px;border-radius:50%;
+  border:1.5px solid var(--text-dim);flex-shrink:0;
+  transition:all .35s cubic-bezier(.34,1.56,.64,1);
+}
+.discipline-item.sacred .disc-marker{border-color:var(--sacred);}
+.discipline-item.keystone .disc-marker{width:11px;height:11px;border-color:var(--accent);border-width:2px;}
+.discipline-item.completed .disc-marker{background:var(--accent-warm);border-color:var(--accent-warm);transform:scale(1.2);}
+.discipline-item.completed.sacred .disc-marker{background:var(--sacred);border-color:var(--sacred);transform:scale(1.2);}
+.disc-name{font-size:16px;font-weight:300;color:var(--text-hero);transition:color .28s;}
+.discipline-item.completed .disc-name{color:var(--text-label);}
+.disc-meta{font-size:10px;color:var(--text-label);margin-top:2px;}
+.disc-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.keystone-badge{font-size:8px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(139,105,20,.26);padding:2px 6px;border-radius:2px;}
+.dark-mode .keystone-badge{border-color:rgba(212,168,83,.24);}
+.disc-tag{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-label);}
+.disc-kcal{font-family:var(--serif);font-size:12px;color:var(--text-label);font-style:italic;}
+
+/* Progress */
+.progress-section{padding:24px 24px 0;}
+.progress-meta{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px;}
+.progress-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-label);}
+.progress-count{font-family:var(--serif);font-size:13px;font-weight:300;color:var(--text-body);}
+.progress-track{height:1.5px;background:var(--border-strong);border-radius:2px;margin-bottom:22px;position:relative;}
+.progress-fill{height:1.5px;background:var(--accent);border-radius:2px;width:0%;transition:width 1.4s cubic-bezier(.16,1,.3,1);position:relative;}
+.progress-fill::after{content:'';position:absolute;right:-3px;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--accent);}
+.stats{display:flex;}
+.stat{flex:1;}
+.stat+.stat{padding-left:16px;margin-left:16px;border-left:1px solid var(--border-strong);}
+.stat-num{font-family:var(--serif);font-size:30px;font-weight:300;color:var(--text-hero);line-height:1;margin-bottom:4px;}
+.stat-num.accent{color:var(--accent);}
+.stat-lbl{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-label);}
+
+/* Energy Today card */
+.energy-today{
+  margin:20px 24px 0;padding:16px;
+  background:var(--bg-card);border:1px solid var(--border-strong);border-radius:2px;
+}
+.et-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.et-title{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-label);}
+.et-weight{font-family:var(--serif);font-size:15px;font-weight:300;color:var(--text-body);}
+.et-weight em{font-style:normal;color:var(--text-hero);}
+.et-rows{display:flex;flex-direction:column;gap:0;}
+.et-row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--border);}
+.et-row:last-child{border-bottom:none;}
+.et-row-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-label);}
+.et-row-val{font-family:var(--serif);font-size:17px;font-weight:300;color:var(--text-hero);}
+.et-row-sub{font-size:10px;color:var(--text-label);margin-left:6px;}
+.et-balance-row{display:flex;justify-content:space-between;align-items:baseline;padding-top:10px;margin-top:4px;border-top:1px solid var(--border-strong);}
+.et-bal-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-label);}
+.et-bal-val{font-family:var(--serif);font-size:22px;font-weight:300;}
+.et-bal-val.deficit{color:var(--text-hero);}
+.et-bal-val.surplus{color:var(--text-body);}
+.et-empty-state{padding:4px 0 2px;}
+.et-empty-line{font-size:11px;color:var(--text-label);margin-bottom:10px;line-height:1.45;}
+.et-empty-checklist{display:flex;flex-direction:column;gap:7px;}
+.et-check-item{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--text-label);}
+.et-check-item.done{color:var(--accent);}
+.et-check-item.done .etc-dot{background:var(--accent);border-color:var(--accent);}
+.etc-dot{width:6px;height:6px;border-radius:50%;border:1.5px solid var(--text-dim);flex-shrink:0;transition:all .2s;}
+
+/* keep old .et-empty for fallback */
+.et-empty{font-family:var(--serif);font-size:14px;font-weight:300;font-style:italic;color:var(--text-label);text-align:center;padding:8px 0;}
+
+/* Record nudge */
+.record-nudge{
+  margin:16px 24px 0;padding:12px 15px;
+  background:var(--bg-raised);border:1px solid var(--border-strong);border-radius:2px;
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.nudge-left{display:flex;flex-direction:column;gap:5px;}
+.nudge-label{font-size:9px;letter-spacing:.17em;text-transform:uppercase;color:var(--text-label);}
+.nudge-status{font-family:var(--serif);font-size:14px;font-weight:300;font-style:italic;color:var(--text-body);}
+.nudge-pills{display:flex;gap:5px;flex-wrap:wrap;}
+.nudge-pill{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);padding:2px 6px;border:1px solid var(--border-strong);border-radius:2px;transition:all .2s;}
+.nudge-pill.done{color:var(--accent);border-color:rgba(139,105,20,.26);}
+.dark-mode .nudge-pill.done{border-color:rgba(212,168,83,.24);}
+.nudge-arrow{color:var(--text-label);font-size:13px;margin-left:10px;flex-shrink:0;}
+
+.evening-prompt{margin:14px 24px 0;padding:13px 15px;background:var(--bg-raised);border:1px solid var(--border);border-radius:2px;}
+.ep-label{font-size:9px;letter-spacing:.17em;text-transform:uppercase;color:var(--text-label);margin-bottom:6px;}
+.ep-text{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--text-body);line-height:1.55;}
+
+
+/* ══════════════════════════════════
+   RECORD — JOURNAL PAGE
+══════════════════════════════════ */
+.journal-compass{
+  padding:54px 24px 0;
+  display:flex;align-items:baseline;justify-content:space-between;
+}
+.jc-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);}
+.jc-value{font-family:var(--serif);font-size:13px;font-weight:300;font-style:italic;color:var(--text-label);}
+.jc-days{font-size:9px;letter-spacing:.1em;color:var(--text-dim);}
+
+.day-nav{display:flex;align-items:center;justify-content:space-between;padding:18px 24px 0;}
+.day-nav-arrow{font-size:14px;color:var(--text-label);cursor:pointer;padding:8px;margin:-8px;-webkit-tap-highlight-color:transparent;transition:color .2s;user-select:none;}
+.day-nav-arrow:active{color:var(--accent);}
+.day-nav-arrow.disabled{opacity:.18;pointer-events:none;}
+.day-nav-center{text-align:center;}
+.journal-date-small{font-family:var(--serif);font-size:13px;font-weight:300;font-style:italic;color:var(--text-label);}
+.day-log-dots{display:flex;justify-content:center;gap:4px;margin-top:6px;}
+.log-dot{width:4px;height:4px;border-radius:50%;background:var(--border-strong);}
+.log-dot.filled{background:var(--accent);}
+.log-dot.today{background:var(--accent-warm);}
+
+.page-headline{padding:18px 24px 0;}
+.page-day-name{font-family:var(--serif);font-size:44px;font-weight:300;color:var(--text-hero);line-height:1;letter-spacing:-.01em;}
+.page-full-date{font-family:var(--serif);font-size:17px;font-weight:300;font-style:italic;color:var(--text-label);margin-top:2px;}
+.page-rule{margin:14px 24px 0;height:1px;background:var(--border-strong);}
+
+/* Journal entries */
+.journal-entry{padding:18px 24px 0;}
+.entry-category{
+  font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-label);
+  margin-bottom:10px;display:flex;align-items:center;gap:10px;
+}
+.entry-category::after{content:'';display:block;height:1px;flex:1;background:var(--border);}
+
+/* Weight */
+.weight-written{display:flex;align-items:baseline;gap:8px;}
+.weight-num-input{
+  background:none;border:none;outline:none;
+  font-family:var(--serif);font-size:50px;font-weight:300;color:var(--text-hero);
+  width:175px;letter-spacing:-.02em;line-height:1;caret-color:var(--accent);
+}
+.weight-num-input::placeholder{color:var(--text-dim);}
+.weight-kg{font-family:var(--serif);font-size:21px;font-weight:300;color:var(--text-label);padding-bottom:5px;}
+.weight-whisper{font-family:var(--serif);font-size:12px;font-weight:300;font-style:italic;color:var(--text-dim);margin-top:4px;}
+.weight-whisper em{font-style:italic;color:var(--accent);opacity:.7;}
+
+/* Sparkline (line chart) */
+.sparkline-svg{width:100%;height:36px;margin-top:12px;overflow:visible;}
+
+/* ── FOOD JOURNAL — AI estimation ── */
+.food-journal{}
+
+/* Single meal row */
+.meal-row{
+  padding:12px 0;
+  border-bottom:1px solid var(--border);
+  display:flex;flex-direction:column;gap:6px;
+}
+.meal-row:first-child{border-top:1px solid var(--border);}
+
+/* Top line: label + kcal badge */
+.meal-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+
+.meal-label{
+  font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--text-label);flex-shrink:0;
+}
+
+/* The kcal badge — right side, shows estimate or "—" */
+.meal-kcal-badge{
+  display:flex;align-items:center;gap:5px;
+  flex-shrink:0;
+}
+.meal-kcal-num{
+  font-family:var(--serif);font-size:14px;font-weight:300;
+  color:var(--text-label);
+  min-width:38px;text-align:right;
+  cursor:text;
+  border-bottom:1px solid transparent;
+  outline:none;background:none;border-left:none;border-top:none;border-right:none;
+  transition:border-color .2s,color .2s;
+  caret-color:var(--accent);
+}
+.meal-kcal-num:focus{border-bottom-color:var(--accent);color:var(--text-hero);}
+.meal-kcal-num.estimated{color:var(--text-body);}
+.meal-kcal-num.empty{color:var(--text-dim);}
+.meal-kcal-unit{font-size:9px;color:var(--text-dim);letter-spacing:.06em;}
+
+/* Estimating spinner */
+.meal-estimating{
+  font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent);opacity:0;
+  transition:opacity .2s;
+}
+.meal-estimating.visible{opacity:1;}
+
+/* The food text input */
+.meal-food-input{
+  background:none;border:none;outline:none;
+  font-family:var(--serif);font-size:18px;font-weight:300;
+  color:var(--text-hero);
+  width:100%;line-height:1.45;resize:none;min-height:26px;
+  caret-color:var(--accent);
+}
+.meal-food-input::placeholder{color:var(--text-dim);font-style:italic;}
+
+/* Estimate line below food text */
+.meal-estimate-row{
+  display:flex;align-items:center;justify-content:space-between;
+  min-height:16px;
+}
+.meal-estimate-note{
+  font-family:var(--serif);font-size:11px;font-style:italic;
+  color:var(--text-dim);
+  transition:color .3s;
+}
+.meal-estimate-note.ready{color:var(--text-label);}
+
+/* Estimate button — appears after text is entered, before estimation */
+.meal-estimate-btn{
+  font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);background:none;border:none;
+  cursor:pointer;padding:0;
+  opacity:0;pointer-events:none;
+  transition:opacity .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.meal-estimate-btn.visible{opacity:1;pointer-events:all;}
+
+/* Food journal total footer */
+.food-total-row{
+  display:flex;align-items:baseline;justify-content:space-between;
+  padding:12px 0 0;
+  border-top:1px solid var(--border-strong);
+  margin-top:4px;
+}
+.food-total-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-label);}
+.food-total-val{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--text-hero);}
+.food-total-val.partial{color:var(--text-body);}
+.food-total-val.empty{color:var(--text-dim);}
+.food-estimate-all-btn{
+  font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);background:none;border:none;cursor:pointer;
+  padding:4px 0;-webkit-tap-highlight-color:transparent;
+  transition:opacity .2s;
+}
+.food-estimate-all-btn:active{opacity:.6;}
+
+/* Steps */
+.steps-written{display:flex;align-items:baseline;gap:8px;}
+.steps-num-input{
+  background:none;border:none;outline:none;
+  font-family:var(--serif);font-size:40px;font-weight:300;color:var(--text-hero);
+  width:155px;letter-spacing:-.02em;caret-color:var(--accent);
+}
+.steps-num-input::placeholder{color:var(--text-dim);}
+.steps-word{font-family:var(--serif);font-size:17px;font-weight:300;color:var(--text-label);padding-bottom:3px;}
+.steps-ref{font-size:11px;color:var(--text-label);margin-top:5px;}
+.steps-ref .steps-hit{color:var(--accent);}
+
+/* Disciplines log */
+.disc-log-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0;border-bottom:1px solid var(--border);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.disc-log-item:first-child{border-top:1px solid var(--border);}
+.disc-log-left{display:flex;align-items:center;gap:12px;}
+.disc-log-marker{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--text-dim);flex-shrink:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);}
+.disc-log-item.sacred .disc-log-marker{border-color:var(--sacred);}
+.disc-log-item.done .disc-log-marker{background:var(--accent-warm);border-color:var(--accent-warm);transform:scale(1.2);}
+.disc-log-item.done.sacred .disc-log-marker{background:var(--sacred);border-color:var(--sacred);transform:scale(1.2);}
+.disc-log-name{font-size:15px;font-weight:300;color:var(--text-hero);transition:color .25s;}
+.disc-log-item.done .disc-log-name{color:var(--text-label);}
+.disc-log-right{display:flex;align-items:center;gap:8px;}
+.disc-dur-input{
+  background:none;border:none;border-bottom:1px solid var(--border-strong);outline:none;
+  font-family:var(--serif);font-size:15px;font-weight:300;color:var(--text-label);
+  width:36px;text-align:right;caret-color:var(--accent);
+}
+.disc-dur-input:focus{border-color:var(--accent);}
+.disc-dur-unit{font-size:9px;letter-spacing:.1em;color:var(--text-dim);}
+.disc-kcal-est{font-family:var(--serif);font-size:12px;font-style:italic;color:var(--text-dim);}
+
+/* Notes */
+.notes-textarea{
+  background:none;border:none;outline:none;
+  font-family:var(--serif);font-size:18px;font-weight:300;font-style:italic;color:var(--text-hero);
+  width:100%;line-height:1.65;resize:none;min-height:80px;caret-color:var(--accent);
+}
+.notes-textarea::placeholder{color:var(--text-dim);}
+
+/* Events */
+.events-entry{padding:18px 24px 0;}
+.event-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.event-chip{
+  font-family:var(--serif);font-size:14px;font-weight:300;
+  color:var(--text-label);padding:5px 13px;
+  border:1px solid var(--border-strong);border-radius:2px;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:all .2s;user-select:none;
+}
+.event-chip:active{transform:scale(.96);}
+.event-chip.selected{color:var(--accent);border-color:rgba(139,105,20,.32);background:var(--accent-light);}
+.dark-mode .event-chip.selected{border-color:rgba(212,168,83,.28);}
+
+/* Energy summary on Record */
+.energy-summary{
+  margin:18px 24px 0;padding:14px 16px;
+  background:var(--bg-card);border:1px solid var(--border-strong);border-radius:2px;
+}
+.es-title{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-label);margin-bottom:10px;}
+.es-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;}
+.es-row+.es-row{border-top:1px solid var(--border);}
+.es-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-label);}
+.es-val{font-family:var(--serif);font-size:16px;font-weight:300;color:var(--text-hero);}
+.es-val.dim{color:var(--text-label);}
+.es-balance{
+  display:flex;justify-content:space-between;align-items:baseline;
+  margin-top:8px;padding-top:10px;border-top:1.5px solid var(--border-strong);
+}
+.es-bal-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-label);}
+.es-bal-val{font-family:var(--serif);font-size:24px;font-weight:300;color:var(--text-hero);}
+
+/* Save */
+.journal-save{margin:24px 24px 0;display:flex;align-items:center;gap:12px;}
+.save-btn{
+  background:none;border:1px solid var(--border-strong);border-radius:2px;
+  padding:13px 0;font-family:var(--sans);font-size:9px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--text-body);cursor:pointer;
+  transition:all .2s;flex:1;
+}
+.save-btn:hover{border-color:var(--accent);color:var(--accent);}
+.save-btn.saved{border-color:var(--accent);color:var(--accent);}
+.save-confirm{font-family:var(--serif);font-size:13px;font-weight:300;font-style:italic;color:var(--accent);opacity:0;transition:opacity .3s;}
+.save-confirm.visible{opacity:1;}
+
+
+/* ══════════════════════════════════
+   MISSION
+══════════════════════════════════ */
+.mission-dest-section{padding:54px 24px 0;}
+.mission-dest-eyebrow{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-label);margin-bottom:12px;}
+.mission-dest-primary{font-family:var(--serif);font-size:46px;font-weight:300;color:var(--text-hero);line-height:1;letter-spacing:-.01em;}
+.mission-dest-weight{font-family:var(--serif);font-size:21px;font-weight:300;font-style:italic;color:var(--accent);margin-top:5px;}
+.mission-dest-sub{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-label);margin-top:7px;}
+.mission-thin-rule{margin:20px 24px 0;height:1px;background:var(--border-strong);}
+
+.mission-brief{margin:22px 24px 0;padding:18px;background:var(--bg-card);border:1px solid var(--border-strong);border-radius:2px;}
+.brief-name{font-family:var(--serif);font-size:27px;font-weight:300;color:var(--text-hero);line-height:1.1;margin-bottom:11px;}
+.brief-name em{font-style:italic;color:var(--accent);}
+.brief-purpose{font-family:var(--serif);font-size:14px;font-weight:300;font-style:italic;color:var(--text-body);line-height:1.55;padding-left:12px;border-left:1.5px solid var(--accent);margin-bottom:16px;}
+.position-table{display:flex;flex-direction:column;}
+.pos-row{display:flex;align-items:baseline;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
+.pos-row:last-child{border-bottom:none;padding-bottom:0;}
+.pos-row:first-child{border-top:1px solid var(--border);}
+.pos-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-label);}
+.pos-value{font-family:var(--serif);font-size:15px;font-weight:300;color:var(--text-hero);text-align:right;}
+.pos-value.now{color:var(--accent);}
+.pos-value.dest{font-size:16px;font-weight:400;}
+
+/* Pace card */
+.pace-card{margin:16px 24px 0;padding:14px 16px;background:var(--bg-raised);border:1px solid var(--border);border-radius:2px;}
+.pace-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;}
+.pace-row+.pace-row{border-top:1px solid var(--border);}
+.pace-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-label);}
+.pace-val{font-family:var(--serif);font-size:16px;font-weight:300;color:var(--text-hero);}
+.pace-val.on-track{color:var(--accent);}
+
+/* Mission narrative */
+.mission-narrative{margin:16px 24px 0;padding:16px;background:var(--bg-raised);border:1px solid var(--border);border-radius:2px;}
+.narrative-text{font-family:var(--serif);font-size:16px;font-weight:300;color:var(--text-body);line-height:1.65;}
+.narrative-text strong{color:var(--text-hero);font-weight:400;}
+.narrative-text em{font-style:italic;color:var(--accent);}
+
+/* Roster */
+.roster-block{margin:0 24px;}
+.roster-item{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);}
+.roster-item:first-child{border-top:1px solid var(--border);}
+.roster-left{display:flex;align-items:center;gap:12px;}
+.roster-marker{width:7px;height:7px;border-radius:50%;border:1.5px solid var(--text-dim);flex-shrink:0;}
+.roster-item.sacred .roster-marker{border-color:var(--sacred);}
+.roster-item.keystone .roster-marker{width:9px;height:9px;border-color:var(--accent);border-width:2px;}
+.roster-name{font-size:15px;font-weight:300;color:var(--text-hero);}
+.roster-right{display:flex;align-items:center;gap:10px;}
+.roster-pct{font-family:var(--serif);font-size:15px;font-weight:300;color:var(--text-body);}
+.roster-pct.strong{color:var(--accent);}
+.roster-kcal{font-family:var(--serif);font-size:12px;font-style:italic;color:var(--text-dim);}
+.roster-cat{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-label);width:50px;text-align:right;}
+
+/* Pattern surfaces on mission */
+.pattern-block{margin:0 24px;display:flex;flex-direction:column;gap:8px;}
+.pattern-item{padding:12px 15px;background:var(--bg-raised);border:1px solid var(--border);border-left:1.5px solid var(--accent);border-radius:2px;}
+.pattern-from{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:4px;}
+.pattern-text{font-family:var(--serif);font-size:14px;font-weight:300;font-style:italic;color:var(--text-body);line-height:1.5;}
+
+
+/* ══════════════════════════════════
+   PATTERNS
+══════════════════════════════════ */
+.patterns-header{padding:54px 24px 0;}
+.patterns-title{font-family:var(--serif);font-size:38px;font-weight:300;color:var(--text-hero);line-height:1;margin-bottom:4px;}
+.patterns-sub{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--text-label);}
+
+/* Weight chart */
+.weight-chart-block{padding:24px 24px 0;}
+.wc-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
+.wc-title{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-label);}
+.wc-range{display:flex;gap:0;border:1px solid var(--border-strong);border-radius:2px;overflow:hidden;}
+.wc-range-btn{
+  font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-label);padding:4px 10px;background:none;border:none;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:all .2s;
+}
+.wc-range-btn.active{background:var(--accent);color:#fff;}
+.chart-svg-wrap{width:100%;height:120px;position:relative;}
+.chart-svg{width:100%;height:100%;overflow:visible;}
+.chart-y-labels{position:absolute;left:0;top:0;height:100%;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none;}
+.chart-y-lbl{font-size:9px;color:var(--text-dim);letter-spacing:.04em;}
+
+/* Breakdown cards */
+.breakdown-grid{margin:0 24px;display:flex;flex-direction:column;gap:10px;}
+.bk-card{padding:14px 16px;background:var(--bg-card);border:1px solid var(--border-strong);border-radius:2px;}
+.bk-title{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-label);margin-bottom:10px;}
+.bk-row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;}
+.bk-row+.bk-row{border-top:1px solid var(--border);}
+.bk-label{font-size:12px;font-weight:300;color:var(--text-body);}
+.bk-val{font-family:var(--serif);font-size:16px;font-weight:300;color:var(--text-hero);}
+.bk-val.accent{color:var(--accent);}
+.bk-val.dim{color:var(--text-label);}
+
+/* Event impact */
+.event-impact-block{margin:0 24px;display:flex;flex-direction:column;gap:8px;}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+
+<!-- ── THEME TOGGLE ── -->
+<div class="theme-toggle" onclick="toggleTheme()">
+  <span class="toggle-label" id="themeLabel">Light</span>
+  <div class="toggle-pill"><div class="toggle-knob"></div></div>
+</div>
+
+<!-- ══════════════════
+     PROFILE MODAL
+══════════════════ -->
+<div class="modal-overlay" id="profileModal">
+  <div class="modal-sheet">
+    <div class="modal-title">Mission Profile</div>
+    <div class="modal-sub">Used to calculate your BMR, TDEE, and energy balance. Entered once.</div>
+    <div class="modal-fields">
+      <div class="modal-row">
+        <div class="modal-field">
+          <div class="modal-field-label">Age</div>
+          <input class="modal-input" id="p-age" type="number" placeholder="35" inputmode="numeric">
+        </div>
+        <div class="modal-field">
+          <div class="modal-field-label">Height (cm)</div>
+          <input class="modal-input" id="p-height" type="number" placeholder="175" inputmode="numeric">
+        </div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-field-label">Sex</div>
+        <div class="modal-seg">
+          <button class="modal-seg-btn active" id="sex-m" onclick="setSex('male')">Male</button>
+          <button class="modal-seg-btn" id="sex-f" onclick="setSex('female')">Female</button>
+        </div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-field-label">Current Weight (kg)</div>
+        <input class="modal-input" id="p-weight" type="number" step="0.1" placeholder="98.2" inputmode="decimal">
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <div class="modal-field-label">Target Weight (kg)</div>
+          <input class="modal-input" id="p-target" type="number" step="0.1" placeholder="82" inputmode="decimal">
+        </div>
+        <div class="modal-field">
+          <div class="modal-field-label">Target Date</div>
+          <input class="modal-input" id="p-date" type="date" style="font-size:16px;">
+        </div>
+      </div>
+    </div>
+    <button class="modal-save-btn" onclick="saveProfile()">Save Profile → Begin Mission</button>
+  </div>
+</div>
+
+
+<!-- ══════════════════
+     TODAY
+══════════════════ -->
+<div class="screen active" id="screen-today">
+  <div class="status-bar">
+    <span class="status-time" id="clockDisplay"></span>
+    <div class="muhurta" id="muhurta">
+      <div class="muhurta-pulse"></div>
+      <span class="muhurta-text">Brahmamuhurta</span>
+    </div>
+  </div>
+
+  <div class="mission-hero">
+    <div class="mission-eyebrow" id="today-eyebrow">The Re-entry · <span id="today-mission-day">Mission Day 17</span></div>
+    <div class="mission-title">The<br><em>Re-entry</em></div>
+    <div class="mission-purpose">"To arrive at September 1st as a different man."</div>
+    <div class="dest-strip">
+      <div class="dest-glyph">◎</div>
+      <div>
+        <div class="dest-label">Destination</div>
+        <div class="dest-value" id="today-dest-value">82 kg · September 1, 2026</div>
+        <div class="dest-sub" id="today-dest-sub">85 days until September 1, 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern-insight-today">
+    <div class="pit-label">From your record</div>
+    <div class="pit-text" id="insightText">It's Monday. Your strongest weeks begin with a complete morning. Angamardana before anything else.</div>
+  </div>
+
+  <div class="section-header">
+    <span class="section-label">Today's Disciplines</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="disciplines" id="disciplineList">
+    <!-- 1. Wake — opens the day, everything follows from this -->
+    <div class="discipline-item completed" data-name="Wake 4:30am" data-kcal="0" data-dur="0">
+      <div class="disc-left">
+        <div class="disc-marker"></div>
+        <div>
+          <div class="disc-name">Wake at 4:30 am</div>
+          <div class="disc-meta">Opens the day. Protects everything that follows.</div>
+        </div>
+      </div>
+      <div class="disc-right"><div class="disc-tag">Discipline</div></div>
+    </div>
+    <!-- 2. Angamardana — first physical practice, keystone -->
+    <div class="discipline-item sacred keystone completed" data-name="Angamardana" data-kcal="310" data-dur="45">
+      <div class="disc-left">
+        <div class="disc-marker"></div>
+        <div>
+          <div class="disc-name">Angamardana</div>
+          <div class="disc-meta">Your strongest — 76% · <span class="disc-kcal">~310 kcal</span></div>
+        </div>
+      </div>
+      <div class="disc-right">
+        <div class="keystone-badge">Keystone</div>
+        <div class="disc-tag">Sadhana</div>
+      </div>
+    </div>
+    <!-- 3. Walk — 10,000 steps, done throughout the day -->
+    <div class="discipline-item" data-name="10,000 Steps" data-kcal="420" data-dur="0">
+      <div class="disc-left">
+        <div class="disc-marker"></div>
+        <div>
+          <div class="disc-name">10,000 Steps</div>
+          <div class="disc-meta" id="stepsContext">3,200 so far today</div>
+        </div>
+      </div>
+      <div class="disc-right"><div class="disc-tag">Fitness</div></div>
+    </div>
+    <!-- 4. Kriya — after movement, before the world begins -->
+    <div class="discipline-item sacred" data-name="Kriya" data-kcal="80" data-dur="30">
+      <div class="disc-left">
+        <div class="disc-marker"></div>
+        <div>
+          <div class="disc-name">Kriya</div>
+          <div class="disc-meta">Often missed on site days</div>
+        </div>
+      </div>
+      <div class="disc-right"><div class="disc-tag">Sadhana</div></div>
+    </div>
+    <!-- 5. Dumbbell Training — evening practice -->
+    <div class="discipline-item" data-name="Dumbbell Training" data-kcal="260" data-dur="45">
+      <div class="disc-left">
+        <div class="disc-marker"></div>
+        <div>
+          <div class="disc-name">Dumbbell Training</div>
+          <div class="disc-meta"><span class="disc-kcal">~260 kcal</span></div>
+        </div>
+      </div>
+      <div class="disc-right"><div class="disc-tag">Fitness</div></div>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-meta">
+      <div class="progress-label">Mission Progress</div>
+      <div class="progress-count" id="progressCount">2 of 5 today</div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num accent" id="missionConsistency">74%</div>
+        <div class="stat-lbl">Consistency</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="pctStat">40%</div>
+        <div class="stat-lbl">Today</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="daysLeft">68</div>
+        <div class="stat-lbl">Days Left</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Energy Today -->
+  <div class="energy-today">
+    <div class="et-header">
+      <div class="et-title">Energy Today</div>
+      <div class="et-weight">Weight: <em id="today-weight-display">not logged</em></div>
+    </div>
+    <div id="energy-today-content">
+      <div class="et-empty-state">
+        <div class="et-empty-line">To calculate today's energy balance, the Record needs:</div>
+        <div class="et-empty-checklist" id="et-checklist">
+          <div class="et-check-item" id="etc-weight">
+            <span class="etc-dot"></span><span>Today's weight</span>
+          </div>
+          <div class="et-check-item" id="etc-food">
+            <span class="etc-dot"></span><span>At least one meal with a kcal estimate</span>
+          </div>
+          <div class="et-check-item" id="etc-steps">
+            <span class="etc-dot"></span><span>Step count (for NEAT)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Record nudge -->
+  <div class="record-nudge" onclick="switchTab('record')">
+    <div class="nudge-left">
+      <div class="nudge-label">Today's Record</div>
+      <div class="nudge-status" id="nudgeStatus">Weight not yet logged</div>
+      <div class="nudge-pills">
+        <span class="nudge-pill" id="np-weight">Weight</span>
+        <span class="nudge-pill" id="np-food">Food</span>
+        <span class="nudge-pill" id="np-steps">Steps</span>
+        <span class="nudge-pill" id="np-notes">Notes</span>
+      </div>
+    </div>
+    <div class="nudge-arrow">→</div>
+  </div>
+
+  <div class="evening-prompt" id="eveningPrompt" style="display:none;">
+    <div class="ep-label">This Evening</div>
+    <div class="ep-text">Site visits usually break your evening. If you return late, complete at least one discipline before sleep.</div>
+  </div>
+</div><!-- /today -->
+
+
+<!-- ══════════════════
+     RECORD
+══════════════════ -->
+<div class="screen" id="screen-record">
+  <div class="journal-compass">
+    <span class="jc-label">Destination</span>
+    <span class="jc-value" id="r-compass-val">82 kg · September 1</span>
+    <span class="jc-days" id="r-compass-days">68 days</span>
+  </div>
+
+  <div class="day-nav">
+    <div class="day-nav-arrow" id="dayPrev" onclick="navigateDay(-1)">←</div>
+    <div class="day-nav-center">
+      <div class="journal-date-small" id="journalDateSmall">Monday, 9 June</div>
+      <div class="day-log-dots" id="dayLogDots"></div>
+    </div>
+    <div class="day-nav-arrow disabled" id="dayNext" onclick="navigateDay(1)">→</div>
+  </div>
+
+  <div class="page-headline">
+    <div class="page-day-name" id="pageDayName">Monday</div>
+    <div class="page-full-date" id="pageFullDate">June 9, 2026</div>
+  </div>
+  <div class="page-rule"></div>
+
+  <!-- WEIGHT -->
+  <div class="journal-entry">
+    <div class="entry-category">Weight</div>
+    <div class="weight-written">
+      <input class="weight-num-input" id="weightInput" type="number" step="0.1" placeholder="—" inputmode="decimal" oninput="onRecordChange()">
+      <span class="weight-kg">kg</span>
+    </div>
+    <div class="weight-whisper">Destination <em id="r-dest-whisper">82 kg</em> · September 1, 2026</div>
+    <svg class="sparkline-svg" id="sparklineSVG" viewBox="0 0 320 36" preserveAspectRatio="none"></svg>
+  </div>
+
+  <!-- FOOD -->
+  <div class="journal-entry">
+    <div class="entry-category" style="justify-content:space-between;">
+      <span>Food</span>
+      <button class="food-estimate-all-btn" id="estimateAllBtn" onclick="estimateAllMeals()">Estimate all →</button>
+    </div>
+    <div class="food-journal" id="foodJournal">
+
+      <!-- Breakfast -->
+      <div class="meal-row" id="meal-row-breakfast">
+        <div class="meal-top">
+          <span class="meal-label">Breakfast</span>
+          <div class="meal-kcal-badge">
+            <span class="meal-estimating" id="est-spin-breakfast">estimating</span>
+            <input class="meal-kcal-num empty" id="kcal-breakfast" type="number" placeholder="—" inputmode="numeric" oninput="onKcalManualEdit('breakfast')">
+            <span class="meal-kcal-unit">kcal</span>
+          </div>
+        </div>
+        <textarea class="meal-food-input" id="meal-breakfast" placeholder="What did you eat?" rows="1"
+          oninput="onMealTextInput('breakfast')" onblur="onMealBlur('breakfast')"></textarea>
+        <div class="meal-estimate-row">
+          <span class="meal-estimate-note" id="est-note-breakfast"></span>
+          <button class="meal-estimate-btn" id="est-btn-breakfast" onclick="estimateMeal('breakfast')">Estimate kcal →</button>
+        </div>
+      </div>
+
+      <!-- Lunch -->
+      <div class="meal-row" id="meal-row-lunch">
+        <div class="meal-top">
+          <span class="meal-label">Lunch</span>
+          <div class="meal-kcal-badge">
+            <span class="meal-estimating" id="est-spin-lunch">estimating</span>
+            <input class="meal-kcal-num empty" id="kcal-lunch" type="number" placeholder="—" inputmode="numeric" oninput="onKcalManualEdit('lunch')">
+            <span class="meal-kcal-unit">kcal</span>
+          </div>
+        </div>
+        <textarea class="meal-food-input" id="meal-lunch" placeholder="What did you eat?" rows="1"
+          oninput="onMealTextInput('lunch')" onblur="onMealBlur('lunch')"></textarea>
+        <div class="meal-estimate-row">
+          <span class="meal-estimate-note" id="est-note-lunch"></span>
+          <button class="meal-estimate-btn" id="est-btn-lunch" onclick="estimateMeal('lunch')">Estimate kcal →</button>
+        </div>
+      </div>
+
+      <!-- Dinner -->
+      <div class="meal-row" id="meal-row-dinner">
+        <div class="meal-top">
+          <span class="meal-label">Dinner</span>
+          <div class="meal-kcal-badge">
+            <span class="meal-estimating" id="est-spin-dinner">estimating</span>
+            <input class="meal-kcal-num empty" id="kcal-dinner" type="number" placeholder="—" inputmode="numeric" oninput="onKcalManualEdit('dinner')">
+            <span class="meal-kcal-unit">kcal</span>
+          </div>
+        </div>
+        <textarea class="meal-food-input" id="meal-dinner" placeholder="What did you eat?" rows="1"
+          oninput="onMealTextInput('dinner')" onblur="onMealBlur('dinner')"></textarea>
+        <div class="meal-estimate-row">
+          <span class="meal-estimate-note" id="est-note-dinner"></span>
+          <button class="meal-estimate-btn" id="est-btn-dinner" onclick="estimateMeal('dinner')">Estimate kcal →</button>
+        </div>
+      </div>
+
+      <!-- Other -->
+      <div class="meal-row" id="meal-row-other">
+        <div class="meal-top">
+          <span class="meal-label">Other</span>
+          <div class="meal-kcal-badge">
+            <span class="meal-estimating" id="est-spin-other">estimating</span>
+            <input class="meal-kcal-num empty" id="kcal-other" type="number" placeholder="—" inputmode="numeric" oninput="onKcalManualEdit('other')">
+            <span class="meal-kcal-unit">kcal</span>
+          </div>
+        </div>
+        <textarea class="meal-food-input" id="meal-other" placeholder="Snacks, tea, anything else" rows="1"
+          oninput="onMealTextInput('other')" onblur="onMealBlur('other')"></textarea>
+        <div class="meal-estimate-row">
+          <span class="meal-estimate-note" id="est-note-other"></span>
+          <button class="meal-estimate-btn" id="est-btn-other" onclick="estimateMeal('other')">Estimate kcal →</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Food total -->
+    <div class="food-total-row">
+      <span class="food-total-label">Total intake</span>
+      <span class="food-total-val empty" id="foodTotalDisplay">—</span>
+      <span class="meal-kcal-unit" style="margin-left:4px;">kcal</span>
+    </div>
+  </div>
+
+  <!-- STEPS -->
+  <div class="journal-entry">
+    <div class="entry-category">Steps</div>
+    <div class="steps-written">
+      <input class="steps-num-input" id="stepsInput" type="number" placeholder="—" inputmode="numeric" oninput="onStepsInput()">
+      <span class="steps-word">steps</span>
+    </div>
+    <div class="steps-ref" id="stepsDisciplineRef">Today's discipline: 10,000 steps</div>
+  </div>
+
+  <!-- DISCIPLINES LOG -->
+  <div class="journal-entry">
+    <div class="entry-category">Disciplines</div>
+    <div id="discLogList">
+      <div class="disc-log-item sacred" data-kcal-per-min="6.9" onclick="toggleDiscLog(this)">
+        <div class="disc-log-left">
+          <div class="disc-log-marker"></div>
+          <div class="disc-log-name">Angamardana</div>
+        </div>
+        <div class="disc-log-right">
+          <input class="disc-dur-input" type="number" placeholder="45" value="45" inputmode="numeric" onclick="event.stopPropagation()" oninput="onRecordChange()">
+          <span class="disc-dur-unit">min</span>
+          <span class="disc-kcal-est" id="disc-kcal-0">~310 kcal</span>
+        </div>
+      </div>
+      <div class="disc-log-item sacred" data-kcal-per-min="2.7" onclick="toggleDiscLog(this)">
+        <div class="disc-log-left">
+          <div class="disc-log-marker"></div>
+          <div class="disc-log-name">Kriya</div>
+        </div>
+        <div class="disc-log-right">
+          <input class="disc-dur-input" type="number" placeholder="30" value="30" inputmode="numeric" onclick="event.stopPropagation()" oninput="onRecordChange()">
+          <span class="disc-dur-unit">min</span>
+          <span class="disc-kcal-est" id="disc-kcal-1">~80 kcal</span>
+        </div>
+      </div>
+      <div class="disc-log-item done" data-kcal-per-min="0" onclick="toggleDiscLog(this)">
+        <div class="disc-log-left">
+          <div class="disc-log-marker"></div>
+          <div class="disc-log-name">Wake at 4:30 am</div>
+        </div>
+        <div class="disc-log-right">
+          <span class="disc-kcal-est" style="opacity:0">—</span>
+        </div>
+      </div>
+      <div class="disc-log-item" data-kcal-per-min="5.8" onclick="toggleDiscLog(this)">
+        <div class="disc-log-left">
+          <div class="disc-log-marker"></div>
+          <div class="disc-log-name">Dumbbell Training</div>
+        </div>
+        <div class="disc-log-right">
+          <input class="disc-dur-input" type="number" placeholder="45" value="45" inputmode="numeric" onclick="event.stopPropagation()" oninput="onRecordChange()">
+          <span class="disc-dur-unit">min</span>
+          <span class="disc-kcal-est" id="disc-kcal-3">~260 kcal</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="journal-entry">
+    <div class="entry-category" style="display:flex;justify-content:space-between;">
+      <span>Notes</span>
+      <span style="font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);border:1px solid var(--border-strong);padding:2px 6px;border-radius:2px;margin-left:auto;">Pattern data</span>
+    </div>
+    <textarea class="notes-textarea" id="notesInput" placeholder="What shaped today?" rows="4"></textarea>
+  </div>
+
+  <!-- EVENTS -->
+  <div class="events-entry">
+    <div class="entry-category">This day</div>
+    <div class="event-chips" id="eventChips">
+      <div class="event-chip" onclick="toggleEvent(this)">Site Visit</div>
+      <div class="event-chip" onclick="toggleEvent(this)">Travel</div>
+      <div class="event-chip" onclick="toggleEvent(this)">Family Function</div>
+      <div class="event-chip" onclick="toggleEvent(this)">Illness</div>
+      <div class="event-chip" onclick="toggleEvent(this)">Rest Day</div>
+      <div class="event-chip" onclick="toggleEvent(this)">Match Day</div>
+      <div class="event-chip" onclick="toggleEvent(this)">Long Drive</div>
+      <div class="event-chip" onclick="toggleEvent(this)">Late Night</div>
+    </div>
+  </div>
+
+  <!-- ENERGY SUMMARY -->
+  <div class="energy-summary" id="energySummary">
+    <div class="es-title">Energy Summary</div>
+    <div class="es-row">
+      <span class="es-label">BMR</span>
+      <span class="es-val dim" id="es-bmr">—</span>
+    </div>
+    <div class="es-row">
+      <span class="es-label">NEAT (steps)</span>
+      <span class="es-val dim" id="es-neat">—</span>
+    </div>
+    <div class="es-row">
+      <span class="es-label">Exercise</span>
+      <span class="es-val dim" id="es-exercise">—</span>
+    </div>
+    <div class="es-row">
+      <span class="es-label">TDEE</span>
+      <span class="es-val" id="es-tdee">—</span>
+    </div>
+    <div class="es-row">
+      <span class="es-label">Intake</span>
+      <span class="es-val" id="es-intake">—</span>
+    </div>
+    <div class="es-balance">
+      <span class="es-bal-label">Balance</span>
+      <span class="es-bal-val" id="es-balance">—</span>
+    </div>
+  </div>
+
+  <div class="journal-save">
+    <button class="save-btn" id="saveBtn" onclick="saveRecord()">Save Record</button>
+    <span class="save-confirm" id="saveConfirm">Saved.</span>
+  </div>
+</div><!-- /record -->
+
+
+<!-- ══════════════════
+     MISSION
+══════════════════ -->
+<div class="screen" id="screen-mission">
+  <div class="mission-dest-section">
+    <div class="mission-dest-eyebrow">Destination</div>
+    <div class="mission-dest-primary" id="m-dest-date">September 1,<br>2026</div>
+    <div class="mission-dest-weight" id="m-dest-weight">82 kg</div>
+    <div class="mission-dest-sub" id="m-dest-sub">68 days remaining · Day 17 of 42</div>
+  </div>
+  <div class="mission-thin-rule"></div>
+
+  <div class="mission-brief">
+    <div class="brief-name">The <em>Re-entry</em></div>
+    <div class="brief-purpose">"To arrive at September 1st as a different man."</div>
+    <div class="position-table">
+      <div class="pos-row">
+        <div class="pos-label">Began</div>
+        <div class="pos-value">100.8 kg · May 14, 2026</div>
+      </div>
+      <div class="pos-row">
+        <div class="pos-label">Now</div>
+        <div class="pos-value now" id="m-pos-now">98.2 kg · Day 17</div>
+      </div>
+      <div class="pos-row">
+        <div class="pos-label">Destination</div>
+        <div class="pos-value dest" id="m-pos-dest">82 kg · September 1</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pace card -->
+  <div class="pace-card">
+    <div class="pace-row">
+      <span class="pace-label">Required pace</span>
+      <span class="pace-val" id="m-pace-required">−0.8 kg / week</span>
+    </div>
+    <div class="pace-row">
+      <span class="pace-label">Current pace</span>
+      <span class="pace-val on-track" id="m-pace-current">−1.1 kg / week ↑</span>
+    </div>
+    <div class="pace-row">
+      <span class="pace-label">Avg daily deficit</span>
+      <span class="pace-val" id="m-avg-deficit">−420 kcal</span>
+    </div>
+    <div class="pace-row">
+      <span class="pace-label">Projected arrival</span>
+      <span class="pace-val on-track" id="m-projected">Aug 26 · 6 days early</span>
+    </div>
+  </div>
+
+  <!-- Narrative -->
+  <div class="mission-narrative">
+    <div class="narrative-text" id="missionNarrative">
+      <strong>17 days</strong> into the mission. <strong>12</strong> were complete days — every discipline done. You've held the line <em>74% of the time.</em> Your average daily deficit over 17 days is <strong>420 kcal</strong>. At this pace you reach the destination <em>6 days early.</em>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <span class="section-label">Discipline Roster</span>
+    <div class="section-line"></div>
+  </div>
+  <div class="roster-block">
+    <div class="roster-item sacred keystone">
+      <div class="roster-left"><div class="roster-marker"></div><div class="roster-name">Angamardana</div></div>
+      <div class="roster-right"><div class="roster-pct strong">76%</div><div class="roster-kcal">~310 kcal</div><div class="roster-cat">Sadhana</div></div>
+    </div>
+    <div class="roster-item sacred">
+      <div class="roster-left"><div class="roster-marker"></div><div class="roster-name">Kriya</div></div>
+      <div class="roster-right"><div class="roster-pct">61%</div><div class="roster-kcal">~80 kcal</div><div class="roster-cat">Sadhana</div></div>
+    </div>
+    <div class="roster-item">
+      <div class="roster-left"><div class="roster-marker"></div><div class="roster-name">Wake at 4:30 am</div></div>
+      <div class="roster-right"><div class="roster-pct strong">82%</div><div class="roster-cat">Discipline</div></div>
+    </div>
+    <div class="roster-item">
+      <div class="roster-left"><div class="roster-marker"></div><div class="roster-name">10,000 Steps</div></div>
+      <div class="roster-right"><div class="roster-pct">58%</div><div class="roster-kcal">~420 kcal</div><div class="roster-cat">Fitness</div></div>
+    </div>
+    <div class="roster-item">
+      <div class="roster-left"><div class="roster-marker"></div><div class="roster-name">Dumbbell Training</div></div>
+      <div class="roster-right"><div class="roster-pct">47%</div><div class="roster-kcal">~260 kcal</div><div class="roster-cat">Fitness</div></div>
+    </div>
+  </div>
+
+  <div class="section-header"><span class="section-label">Patterns</span><div class="section-line"></div></div>
+  <div class="pattern-block">
+    <div class="pattern-item"><div class="pattern-from">From your record</div><div class="pattern-text">Angamardana completion strongly predicts full-day performance. 91% of your complete days began with it.</div></div>
+    <div class="pattern-item"><div class="pattern-from">From your record</div><div class="pattern-text">Site visit days average a 180 kcal surplus. Non-site days average a 420 kcal deficit. Site visits cost this mission the most.</div></div>
+    <div class="pattern-item"><div class="pattern-from">From your record</div><div class="pattern-text">Fridays are historically your weakest day. 3 of 4 Friday records show partial completion only.</div></div>
+  </div>
+  <div style="height:20px;"></div>
+</div><!-- /mission -->
+
+
+<!-- ══════════════════
+     PATTERNS
+══════════════════ -->
+<div class="screen" id="screen-patterns">
+  <div class="patterns-header">
+    <div class="patterns-title">Patterns</div>
+    <div class="patterns-sub">What your record reveals.</div>
+  </div>
+
+  <!-- Weight chart -->
+  <div class="weight-chart-block">
+    <div class="wc-header">
+      <div class="wc-title">Weight Trend</div>
+      <div class="wc-range">
+        <button class="wc-range-btn" onclick="setChartRange(14,this)">14d</button>
+        <button class="wc-range-btn active" onclick="setChartRange(30,this)">30d</button>
+        <button class="wc-range-btn" onclick="setChartRange(0,this)">All</button>
+      </div>
+    </div>
+    <div class="chart-svg-wrap">
+      <svg class="chart-svg" id="weightChartSVG" viewBox="0 0 330 120" preserveAspectRatio="none"></svg>
+    </div>
+  </div>
+
+  <!-- Energy breakdown -->
+  <div class="section-header"><span class="section-label">Energy Breakdown</span><div class="section-line"></div></div>
+  <div class="breakdown-grid">
+    <div class="bk-card">
+      <div class="bk-title">17-Day Averages</div>
+      <div class="bk-row"><span class="bk-label">BMR</span><span class="bk-val dim" id="bk-avg-bmr">2,080 kcal</span></div>
+      <div class="bk-row"><span class="bk-label">NEAT (steps)</span><span class="bk-val dim" id="bk-avg-neat">380 kcal</span></div>
+      <div class="bk-row"><span class="bk-label">Exercise</span><span class="bk-val dim" id="bk-avg-exercise">290 kcal</span></div>
+      <div class="bk-row"><span class="bk-label">TDEE</span><span class="bk-val">2,750 kcal</span></div>
+      <div class="bk-row"><span class="bk-label">Intake</span><span class="bk-val">2,330 kcal</span></div>
+      <div class="bk-row"><span class="bk-label">Balance</span><span class="bk-val accent">−420 kcal</span></div>
+    </div>
+
+    <div class="bk-card">
+      <div class="bk-title">By Day Type</div>
+      <div class="bk-row"><span class="bk-label">Complete discipline days</span><span class="bk-val accent">−610 kcal</span></div>
+      <div class="bk-row"><span class="bk-label">Partial discipline days</span><span class="bk-val dim">−180 kcal</span></div>
+      <div class="bk-row"><span class="bk-label">Site visit days</span><span class="bk-val dim">+180 kcal</span></div>
+      <div class="bk-row"><span class="bk-label">Home days</span><span class="bk-val accent">−520 kcal</span></div>
+    </div>
+  </div>
+
+  <!-- Behavioral correlations -->
+  <div class="section-header"><span class="section-label">Behavioral Patterns</span><div class="section-line"></div></div>
+  <div class="pattern-block" style="margin:0 24px;">
+    <div class="pattern-item">
+      <div class="pattern-from">Energy · Disciplines</div>
+      <div class="pattern-text">Weeks with Angamardana + 10,000 steps: avg −0.9 kg. Weeks without both: avg −0.2 kg. The combination is your engine.</div>
+    </div>
+    <div class="pattern-item">
+      <div class="pattern-from">Energy · Events</div>
+      <div class="pattern-text">One site visit day costs approximately 3 deficit days in net energy terms. 4 site visits so far = roughly 2.4 kg of pace lost.</div>
+    </div>
+    <div class="pattern-item">
+      <div class="pattern-from">Weight · Trend</div>
+      <div class="pattern-text">2.6 kg lost in 17 days. Current 7-day trend: −0.28 kg/day. The last 5 days are your strongest stretch this mission.</div>
+    </div>
+    <div class="pattern-item">
+      <div class="pattern-from">Rhythm · Time</div>
+      <div class="pattern-text">Fridays show the lowest discipline completion (avg 1.8 of 5). Monday–Thursday average 4.1 of 5. The week has a shape.</div>
+    </div>
+  </div>
+
+  <!-- Event impact -->
+  <div class="section-header"><span class="section-label">Event Impact</span><div class="section-line"></div></div>
+  <div class="event-impact-block">
+    <div class="bk-card">
+      <div class="bk-title">Site Visit (4 days)</div>
+      <div class="bk-row"><span class="bk-label">Avg disciplines</span><span class="bk-val dim">2.1 / 5</span></div>
+      <div class="bk-row"><span class="bk-label">Avg energy balance</span><span class="bk-val dim">+180 kcal</span></div>
+      <div class="bk-row"><span class="bk-label">Vs. non-site days</span><span class="bk-val accent">−700 kcal difference</span></div>
+    </div>
+  </div>
+
+  <div style="height:24px;"></div>
+</div><!-- /patterns -->
+
+
+<!-- ── NAV ── -->
+<div class="bottom-nav" id="bottomNav">
+  <div class="nav-item active" data-tab="today" onclick="switchTab('today')">
+    <div class="nav-pip"></div><div class="nav-lbl">Today</div>
+  </div>
+  <div class="nav-item" data-tab="record" onclick="switchTab('record')">
+    <div class="nav-pip"></div><div class="nav-lbl">Record</div>
+  </div>
+  <div class="nav-item" data-tab="mission" onclick="switchTab('mission')">
+    <div class="nav-pip"></div><div class="nav-lbl">Mission</div>
+  </div>
+  <div class="nav-item" data-tab="patterns" onclick="switchTab('patterns')">
+    <div class="nav-pip"></div><div class="nav-lbl">Patterns</div>
+  </div>
+</div>
+
+</div><!-- /phone -->
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════
+// STATE & STORAGE
+// ═══════════════════════════════════════════
+
+let isDark = false;
+let activeTab = 'today';
+let currentDayOffset = 0;
+const MAX_PAST = 30;
+
+// Profile
+let profile = {
+  age: 35, sex: 'male', height: 175,
+  startWeight: 100.8, targetWeight: 82,
+  targetDate: '2026-09-01',
+  startDate: '2026-05-14'
+};
+
+// Seed data: 17 days of records for demo
+const seedRecords = {};
+const seedWeights = [100.8,100.6,100.5,100.3,100.2,100.0,100.1,99.8,99.6,99.5,99.3,99.2,99.0,98.8,98.6,98.4,98.2];
+const seedDeficits = [380,420,510,400,390,350,180,460,520,480,430,390,410,450,480,500,490];
+const baseDate = new Date('2026-05-14');
+for(let i=0;i<17;i++){
+  const d = new Date(baseDate);
+  d.setDate(d.getDate()+i);
+  const key = d.toISOString().slice(0,10);
+  const bmr = calcBMR(profile.age, profile.sex, profile.height, seedWeights[i]);
+  const neat = Math.round((7000+Math.random()*5000)*0.04);
+  const ex = [200,310,290,250,280,300,0,320,330,290,270,310,280,300,320,290,310][i];
+  const tdee = bmr+neat+ex;
+  const intake = tdee - seedDeficits[i];
+  seedRecords[key]={
+    weight:seedWeights[i],
+    breakfast:['Puttu and kadala','Idli sambhar','Dosa chutney','Chapati curry','Puttu kadala','Idli sambar','—'][i%7],
+    lunch:['Chicken biriyani','Rice fish curry','Rice dal','Chicken rice','Biriyani','Fish curry rice','—'][i%7],
+    dinner:['Salad','Chapati','Rice soup','Salad','Chapati dal','Salad','—'][i%7],
+    other:'',
+    steps:String(7000+Math.round(Math.random()*6000)),
+    notes:i%4===0?'Site visit. Returned late.':'',
+    events:i%4===0?['Site Visit']:[],
+    disciplines:[true,i%3!==0,true,i%2===0,i%3===0],
+    bmr, neat, exercise:ex, tdee, intake,
+    balance: intake-tdee,
+    kcal:{breakfast:400+Math.round(Math.random()*200),lunch:600+Math.round(Math.random()*300),dinner:300+Math.round(Math.random()*200),other:100}
+  };
+}
+
+// Load or seed
+function loadStorage(){
+  try{
+    const p=localStorage.getItem('missionProfile');
+    if(p) profile=JSON.parse(p);
+    const r=localStorage.getItem('missionRecords');
+    if(r){
+      const saved=JSON.parse(r);
+      Object.assign(seedRecords,saved);
+    }
+  }catch(e){}
+}
+function saveStorage(){
+  try{
+    localStorage.setItem('missionProfile',JSON.stringify(profile));
+    localStorage.setItem('missionRecords',JSON.stringify(seedRecords));
+  }catch(e){}
+}
+
+function todayKey(){
+  return new Date().toISOString().slice(0,10);
+}
+function keyForOffset(offset){
+  const d=new Date();
+  d.setDate(d.getDate()+offset);
+  return d.toISOString().slice(0,10);
+}
+
+// ═══════════════════════════════════════════
+// ENERGY ENGINE
+// ═══════════════════════════════════════════
+
+function calcBMR(age,sex,height,weight){
+  // Mifflin-St Jeor
+  if(sex==='male') return Math.round(10*weight + 6.25*height - 5*age + 5);
+  return Math.round(10*weight + 6.25*height - 5*age - 161);
+}
+function stepsToKcal(steps){
+  return Math.round((steps||0)*0.04);
+}
+function exerciseKcal(discItems){
+  let total=0;
+  discItems.forEach(item=>{
+    if(item.done){
+      const kpm=parseFloat(item.kcalPerMin)||0;
+      const dur=parseFloat(item.duration)||0;
+      total+=Math.round(kpm*dur);
+    }
+  });
+  return total;
+}
+function calcEnergy(weight,steps,discItems,intakeKcal){
+  const w=weight||profile.startWeight;
+  const bmr=calcBMR(profile.age,profile.sex,profile.height,w);
+  const neat=stepsToKcal(steps);
+  const ex=exerciseKcal(discItems);
+  const tdee=bmr+neat+ex;
+  const intake=intakeKcal||0;
+  const balance=intake-tdee;
+  return{bmr,neat,ex,tdee,intake,balance};
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+
+function init(){
+  loadStorage();
+  const hasProfile=localStorage.getItem('missionProfile');
+  if(!hasProfile) openProfileModal();
+
+  startClock();
+  updateDestinationDisplays();
+  buildDayDots();
+  updateDayDisplay();
+  buildSparklineSVG();
+  buildWeightChart(30);
+  setupTextareas();
+  setupDisciplines();
+  syncRecordToday();
+  updateEnergySummary();
+  updateEnergyToday();
+  updateNudge();
+  checkEvening();
+
+  setTimeout(()=>{
+    document.getElementById('progressFill').style.width='40%';
+  },380);
+}
+
+// ═══════════════════════════════════════════
+// PROFILE MODAL
+// ═══════════════════════════════════════════
+
+let profileSex='male';
+function setSex(s){
+  profileSex=s;
+  document.getElementById('sex-m').classList.toggle('active',s==='male');
+  document.getElementById('sex-f').classList.toggle('active',s==='female');
+}
+function openProfileModal(){
+  document.getElementById('profileModal').classList.add('open');
+  document.getElementById('p-age').value=profile.age||'';
+  document.getElementById('p-height').value=profile.height||'';
+  document.getElementById('p-weight').value=profile.startWeight||'';
+  document.getElementById('p-target').value=profile.targetWeight||'';
+  document.getElementById('p-date').value=profile.targetDate||'';
+  setSex(profile.sex||'male');
+}
+function saveProfile(){
+  const age=parseInt(document.getElementById('p-age').value)||35;
+  const height=parseInt(document.getElementById('p-height').value)||175;
+  const weight=parseFloat(document.getElementById('p-weight').value)||100;
+  const target=parseFloat(document.getElementById('p-target').value)||82;
+  const date=document.getElementById('p-date').value||'2026-09-01';
+  profile={age,sex:profileSex,height,startWeight:weight,targetWeight:target,targetDate:date,startDate:todayKey()};
+  saveStorage();
+  document.getElementById('profileModal').classList.remove('open');
+  updateDestinationDisplays();
+  buildSparklineSVG();
+  buildWeightChart(30);
+  updateEnergySummary();
+  updateEnergyToday();
+}
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+
+function switchTab(tab){
+  activeTab=tab;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('screen-'+tab).classList.add('active');
+  document.querySelector('[data-tab="'+tab+'"]').classList.add('active');
+  document.getElementById('screen-'+tab).scrollTop=0;
+  if(tab==='patterns') buildWeightChart(currentChartRange);
+}
+
+// ═══════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════
+
+function toggleTheme(){
+  isDark=!isDark;
+  document.body.classList.toggle('dark-mode',isDark);
+  document.getElementById('phone').classList.toggle('dark-mode',isDark);
+  document.getElementById('themeLabel').textContent=isDark?'Dark':'Light';
+  checkMuhurta();
+  document.getElementById('insightText').textContent=isMuhurta()
+    ?'Brahmamuhurta. Your strongest mission days begin now. Angamardana first.'
+    :"It's Monday. Your strongest weeks begin with a complete morning. Angamardana before anything else.";
+  setTimeout(()=>buildWeightChart(currentChartRange),100);
+}
+
+// ═══════════════════════════════════════════
+// DESTINATION DISPLAYS
+// ═══════════════════════════════════════════
+
+function updateDestinationDisplays(){
+  const td=new Date(profile.targetDate+'T00:00:00');
+  const today=new Date(); today.setHours(0,0,0,0);
+  const daysLeft=Math.max(0,Math.round((td-today)/86400000));
+  const mo=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dateStr=`${mo[td.getMonth()]} ${td.getDate()}, ${td.getFullYear()}`;
+  const shortDate=`${mo[td.getMonth()]} ${td.getDate()}`;
+
+  // Mission day: days since startDate
+  const startD=new Date(profile.startDate+'T00:00:00');
+  const missionDay=Math.max(1,Math.round((today-startD)/86400000)+1);
+
+  // Eyebrow: mission day
+  const eyebrowDay=document.getElementById('today-mission-day');
+  if(eyebrowDay) eyebrowDay.textContent=`Mission Day ${missionDay}`;
+
+  // Destination: explicit date
+  const destValEl=document.getElementById('today-dest-value');
+  if(destValEl) destValEl.textContent=`${profile.targetWeight} kg · ${dateStr}`;
+
+  // Sub-line: explicit "X days until [full date]"
+  const destSubEl=document.getElementById('today-dest-sub');
+  if(destSubEl) destSubEl.textContent=`${daysLeft} days until ${dateStr}`;
+
+  document.getElementById('r-compass-val').textContent=`${profile.targetWeight} kg · ${shortDate}`;
+  document.getElementById('r-compass-days').textContent=`${daysLeft} days`;
+  document.getElementById('r-dest-whisper').textContent=`${profile.targetWeight} kg`;
+  document.getElementById('m-dest-date').innerHTML=`${mo[td.getMonth()]} ${td.getDate()},<br>${td.getFullYear()}`;
+  document.getElementById('m-dest-weight').textContent=`${profile.targetWeight} kg`;
+  document.getElementById('m-dest-sub').textContent=`${daysLeft} days until ${dateStr} · Mission Day ${missionDay}`;
+  document.getElementById('m-pos-dest').textContent=`${profile.targetWeight} kg · ${shortDate}`;
+
+  // Pace
+  const startW=profile.startWeight;
+  const delta=startW-profile.targetWeight;
+  const weeksLeft=daysLeft/7;
+  const reqPace=weeksLeft>0?(delta/weeksLeft).toFixed(1):0;
+  document.getElementById('m-pace-required').textContent=`−${reqPace} kg / week`;
+
+  // BMR display
+  const bmr=calcBMR(profile.age,profile.sex,profile.height,profile.startWeight);
+  document.getElementById('es-bmr').textContent=`~${bmr.toLocaleString()} kcal`;
+}
+
+// ═══════════════════════════════════════════
+// DAY NAVIGATION (RECORD)
+// ═══════════════════════════════════════════
+
+function navigateDay(dir){
+  const n=currentDayOffset+dir;
+  if(n>0||n<-MAX_PAST) return;
+  currentDayOffset=n;
+  updateDayDisplay();
+  buildDayDots();
+  document.getElementById('dayPrev').classList.toggle('disabled',currentDayOffset<=-MAX_PAST);
+  document.getElementById('dayNext').classList.toggle('disabled',currentDayOffset>=0);
+  syncRecordToday();
+  updateEnergySummary();
+}
+
+function updateDayDisplay(){
+  const d=new Date();
+  d.setDate(d.getDate()+currentDayOffset);
+  const dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const mo=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dayName=dayNames[d.getDay()];
+  const shortDate=`${dayName}, ${d.getDate()} ${mo[d.getMonth()]}`;
+  const fullDate=`${mo[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+  document.getElementById('journalDateSmall').textContent=shortDate;
+  document.getElementById('pageDayName').textContent=dayName;
+  document.getElementById('pageFullDate').textContent=currentDayOffset===0
+    ? fullDate
+    : `${fullDate} · ${Math.abs(currentDayOffset)} day${Math.abs(currentDayOffset)>1?'s':''} ago`;
+}
+
+function buildDayDots(){
+  const c=document.getElementById('dayLogDots');
+  c.innerHTML='';
+  for(let i=-4;i<=0;i++){
+    const offset=currentDayOffset+i;
+    const key=keyForOffset(offset);
+    const dot=document.createElement('div');
+    dot.className='log-dot';
+    if(offset===0) dot.classList.add('today');
+    else if(seedRecords[key]) dot.classList.add('filled');
+    c.appendChild(dot);
+  }
+}
+
+// ═══════════════════════════════════════════
+// RECORD SYNC
+// ═══════════════════════════════════════════
+
+function syncRecordToday(){
+  const key=keyForOffset(currentDayOffset);
+  const rec=seedRecords[key];
+  if(rec){
+    document.getElementById('weightInput').value=rec.weight||'';
+    document.getElementById('meal-breakfast').value=rec.breakfast||'';
+    document.getElementById('meal-lunch').value=rec.lunch||'';
+    document.getElementById('meal-dinner').value=rec.dinner||'';
+    document.getElementById('meal-other').value=rec.other||'';
+    document.getElementById('stepsInput').value=rec.steps||'';
+    document.getElementById('notesInput').value=rec.notes||'';
+    if(rec.kcal){
+      document.getElementById('kcal-breakfast').value=rec.kcal.breakfast||'';
+      document.getElementById('kcal-lunch').value=rec.kcal.lunch||'';
+      document.getElementById('kcal-dinner').value=rec.kcal.dinner||'';
+      document.getElementById('kcal-other').value=rec.kcal.other||'';
+    }
+    // Sync discipline log
+    const items=document.querySelectorAll('.disc-log-item');
+    items.forEach((item,i)=>{
+      const done=rec.disciplines?rec.disciplines[i]:false;
+      item.classList.toggle('done',!!done);
+    });
+    // Events
+    document.querySelectorAll('.event-chip').forEach(chip=>{
+      chip.classList.toggle('selected',rec.events&&rec.events.includes(chip.textContent.trim()));
+    });
+  } else {
+    // Clear
+    ['weightInput','meal-breakfast','meal-lunch','meal-dinner','meal-other','stepsInput','notesInput',
+     'kcal-breakfast','kcal-lunch','kcal-dinner','kcal-other'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.value='';
+    });
+    document.querySelectorAll('.disc-log-item').forEach(item=>item.classList.remove('done'));
+    document.querySelectorAll('.event-chip').forEach(c=>c.classList.remove('selected'));
+  }
+  autoResizeAll();
+  onStepsInput();
+  buildSparklineSVG();
+  syncMealEstimationState();
+}
+
+// ═══════════════════════════════════════════
+// ENERGY CALCULATIONS
+// ═══════════════════════════════════════════
+
+function getDiscLogItems(){
+  const items=[];
+  document.querySelectorAll('.disc-log-item').forEach(item=>{
+    const kpm=parseFloat(item.dataset.kcalPerMin)||0;
+    const durInput=item.querySelector('.disc-dur-input');
+    const dur=durInput?parseFloat(durInput.value)||0:0;
+    items.push({done:item.classList.contains('done'),kcalPerMin:kpm,duration:dur});
+  });
+  return items;
+}
+
+function getTotalIntake(){
+  const ids=['kcal-breakfast','kcal-lunch','kcal-dinner','kcal-other'];
+  let total=0;
+  ids.forEach(id=>{
+    const v=parseFloat(document.getElementById(id).value)||0;
+    total+=v;
+  });
+  return total;
+}
+
+function updateEnergySummary(){
+  const weight=parseFloat(document.getElementById('weightInput').value)||null;
+  const steps=parseInt(document.getElementById('stepsInput').value)||0;
+  const discItems=getDiscLogItems();
+  const intake=getTotalIntake();
+  const e=calcEnergy(weight,steps,discItems,intake);
+
+  document.getElementById('es-bmr').textContent=`~${e.bmr.toLocaleString()} kcal`;
+  document.getElementById('es-neat').textContent=steps?`~${e.neat.toLocaleString()} kcal`:'—';
+  document.getElementById('es-exercise').textContent=e.ex?`~${e.ex.toLocaleString()} kcal`:'—';
+  document.getElementById('es-tdee').textContent=`~${e.tdee.toLocaleString()} kcal`;
+  document.getElementById('es-intake').textContent=intake?`~${e.intake.toLocaleString()} kcal`:'—';
+
+  const balEl=document.getElementById('es-balance');
+  if(intake){
+    const sign=e.balance>0?'+':'';
+    balEl.textContent=`${sign}${e.balance.toLocaleString()} kcal`;
+    balEl.className='es-bal-val';
+  } else {
+    balEl.textContent='—';
+    balEl.className='es-bal-val';
+  }
+
+  // Update disc kcal estimates
+  document.querySelectorAll('.disc-log-item').forEach((item,i)=>{
+    const el=item.querySelector('.disc-kcal-est');
+    if(!el) return;
+    const kpm=parseFloat(item.dataset.kcalPerMin)||0;
+    const durInput=item.querySelector('.disc-dur-input');
+    const dur=durInput?parseFloat(durInput.value)||0:0;
+    if(kpm&&dur) el.textContent=`~${Math.round(kpm*dur)} kcal`;
+  });
+}
+
+function updateEnergyToday(){
+  const key=todayKey();
+  const rec=seedRecords[key];
+  const todayWeightEl=document.getElementById('today-weight-display');
+  const contentEl=document.getElementById('energy-today-content');
+
+  const hasWeight=!!(rec&&rec.weight);
+  const hasFood=!!(rec&&rec.kcal&&(rec.kcal.breakfast||rec.kcal.lunch||rec.kcal.dinner));
+  const hasSteps=!!(rec&&rec.steps&&rec.steps!=='0');
+
+  if(hasWeight) todayWeightEl.textContent=`${rec.weight} kg`;
+  else todayWeightEl.textContent='not logged';
+
+  if(!hasFood){
+    // Show checklist empty state with items ticked as available
+    contentEl.innerHTML=`
+      <div class="et-empty-state">
+        <div class="et-empty-line">To calculate today's energy balance, the Record needs:</div>
+        <div class="et-empty-checklist">
+          <div class="et-check-item${hasWeight?' done':''}">
+            <span class="etc-dot"></span>
+            <span>Today's weight${hasWeight?' ✓':''}</span>
+          </div>
+          <div class="et-check-item">
+            <span class="etc-dot"></span>
+            <span>At least one meal with a kcal estimate</span>
+          </div>
+          <div class="et-check-item${hasSteps?' done':''}">
+            <span class="etc-dot"></span>
+            <span>Step count (for NEAT)${hasSteps?' ✓':''}</span>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const intake=(rec.kcal.breakfast||0)+(rec.kcal.lunch||0)+(rec.kcal.dinner||0)+(rec.kcal.other||0);
+  const bmr=calcBMR(profile.age,profile.sex,profile.height,rec.weight||profile.startWeight);
+  const neat=stepsToKcal(parseInt(rec.steps)||0);
+  const tdee=rec.tdee||bmr+neat;
+  const balance=intake-tdee;
+  const sign=balance>0?'+':'';
+
+  contentEl.innerHTML=`
+    <div class="et-rows">
+      <div class="et-row">
+        <span class="et-row-label">Intake</span>
+        <span class="et-row-val">~${intake.toLocaleString()} <span class="et-row-sub">kcal</span></span>
+      </div>
+      <div class="et-row">
+        <span class="et-row-label">TDEE</span>
+        <span class="et-row-val">~${tdee.toLocaleString()} <span class="et-row-sub">kcal</span></span>
+      </div>
+    </div>
+    <div class="et-balance-row">
+      <span class="et-bal-label">Balance</span>
+      <span class="et-bal-val ${balance<0?'deficit':'surplus'}">${sign}${balance.toLocaleString()} kcal</span>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════
+// SPARKLINE (line chart, SVG)
+// ═══════════════════════════════════════════
+
+function buildSparklineSVG(){
+  const svg=document.getElementById('sparklineSVG');
+  if(!svg) return;
+  svg.innerHTML='';
+  const points=[];
+  for(let i=-6;i<=0;i++){
+    const key=keyForOffset(i);
+    const rec=seedRecords[key];
+    const w=rec?parseFloat(rec.weight):null;
+    points.push({offset:i,w});
+  }
+  const valid=points.filter(p=>p.w!==null).map(p=>p.w);
+  if(valid.length<2){svg.innerHTML='';return;}
+  const minW=Math.min(...valid)-0.3,maxW=Math.max(...valid)+0.3;
+  const W=320,H=28,pad=4;
+
+  // Grid line
+  const grid=document.createElementNS('http://www.w3.org/2000/svg','line');
+  grid.setAttribute('x1',0);grid.setAttribute('y1',H/2);grid.setAttribute('x2',W);grid.setAttribute('y2',H/2);
+  grid.setAttribute('stroke','rgba(139,105,20,0.08)');grid.setAttribute('stroke-width','1');
+  svg.appendChild(grid);
+
+  const coords=[];
+  points.forEach((p,i)=>{
+    if(p.w===null) return;
+    const x=pad+(i/(points.length-1))*(W-2*pad);
+    const y=H-pad-((p.w-minW)/(maxW-minW))*(H-2*pad);
+    coords.push({x,y,i,offset:p.offset});
+  });
+
+  if(coords.length<2) return;
+
+  // Line path
+  const path=document.createElementNS('http://www.w3.org/2000/svg','polyline');
+  path.setAttribute('points',coords.map(c=>`${c.x},${c.y}`).join(' '));
+  path.setAttribute('fill','none');
+  path.setAttribute('stroke',isDark?'#D4A853':'#8B6914');
+  path.setAttribute('stroke-width','1.5');
+  path.setAttribute('stroke-linejoin','round');
+  svg.appendChild(path);
+
+  // Dots
+  coords.forEach(c=>{
+    const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx',c.x);circle.setAttribute('cy',c.y);
+    circle.setAttribute('r',c.offset===0?3:2);
+    circle.setAttribute('fill',c.offset===0?(isDark?'#D4A853':'#8B6914'):(isDark?'#3A3836':'#C0B8B0'));
+    svg.appendChild(circle);
+  });
+}
+
+// ═══════════════════════════════════════════
+// WEIGHT CHART (Patterns screen)
+// ═══════════════════════════════════════════
+
+let currentChartRange=30;
+
+function setChartRange(range,btn){
+  currentChartRange=range;
+  document.querySelectorAll('.wc-range-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  buildWeightChart(range);
+}
+
+function buildWeightChart(rangeDays){
+  const svg=document.getElementById('weightChartSVG');
+  if(!svg) return;
+  svg.innerHTML='';
+  const W=330,H=100,padL=8,padR=8,padT=8,padB=16;
+
+  // Collect data
+  const allEntries=Object.entries(seedRecords)
+    .filter(([k,v])=>v.weight)
+    .map(([k,v])=>({date:new Date(k+'T00:00:00'),w:parseFloat(v.weight)}))
+    .sort((a,b)=>a.date-b.date);
+
+  let entries=allEntries;
+  if(rangeDays>0){
+    const cutoff=new Date();
+    cutoff.setDate(cutoff.getDate()-(rangeDays-1));
+    cutoff.setHours(0,0,0,0);
+    entries=allEntries.filter(e=>e.date>=cutoff);
+  }
+  if(entries.length<2) return;
+
+  const weights=entries.map(e=>e.w);
+  const minW=Math.min(...weights,profile.targetWeight)-0.5;
+  const maxW=Math.max(...weights)+0.5;
+  const minDate=entries[0].date.getTime();
+  const maxDate=entries[entries.length-1].date.getTime();
+  const dateRange=maxDate-minDate||1;
+
+  const toX=date=>padL+((date-minDate)/dateRange)*(W-padL-padR);
+  const toY=w=>padT+((maxW-w)/(maxW-minW))*(H-padT-padB);
+
+  // Destination target line
+  const targetY=toY(profile.targetWeight);
+  const tl=document.createElementNS('http://www.w3.org/2000/svg','line');
+  tl.setAttribute('x1',padL);tl.setAttribute('y1',targetY);tl.setAttribute('x2',W-padR);tl.setAttribute('y2',targetY);
+  tl.setAttribute('stroke',isDark?'rgba(212,168,83,0.18)':'rgba(139,105,20,0.14)');
+  tl.setAttribute('stroke-width','1');tl.setAttribute('stroke-dasharray','3,4');
+  svg.appendChild(tl);
+
+  // Target label
+  const tLabel=document.createElementNS('http://www.w3.org/2000/svg','text');
+  tLabel.setAttribute('x',W-padR-2);tLabel.setAttribute('y',targetY-3);
+  tLabel.setAttribute('text-anchor','end');tLabel.setAttribute('font-size','8');
+  tLabel.setAttribute('fill',isDark?'rgba(212,168,83,0.45)':'rgba(139,105,20,0.45)');
+  tLabel.textContent=`${profile.targetWeight}`;
+  svg.appendChild(tLabel);
+
+  // Trend projection line
+  if(entries.length>=5){
+    const n=Math.min(7,entries.length);
+    const recent=entries.slice(-n);
+    const dates=recent.map(e=>e.date.getTime());
+    const ws=recent.map(e=>e.w);
+    const avgD=(dates[dates.length-1]-dates[0])/((n-1)||1);
+    const avgW=(ws[ws.length-1]-ws[0])/((n-1)||1);
+    const slope=avgD>0?avgW/avgD*86400000:0; // kg/day
+
+    const lastDate=entries[entries.length-1].date.getTime();
+    const lastW=entries[entries.length-1].w;
+    const projDays=rangeDays>0?Math.min(rangeDays,45):45;
+    const projDate=lastDate+projDays*86400000;
+    const projW=lastW+slope*projDays;
+
+    const projX=Math.min(W-padR,toX(projDate));
+    const projY=Math.max(padT,Math.min(H-padB,toY(projW)));
+    const startX=toX(lastDate);
+    const startY=toY(lastW);
+
+    const projLine=document.createElementNS('http://www.w3.org/2000/svg','line');
+    projLine.setAttribute('x1',startX);projLine.setAttribute('y1',startY);
+    projLine.setAttribute('x2',projX);projLine.setAttribute('y2',projY);
+    projLine.setAttribute('stroke',isDark?'rgba(212,168,83,0.28)':'rgba(139,105,20,0.22)');
+    projLine.setAttribute('stroke-width','1');projLine.setAttribute('stroke-dasharray','2,3');
+    svg.appendChild(projLine);
+  }
+
+  // Main line
+  const polyline=document.createElementNS('http://www.w3.org/2000/svg','polyline');
+  const pts=entries.map(e=>`${toX(e.date.getTime()).toFixed(1)},${toY(e.w).toFixed(1)}`).join(' ');
+  polyline.setAttribute('points',pts);
+  polyline.setAttribute('fill','none');
+  polyline.setAttribute('stroke',isDark?'#D4A853':'#8B6914');
+  polyline.setAttribute('stroke-width','1.8');
+  polyline.setAttribute('stroke-linejoin','round');
+  svg.appendChild(polyline);
+
+  // Dots
+  entries.forEach((e,i)=>{
+    const isLast=i===entries.length-1;
+    const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx',toX(e.date.getTime()).toFixed(1));
+    circle.setAttribute('cy',toY(e.w).toFixed(1));
+    circle.setAttribute('r',isLast?3.5:1.8);
+    circle.setAttribute('fill',isDark?'#D4A853':'#8B6914');
+    svg.appendChild(circle);
+  });
+
+  // Y axis labels (min/max/current)
+  const addYLabel=(text,y)=>{
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',padL);t.setAttribute('y',y);
+    t.setAttribute('font-size','8');
+    t.setAttribute('fill',isDark?'#6B6560':'#B5ADA5');
+    t.textContent=text;
+    svg.appendChild(t);
+  };
+  addYLabel(`${maxW.toFixed(1)}`,padT+8);
+  addYLabel(`${entries[entries.length-1].w}`,toY(entries[entries.length-1].w)-3);
+}
+
+// ═══════════════════════════════════════════
+// INPUT HANDLERS
+// ═══════════════════════════════════════════
+
+function onRecordChange(){
+  updateEnergySummary();
+  buildSparklineSVG();
+}
+
+function onStepsInput(){
+  const val=parseInt(document.getElementById('stepsInput').value)||0;
+  const ref=document.getElementById('stepsDisciplineRef');
+  const ctx=document.getElementById('stepsContext');
+  if(val>=10000){
+    ref.innerHTML='Today\'s discipline: 10,000 steps <span class="steps-hit">· Done ✓</span>';
+    if(ctx) ctx.textContent=val.toLocaleString()+' steps today ✓';
+  } else if(val>0){
+    ref.innerHTML=`Today's discipline: 10,000 steps · <span style="color:var(--text-label)">${(10000-val).toLocaleString()} remaining</span>`;
+    if(ctx) ctx.textContent=val.toLocaleString()+' so far today';
+  } else {
+    ref.innerHTML='Today\'s discipline: 10,000 steps';
+  }
+  updateEnergySummary();
+}
+
+function toggleEvent(chip){
+  chip.classList.toggle('selected');
+}
+
+function toggleDiscLog(item){
+  item.classList.toggle('done');
+  updateEnergySummary();
+}
+
+// ═══════════════════════════════════════════
+// DISCIPLINES (TODAY TAP)
+// ═══════════════════════════════════════════
+
+function setupDisciplines(){
+  document.querySelectorAll('#disciplineList .discipline-item').forEach(item=>{
+    item.addEventListener('click',()=>{
+      item.classList.toggle('completed');
+      updateProgress();
+    });
+  });
+}
+function updateProgress(){
+  const total=document.querySelectorAll('#disciplineList .discipline-item').length;
+  const done=document.querySelectorAll('#disciplineList .discipline-item.completed').length;
+  const pct=Math.round((done/total)*100);
+  document.getElementById('pctStat').textContent=pct+'%';
+  document.getElementById('progressCount').textContent=done+' of '+total+' today';
+  document.getElementById('progressFill').style.width=pct+'%';
+}
+
+// ═══════════════════════════════════════════
+// FOOD ESTIMATION ENGINE
+// ═══════════════════════════════════════════
+
+const MEALS = ['breakfast','lunch','dinner','other'];
+
+// Track estimation state per meal
+const mealState = {};
+MEALS.forEach(m => { mealState[m] = { estimated: false, lastText: '' }; });
+
+function onMealTextInput(meal) {
+  const ta = document.getElementById('meal-'+meal);
+  // Auto-resize
+  ta.style.height = 'auto';
+  ta.style.height = ta.scrollHeight + 'px';
+
+  const text = ta.value.trim();
+  const btn = document.getElementById('est-btn-'+meal);
+  const note = document.getElementById('est-note-'+meal);
+
+  if (!text) {
+    btn.classList.remove('visible');
+    note.textContent = '';
+    note.classList.remove('ready');
+    clearKcal(meal);
+    updateFoodTotal();
+    onRecordChange();
+    return;
+  }
+
+  // If text changed since last estimate, show the estimate button
+  if (text !== mealState[meal].lastText) {
+    mealState[meal].estimated = false;
+    if (!mealState[meal].estimated) {
+      btn.classList.add('visible');
+      note.textContent = '';
+      note.classList.remove('ready');
+    }
+  }
+}
+
+function onMealBlur(meal) {
+  const text = document.getElementById('meal-'+meal).value.trim();
+  if (text && !mealState[meal].estimated) {
+    // Auto-trigger estimation on blur after 400ms
+    setTimeout(() => {
+      const currentText = document.getElementById('meal-'+meal).value.trim();
+      if (currentText && !mealState[meal].estimated) {
+        estimateMeal(meal);
+      }
+    }, 400);
+  }
+}
+
+function onKcalManualEdit(meal) {
+  const val = parseInt(document.getElementById('kcal-'+meal).value) || 0;
+  const badge = document.getElementById('kcal-'+meal);
+  badge.classList.toggle('estimated', val > 0);
+  badge.classList.toggle('empty', val === 0);
+  const note = document.getElementById('est-note-'+meal);
+  if (val > 0) {
+    note.textContent = 'Edited manually';
+    note.classList.add('ready');
+    mealState[meal].estimated = true;
+    document.getElementById('est-btn-'+meal).classList.remove('visible');
+  }
+  updateFoodTotal();
+  onRecordChange();
+}
+
+function clearKcal(meal) {
+  const badge = document.getElementById('kcal-'+meal);
+  badge.value = '';
+  badge.classList.remove('estimated');
+  badge.classList.add('empty');
+  mealState[meal].estimated = false;
+}
+
+async function estimateMeal(meal) {
+  const text = document.getElementById('meal-'+meal).value.trim();
+  if (!text) return;
+
+  mealState[meal].lastText = text;
+  mealState[meal].estimated = false;
+
+  // UI: show spinner, hide button
+  const spin = document.getElementById('est-spin-'+meal);
+  const btn = document.getElementById('est-btn-'+meal);
+  const note = document.getElementById('est-note-'+meal);
+  const badge = document.getElementById('kcal-'+meal);
+
+  spin.classList.add('visible');
+  btn.classList.remove('visible');
+  note.textContent = '';
+  note.classList.remove('ready');
+
+  try {
+    const result = await callEstimationAPI(text, meal);
+    badge.value = result.kcal;
+    badge.classList.add('estimated');
+    badge.classList.remove('empty');
+    note.textContent = result.note;
+    note.classList.add('ready');
+    mealState[meal].estimated = true;
+    btn.classList.remove('visible');
+    updateFoodTotal();
+    onRecordChange();
+  } catch(e) {
+    note.textContent = 'Could not estimate — enter manually';
+    btn.classList.add('visible');
+    btn.textContent = 'Retry →';
+  } finally {
+    spin.classList.remove('visible');
+  }
+}
+
+async function estimateAllMeals() {
+  const pending = MEALS.filter(m => {
+    const text = document.getElementById('meal-'+m).value.trim();
+    return text && !mealState[m].estimated;
+  });
+  if (!pending.length) return;
+
+  // Estimate all at once via a single API call
+  const entries = pending.map(m => ({
+    meal: m,
+    text: document.getElementById('meal-'+m).value.trim()
+  }));
+
+  // Show spinners on all pending
+  pending.forEach(m => {
+    document.getElementById('est-spin-'+m).classList.add('visible');
+    document.getElementById('est-btn-'+m).classList.remove('visible');
+  });
+
+  try {
+    const results = await callBatchEstimationAPI(entries);
+    results.forEach(r => {
+      const badge = document.getElementById('kcal-'+r.meal);
+      const note = document.getElementById('est-note-'+r.meal);
+      badge.value = r.kcal;
+      badge.classList.add('estimated');
+      badge.classList.remove('empty');
+      note.textContent = r.note;
+      note.classList.add('ready');
+      mealState[r.meal].estimated = true;
+      mealState[r.meal].lastText = document.getElementById('meal-'+r.meal).value.trim();
+    });
+    updateFoodTotal();
+    onRecordChange();
+  } catch(e) {
+    pending.forEach(m => {
+      document.getElementById('est-note-'+m).textContent = 'Could not estimate';
+      document.getElementById('est-btn-'+m).classList.add('visible');
+    });
+  } finally {
+    pending.forEach(m => document.getElementById('est-spin-'+m).classList.remove('visible'));
+  }
+}
+
+async function callEstimationAPI(foodText, mealLabel) {
+  const prompt = `You are a calorie estimation assistant for a fitness mission app.
+
+The user has logged their ${mealLabel}: "${foodText}"
+
+Estimate the calorie content. Context: This is a Kerala/South Indian diet context, so foods like puttu, kadala, biriyani, appam, dosa, idli, fish curry, chicken curry are common.
+
+Respond ONLY with valid JSON in this exact format (no markdown, no explanation):
+{"kcal": <integer>, "note": "<short explanation under 40 chars>"}
+
+Examples:
+{"kcal": 420, "note": "Puttu ~180, kadala curry ~240"}
+{"kcal": 650, "note": "Chicken biriyani, 1 plate"}
+{"kcal": 320, "note": "2 uthappam with sambar"}`;
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 100,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!response.ok) throw new Error('API error');
+  const data = await response.json();
+  const raw = data.content.map(b => b.text || '').join('').trim()
+    .replace(/```json|```/g, '').trim();
+  const parsed = JSON.parse(raw);
+  if (!parsed.kcal || isNaN(parsed.kcal)) throw new Error('Bad response');
+  return { kcal: Math.round(parsed.kcal), note: parsed.note || '' };
+}
+
+async function callBatchEstimationAPI(entries) {
+  const lines = entries.map(e => `${e.meal}: "${e.text}"`).join('\n');
+  const prompt = `You are a calorie estimation assistant for a fitness mission app.
+
+The user has logged the following meals:
+${lines}
+
+Estimate calories for each. Context: Kerala/South Indian diet — puttu, kadala, biriyani, appam, dosa, idli, fish curry, chicken curry are common.
+
+Respond ONLY with valid JSON array (no markdown, no explanation):
+[{"meal":"<meal_name>","kcal":<integer>,"note":"<under 40 chars>"},...]`;
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 300,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!response.ok) throw new Error('API error');
+  const data = await response.json();
+  const raw = data.content.map(b => b.text || '').join('').trim()
+    .replace(/```json|```/g, '').trim();
+  const parsed = JSON.parse(raw);
+  if (!Array.isArray(parsed)) throw new Error('Bad response');
+  return parsed.map(r => ({ meal: r.meal, kcal: Math.round(r.kcal), note: r.note || '' }));
+}
+
+function updateFoodTotal() {
+  let total = 0;
+  let count = 0;
+  MEALS.forEach(m => {
+    const v = parseInt(document.getElementById('kcal-'+m).value) || 0;
+    if (v > 0) { total += v; count++; }
+  });
+  const el = document.getElementById('foodTotalDisplay');
+  if (total > 0) {
+    el.textContent = '~' + total.toLocaleString();
+    el.className = 'food-total-val' + (count < 3 ? ' partial' : '');
+  } else {
+    el.textContent = '—';
+    el.className = 'food-total-val empty';
+  }
+
+  // Update estimate-all button visibility
+  const hasPending = MEALS.some(m => {
+    const text = document.getElementById('meal-'+m).value.trim();
+    return text && !mealState[m].estimated;
+  });
+  document.getElementById('estimateAllBtn').style.opacity = hasPending ? '1' : '0.3';
+}
+
+// Sync meal state when loading saved records
+function syncMealEstimationState() {
+  MEALS.forEach(m => {
+    const kcalEl = document.getElementById('kcal-'+m);
+    const val = parseInt(kcalEl.value) || 0;
+    const text = document.getElementById('meal-'+m).value.trim();
+    if (val > 0 && text) {
+      kcalEl.classList.add('estimated');
+      kcalEl.classList.remove('empty');
+      mealState[m].estimated = true;
+      mealState[m].lastText = text;
+      const note = document.getElementById('est-note-'+m);
+      note.textContent = '~' + val + ' kcal (saved)';
+      note.classList.add('ready');
+    } else {
+      kcalEl.classList.remove('estimated');
+      kcalEl.classList.add('empty');
+      mealState[m].estimated = false;
+      if (text) document.getElementById('est-btn-'+m).classList.add('visible');
+    }
+  });
+  updateFoodTotal();
+}
+
+// ═══════════════════════════════════════════
+// SAVE RECORD
+// ═══════════════════════════════════════════
+
+function saveRecord(){
+  const key=keyForOffset(currentDayOffset);
+  const discDone=[];
+  document.querySelectorAll('.disc-log-item').forEach(item=>discDone.push(item.classList.contains('done')));
+  const events=[];
+  document.querySelectorAll('.event-chip.selected').forEach(c=>events.push(c.textContent.trim()));
+
+  const weight=parseFloat(document.getElementById('weightInput').value)||null;
+  const steps=parseInt(document.getElementById('stepsInput').value)||0;
+  const discItems=getDiscLogItems();
+  const intake=getTotalIntake();
+  const e=calcEnergy(weight,steps,discItems,intake);
+
+  seedRecords[key]={
+    weight,
+    breakfast:document.getElementById('meal-breakfast').value,
+    lunch:document.getElementById('meal-lunch').value,
+    dinner:document.getElementById('meal-dinner').value,
+    other:document.getElementById('meal-other').value,
+    steps:String(steps),
+    notes:document.getElementById('notesInput').value,
+    events, disciplines:discDone,
+    kcal:{
+      breakfast:parseInt(document.getElementById('kcal-breakfast').value)||0,
+      lunch:parseInt(document.getElementById('kcal-lunch').value)||0,
+      dinner:parseInt(document.getElementById('kcal-dinner').value)||0,
+      other:parseInt(document.getElementById('kcal-other').value)||0,
+    },
+    bmr:e.bmr, neat:e.neat, exercise:e.ex, tdee:e.tdee, intake:e.intake, balance:e.balance
+  };
+  saveStorage();
+  buildDayDots();
+  updateNudge();
+  updateEnergyToday();
+  buildSparklineSVG();
+  buildWeightChart(currentChartRange);
+
+  const btn=document.getElementById('saveBtn');
+  const conf=document.getElementById('saveConfirm');
+  btn.classList.add('saved');conf.classList.add('visible');
+  setTimeout(()=>{btn.classList.remove('saved');conf.classList.remove('visible');},2200);
+}
+
+// ═══════════════════════════════════════════
+// NUDGE
+// ═══════════════════════════════════════════
+
+function updateNudge(){
+  const key=todayKey();
+  const rec=seedRecords[key];
+  if(!rec){
+    setPill('np-weight',false,'Weight');
+    setPill('np-food',false,'Food');
+    setPill('np-steps',false,'Steps');
+    setPill('np-notes',false,'Notes');
+    document.getElementById('nudgeStatus').textContent='Weight not yet logged';
+    document.getElementById('nudgeStatus').style.color='';
+    return;
+  }
+  const hw=!!rec.weight;
+  const hf=!!(rec.breakfast||rec.lunch||rec.dinner);
+  const hs=!!(rec.steps&&rec.steps!=='0');
+  const hn=!!rec.notes;
+  const done=[hw,hf,hs,hn].filter(Boolean).length;
+  setPill('np-weight',hw,'Weight');
+  setPill('np-food',hf,'Food');
+  setPill('np-steps',hs,'Steps');
+  setPill('np-notes',hn,'Notes');
+  const st=document.getElementById('nudgeStatus');
+  if(done===4){st.textContent='Record complete';st.style.color='var(--accent)';}
+  else if(done===0){st.textContent='Weight not yet logged';st.style.color='';}
+  else{st.textContent=done+' of 4 fields logged';st.style.color='';}
+}
+function setPill(id,ok,label){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.textContent=ok?label+' ✓':label;
+  el.classList.toggle('done',ok);
+}
+
+// ═══════════════════════════════════════════
+// TEXTAREA AUTO-RESIZE
+// ═══════════════════════════════════════════
+
+function setupTextareas(){
+  document.querySelectorAll('.meal-food-input,.notes-textarea').forEach(ta=>{
+    ta.addEventListener('input',()=>{
+      ta.style.height='auto';
+      ta.style.height=ta.scrollHeight+'px';
+    });
+  });
+}
+function autoResizeAll(){
+  document.querySelectorAll('.meal-food-input,.notes-textarea').forEach(ta=>{
+    ta.style.height='auto';
+    ta.style.height=ta.scrollHeight+'px';
+  });
+}
+
+// ═══════════════════════════════════════════
+// EVENING PROMPT
+// ═══════════════════════════════════════════
+
+function checkEvening(){
+  const h=new Date().getHours();
+  if(h>=17||h<4) document.getElementById('eveningPrompt').style.display='block';
+}
+
+// ═══════════════════════════════════════════
+// LIVE CLOCK
+// ═══════════════════════════════════════════
+function isMuhurta(){
+  const h=new Date().getHours(),m=new Date().getMinutes();
+  // Brahmamuhurta: ~3:30–5:30 am
+  return (h===3&&m>=30)||(h===4)||(h===5&&m<30);
+}
+function checkMuhurta(){
+  const show=isMuhurta();
+  const el=document.getElementById('muhurta');
+  if(el) el.classList.toggle('visible',show);
+}
+function updateClock(){
+  const now=new Date();
+  let h=now.getHours(),m=now.getMinutes();
+  const ampm=h>=12?'pm':'am';
+  h=h%12||12;
+  const mStr=m<10?'0'+m:String(m);
+  const el=document.getElementById('clockDisplay');
+  if(el) el.textContent=`${h}:${mStr} ${ampm}`;
+  checkMuhurta();
+}
+function startClock(){
+  updateClock();
+  // Align to next minute boundary then tick every 60s
+  const now=new Date();
+  const msToNextMin=(60-now.getSeconds())*1000-now.getMilliseconds();
+  setTimeout(()=>{
+    updateClock();
+    setInterval(updateClock,60000);
+  },msToNextMin);
+}
+
+// ═══════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════
+init();
+</script>
+</body>
+</html>
