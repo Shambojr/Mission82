@@ -1,0 +1,2056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Mission OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+<style>
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+input[type=number]{-moz-appearance:textfield;}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+
+/* ═══════════════════════════════════════
+   DESIGN TOKENS — Architectural Digest
+═══════════════════════════════════════ */
+:root{
+  --bg:   #F4EFE5;   /* warm ivory */
+  --bg-r: #ECE6DA;   /* deeper ivory — inset */
+  --t1:   #1B1814;   /* charcoal — primary */
+  --t2:   #3C3730;   /* dark warm brown — body */
+  --t3:   #8C857B;   /* mid grey — labels */
+  --t4:   #BEB7AE;   /* light grey — placeholder */
+  --ac:   #9A7B3C;   /* muted editorial gold */
+  --rl:   rgba(28,25,20,.09);   /* hairline rule */
+  --rls:  rgba(28,25,20,.16);   /* stronger rule */
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans: 'DM Sans',sans-serif;
+}
+.dk{
+  --bg:   #161412;
+  --bg-r: #1E1C18;
+  --t1:   #EDE7DB;
+  --t2:   #B4ADA3;
+  --t3:   #6A6460;
+  --t4:   #3A3630;
+  --ac:   #C9A45A;
+  --rl:   rgba(237,231,219,.07);
+  --rls:  rgba(237,231,219,.14);
+}
+
+/* ── BASE ── */
+html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:antialiased;min-height:100vh;width:100%;}
+.phone{width:100%;min-height:100vh;background:var(--bg);position:relative;transition:background .4s;overflow:hidden;}
+
+/* ── SCREENS ── */
+.screen{display:none;height:100vh;overflow-y:auto;padding-bottom:88px;-webkit-overflow-scrolling:touch;position:absolute;top:0;left:0;width:100%;will-change:transform,opacity;}
+.screen.on{display:block;}
+#s-today{display:block;}
+.screen.slide-in-right{display:block;animation:sIR .34s cubic-bezier(.25,.46,.45,.94) both;}
+.screen.slide-in-left{display:block;animation:sIL .34s cubic-bezier(.25,.46,.45,.94) both;}
+.screen.slide-out-left{display:block;animation:sOL .34s cubic-bezier(.25,.46,.45,.94) both;pointer-events:none;}
+.screen.slide-out-right{display:block;animation:sOR .34s cubic-bezier(.25,.46,.45,.94) both;pointer-events:none;}
+@keyframes sIR{from{transform:translateX(100%);opacity:.5}to{transform:translateX(0);opacity:1}}
+@keyframes sIL{from{transform:translateX(-100%);opacity:.5}to{transform:translateX(0);opacity:1}}
+@keyframes sOL{from{transform:translateX(0);opacity:1}to{transform:translateX(-26%);opacity:0}}
+@keyframes sOR{from{transform:translateX(0);opacity:1}to{transform:translateX(26%);opacity:0}}
+
+/* ── NAV — bare editorial bar ── */
+.nav{position:fixed;bottom:0;left:0;width:100%;padding:12px 0 36px;background:var(--bg);border-top:1px solid var(--rl);display:flex;justify-content:space-around;z-index:40;transition:background .4s,border-color .4s;}
+.ni{display:flex;flex-direction:column;align-items:center;gap:5px;opacity:.28;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .2s;padding:2px 14px;}
+.ni.on{opacity:1;}
+.nd{display:none;}
+.nl{font-size:8px;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);transition:color .2s;}
+.ni.on .nl{color:var(--ac);}
+
+/* ── SHARED ── */
+.sh{display:flex;align-items:center;gap:14px;padding:32px 28px 0;}
+.sl{font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:var(--t3);white-space:nowrap;flex-shrink:0;}
+.sr{flex:1;height:1px;background:var(--rl);}
+.flbl{font-size:8px;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:8px;}
+.finp{background:none;border:none;border-bottom:1px solid var(--rls);outline:none;width:100%;padding-bottom:8px;font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t1);caret-color:var(--ac);transition:border-color .2s;}
+.finp:focus{border-bottom-color:var(--ac);}
+.finp::placeholder{color:var(--t4);}
+.btn-primary{width:100%;padding:16px 0;background:var(--t1);border:none;font-family:var(--sans);font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--bg);cursor:pointer;transition:opacity .2s;margin-top:24px;}
+.btn-primary:active{opacity:.75;}
+.btn-ghost{background:none;border:1px solid var(--rls);padding:13px 0;width:100%;font-family:var(--sans);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--t2);cursor:pointer;transition:all .2s;}
+.btn-ghost:active{border-color:var(--ac);color:var(--ac);}
+
+/* ── ONBOARDING ── */
+.ob{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;flex-direction:column;overflow-y:auto;transition:background .4s;}
+.ob.hide{display:none;}
+.ob-inner{width:100%;padding:64px 28px 56px;min-height:100vh;display:flex;flex-direction:column;}
+.ob-step{display:none;flex:1;flex-direction:column;}
+.ob-step.on{display:flex;}
+.ob-n{font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:var(--t3);margin-bottom:28px;}
+.ob-q{font-family:var(--serif);font-size:36px;font-weight:300;color:var(--t1);line-height:1.05;margin-bottom:10px;}
+.ob-hint{font-family:var(--serif);font-size:16px;font-weight:300;font-style:italic;color:var(--t3);margin-bottom:32px;line-height:1.5;}
+.ob-examples{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:28px;}
+.ob-ex{font-size:11px;letter-spacing:.06em;color:var(--t3);padding:5px 12px;border:1px solid var(--rl);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s;}
+.ob-ex:active{border-color:var(--ac);color:var(--ac);}
+.ob-ta{background:none;border:none;border-bottom:1.5px solid var(--rl);outline:none;font-family:var(--serif);font-size:30px;font-weight:300;color:var(--t1);width:100%;caret-color:var(--ac);padding-bottom:10px;resize:none;line-height:1.3;transition:border-color .2s;min-height:48px;}
+.ob-ta:focus{border-bottom-color:var(--ac);}
+.ob-ta::placeholder{color:var(--t4);}
+.ob-inp{background:none;border:none;border-bottom:1.5px solid var(--rl);outline:none;font-family:var(--serif);font-size:30px;font-weight:300;color:var(--t1);width:100%;caret-color:var(--ac);padding-bottom:10px;transition:border-color .2s;}
+.ob-inp:focus{border-bottom-color:var(--ac);}
+.ob-inp::placeholder{color:var(--t4);}
+.ob-date{font-size:18px;background:none;border:none;border-bottom:1px solid var(--rl);color:var(--t1);outline:none;width:100%;font-family:var(--sans);padding-bottom:8px;transition:border-color .2s;}
+.ob-date:focus{border-bottom-color:var(--ac);}
+.ob-row{display:flex;gap:20px;}
+.ob-row .ob-field{flex:1;}
+.ob-seg{display:flex;border:1px solid var(--rls);}
+.ob-sb{flex:1;padding:11px;background:none;border:none;font-family:var(--sans);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);cursor:pointer;transition:all .18s;}
+.ob-sb.on{background:var(--t1);color:var(--bg);}
+.ob-spacer{flex:1;}
+.sum-screen{display:none;flex-direction:column;padding:64px 28px 48px;min-height:100vh;}
+.sum-screen.on{display:flex;}
+.sum-label{font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:var(--t3);margin-bottom:20px;}
+.sum-name{font-family:var(--serif);font-size:52px;font-weight:300;color:var(--t1);line-height:.97;margin-bottom:10px;letter-spacing:-.01em;}
+.sum-name em{font-style:italic;color:var(--ac);}
+.sum-dest{font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t2);margin-bottom:6px;}
+.sum-days{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);margin-bottom:36px;}
+.sum-rule{height:1px;background:var(--rl);margin-bottom:32px;}
+.sum-prac-label{font-size:8px;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);margin-bottom:12px;}
+.sum-prac{font-family:var(--serif);font-size:24px;font-weight:300;color:var(--t1);}
+.sum-prac em{font-style:italic;color:var(--ac);}
+
+/* Profile sheet */
+.psheet{position:fixed;inset:0;background:rgba(20,18,14,.55);z-index:90;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s;}
+.psheet.on{opacity:1;pointer-events:all;}
+.psheet-inner{width:100%;background:var(--bg);padding:32px 28px 52px;transform:translateY(100%);transition:transform .38s cubic-bezier(.16,1,.3,1);border-top:1px solid var(--rl);}
+.psheet.on .psheet-inner{transform:translateY(0);}
+.psheet-title{font-family:var(--serif);font-size:26px;font-weight:300;color:var(--t1);margin-bottom:4px;}
+.psheet-sub{font-family:var(--serif);font-size:14px;font-weight:300;font-style:italic;color:var(--t3);margin-bottom:28px;}
+.psheet-fields{display:flex;flex-direction:column;gap:20px;}
+.psheet-row{display:flex;gap:20px;}
+.psheet-row .psheet-field{flex:1;}
+
+/* ═══════════════════════════════
+   TODAY
+═══════════════════════════════ */
+.tod-top{padding:22px 28px 0;display:flex;justify-content:space-between;align-items:center;}
+.tod-meta{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);}
+.tod-meta span{color:var(--ac);}
+.dk-toggle{display:flex;align-items:center;gap:8px;cursor:pointer;}
+.dkt-lbl{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);}
+.dkt-pill{width:28px;height:2px;background:var(--rls);position:relative;top:0;}
+.dkt-knob{width:8px;height:8px;border-radius:50%;background:var(--ac);position:absolute;top:-3px;left:0;transition:left .28s ease;}
+.dk .dkt-knob{left:20px;}
+
+/* Next up — dominant operational element */
+.next-up{padding:38px 28px 0;}
+.nu-eyebrow{font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:14px;}
+.nu-eyebrow::after{content:'';flex:1;height:1px;background:var(--rl);}
+.nu-disc{font-family:var(--serif);font-size:46px;font-weight:300;color:var(--t1);line-height:1;letter-spacing:-.01em;margin-bottom:7px;transition:all .3s;}
+.nu-disc.done{font-style:italic;color:var(--t3);font-size:28px;}
+.nu-tag{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--t4);}
+
+/* Progress — single hairline */
+.prog{padding:26px 28px 0;}
+.prog-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+.prog-label{font-size:8px;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);}
+.prog-count{font-family:var(--serif);font-size:13px;font-weight:300;color:var(--t2);}
+.prog-track{height:1px;background:var(--rl);}
+.prog-fill{height:1px;background:var(--ac);width:0%;transition:width 1.3s cubic-bezier(.16,1,.3,1);}
+
+/* Energy strip */
+.e-strip{margin:24px 28px 0;padding:16px 0;border-top:1px solid var(--rl);border-bottom:1px solid var(--rl);}
+.es-row{display:flex;justify-content:space-between;align-items:baseline;padding:2px 0;}
+.es-lbl{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);}
+.es-val{font-family:var(--serif);font-size:18px;font-weight:300;color:var(--t1);}
+.es-bal-row{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;padding-top:10px;border-top:1px solid var(--rl);}
+.es-bal-lbl{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);}
+.es-bal-num{font-family:var(--serif);font-size:26px;font-weight:300;color:var(--t1);}
+.es-empty{font-family:var(--serif);font-size:14px;font-weight:300;font-style:italic;color:var(--t3);padding:4px 0;}
+
+/* Record status — typographic only, no boxes */
+.rec-status{margin:22px 28px 0;padding:14px 0;border-top:1px solid var(--rl);border-bottom:1px solid var(--rl);display:flex;align-items:center;justify-content:space-between;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.rs-left{display:flex;flex-direction:column;gap:8px;}
+.rs-label{font-size:8px;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);}
+.rs-pills{display:flex;gap:16px;}
+.rs-pill{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t4);transition:color .2s;}
+.rs-pill.on{color:var(--ac);}
+.rs-arr{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t3);}
+
+/* Discipline list */
+.disc-list{padding:8px 28px 0;}
+.di{display:flex;align-items:center;justify-content:space-between;padding:15px 0;border-bottom:1px solid var(--rl);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.di:first-child{border-top:1px solid var(--rl);}
+.di-l{display:flex;align-items:center;gap:18px;}
+.di-dot{width:16px;height:1px;background:var(--t4);flex-shrink:0;transition:background .28s;}
+.di.done .di-dot{background:var(--ac);}
+.di-name{font-family:var(--serif);font-size:19px;font-weight:300;color:var(--t1);transition:all .28s;letter-spacing:.01em;}
+.di.done .di-name{color:var(--t3);font-style:italic;}
+.di-sub{font-size:10px;color:var(--t3);margin-top:2px;letter-spacing:.04em;}
+.di-r{display:flex;flex-direction:column;align-items:flex-end;gap:3px;}
+.di-tag{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--t4);}
+.di-badge{font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--ac);}
+
+/* Destination */
+.dest-strip{margin:22px 28px 0;padding:14px 0;border-top:1px solid var(--rl);display:flex;align-items:flex-start;gap:16px;}
+.dest-icon{font-family:var(--serif);font-size:13px;color:var(--t4);flex-shrink:0;padding-top:2px;}
+.dest-lbl{font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);margin-bottom:4px;}
+.dest-val{font-family:var(--serif);font-size:17px;font-weight:400;color:var(--t1);}
+.dest-sub{font-size:10px;color:var(--t3);margin-top:2px;letter-spacing:.04em;}
+
+/* Evening prompt */
+.ev-prompt{margin:18px 28px 0;padding:14px 0;border-top:1px solid var(--rl);}
+.ev-lbl{font-size:8px;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);margin-bottom:6px;}
+.ev-text{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--t2);line-height:1.55;}
+
+/* Projection card */
+#proj-card{margin:16px 28px 0;padding:14px 0;border-top:1px solid var(--rl);}
+
+/* ═══════════════════════════════
+   RECORD — FIELD JOURNAL
+═══════════════════════════════ */
+.compass{padding:58px 28px 12px;display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--rl);}
+.cmp-lbl{font-size:8px;letter-spacing:.24em;text-transform:uppercase;color:var(--ac);}
+.cmp-val{font-family:var(--serif);font-size:14px;font-weight:300;font-style:italic;color:var(--t3);}
+.cmp-days{font-size:9px;color:var(--t4);letter-spacing:.06em;}
+.daynav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px 0;}
+.dn-arr{font-family:var(--serif);font-size:24px;font-weight:300;color:var(--t3);cursor:pointer;padding:6px;margin:-6px;-webkit-tap-highlight-color:transparent;transition:color .18s;user-select:none;}
+.dn-arr:active{color:var(--ac);}
+.dn-arr.dis{opacity:.14;pointer-events:none;}
+.dn-date{font-family:var(--serif);font-size:13px;font-weight:300;font-style:italic;color:var(--t3);text-align:center;letter-spacing:.04em;}
+.page-head{padding:16px 28px 0;}
+.ph-day{font-family:var(--serif);font-size:48px;font-weight:300;color:var(--t1);line-height:1;letter-spacing:-.01em;}
+.ph-full{font-family:var(--serif);font-size:16px;font-weight:300;font-style:italic;color:var(--t3);margin-top:3px;}
+.page-rule{margin:14px 28px 0;height:1px;background:var(--rls);}
+.je{padding:20px 28px 0;}
+.je-cat{font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:var(--t3);margin-bottom:12px;display:flex;align-items:center;gap:12px;}
+.je-cat::after{content:'';flex:1;height:1px;background:var(--rl);}
+
+/* Weight */
+.w-row{display:flex;align-items:baseline;gap:8px;}
+.w-inp{background:none;border:none;outline:none;font-family:var(--serif);font-size:52px;font-weight:300;color:var(--t1);width:180px;letter-spacing:-.02em;line-height:1;caret-color:var(--ac);}
+.w-inp::placeholder{color:var(--t4);}
+.w-unit{font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t3);padding-bottom:6px;}
+.w-whisper{font-family:var(--serif);font-size:11px;font-weight:300;font-style:italic;color:var(--t4);margin-top:5px;}
+.w-whisper em{font-style:italic;color:var(--ac);opacity:.75;}
+.spark-svg{width:100%;height:32px;margin-top:12px;overflow:visible;}
+
+/* Food — notebook lines */
+.meal-row{padding:10px 0;border-bottom:1px solid var(--rl);display:flex;align-items:flex-start;}
+.meal-row:first-child{border-top:1px solid var(--rl);}
+.ml-lbl{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);width:76px;flex-shrink:0;padding-top:4px;}
+.ml-right{flex:1;display:flex;flex-direction:column;gap:4px;}
+.ml-ta{background:none;border:none;outline:none;font-family:var(--serif);font-size:18px;font-weight:300;color:var(--t1);width:100%;resize:none;min-height:26px;line-height:1.45;caret-color:var(--ac);}
+.ml-ta::placeholder{color:var(--t4);font-style:italic;}
+.ml-kcal-row{display:flex;align-items:center;gap:6px;min-height:18px;}
+.ml-est{font-family:var(--serif);font-size:11px;font-style:italic;color:var(--t4);flex:1;transition:color .22s;}
+.ml-est.ready{color:var(--t3);}
+.ml-knum{background:none;border:none;border-bottom:1px solid var(--rl);outline:none;font-family:var(--serif);font-size:13px;font-weight:300;color:var(--t3);width:52px;text-align:right;caret-color:var(--ac);}
+.ml-knum:focus{border-bottom-color:var(--ac);}
+.ml-knum.est{color:var(--t2);}
+.ml-kunit{font-size:8px;color:var(--t4);letter-spacing:.08em;}
+.food-total{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0 0;border-top:1px solid var(--rls);margin-top:6px;}
+.ft-lbl{font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);}
+.ft-val{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t1);}
+.ft-val.dim{color:var(--t3);}
+
+/* Steps */
+.s-row{display:flex;align-items:baseline;gap:8px;}
+.s-inp{background:none;border:none;outline:none;font-family:var(--serif);font-size:42px;font-weight:300;color:var(--t1);width:160px;letter-spacing:-.02em;caret-color:var(--ac);}
+.s-inp::placeholder{color:var(--t4);}
+.s-unit{font-family:var(--serif);font-size:17px;font-weight:300;color:var(--t3);padding-bottom:4px;}
+.s-ref{font-size:11px;color:var(--t3);margin-top:5px;letter-spacing:.04em;}
+.s-ref .hit{color:var(--ac);}
+
+/* Discipline log */
+.dl-item{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--rl);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.dl-item:first-child{border-top:1px solid var(--rl);}
+.dl-l{display:flex;align-items:center;gap:14px;}
+.dl-dot{width:12px;height:1px;background:var(--t4);flex-shrink:0;transition:background .24s;}
+.dl-item.done .dl-dot{background:var(--ac);}
+.dl-name{font-family:var(--serif);font-size:16px;font-weight:300;color:var(--t1);transition:all .22s;}
+.dl-item.done .dl-name{color:var(--t3);font-style:italic;}
+.dl-r{display:flex;align-items:center;gap:6px;}
+.dl-dur{background:none;border:none;border-bottom:1px solid var(--rl);outline:none;font-family:var(--serif);font-size:14px;font-weight:300;color:var(--t3);width:34px;text-align:right;caret-color:var(--ac);}
+.dl-dur:focus{border-bottom-color:var(--ac);}
+.dl-dunit{font-size:8px;letter-spacing:.1em;color:var(--t4);}
+.dl-kest{font-family:var(--serif);font-size:11px;font-style:italic;color:var(--t4);}
+
+/* Notes */
+.notes-ta{background:none;border:none;outline:none;font-family:var(--serif);font-size:18px;font-weight:300;font-style:italic;color:var(--t1);width:100%;resize:none;min-height:76px;line-height:1.65;caret-color:var(--ac);}
+.notes-ta::placeholder{color:var(--t4);}
+
+/* Energy summary */
+.esumm{border-top:1px solid var(--rl);border-bottom:1px solid var(--rl);padding:14px 0;margin:18px 28px 0;}
+.esumm-title{font-size:8px;letter-spacing:.26em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;}
+.erow{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--rl);}
+.erow:last-of-type{border-bottom:none;}
+.erow-lbl{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);}
+.erow-val{font-family:var(--serif);font-size:16px;font-weight:300;color:var(--t1);}
+.erow-val.dim{color:var(--t3);}
+.ebal{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;padding-top:10px;border-top:1px solid var(--rls);}
+.ebal-lbl{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);}
+.ebal-val{font-family:var(--serif);font-size:24px;font-weight:300;color:var(--t1);}
+.esum-empty{font-family:var(--serif);font-size:13px;font-weight:300;font-style:italic;color:var(--t3);padding:4px 0;}
+
+/* Save */
+.save-row{margin:22px 28px 0;display:flex;align-items:center;gap:14px;}
+.save-conf{font-family:var(--serif);font-size:13px;font-weight:300;font-style:italic;color:var(--ac);opacity:0;transition:opacity .3s;}
+.save-conf.on{opacity:1;}
+
+/* ═══════════════════════════════
+   MISSION
+═══════════════════════════════ */
+.m-dest{padding:58px 28px 0;}
+.m-dest-ey{font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;}
+.m-dest-date{font-family:var(--serif);font-size:48px;font-weight:300;color:var(--t1);line-height:1;letter-spacing:-.01em;}
+.m-dest-wt{font-family:var(--serif);font-size:22px;font-weight:300;font-style:italic;color:var(--ac);margin-top:5px;}
+.m-dest-sub{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);margin-top:8px;}
+.m-rule{margin:22px 28px 0;height:1px;background:var(--rl);}
+.m-brief{margin:22px 28px 0;}
+.m-brief-name{font-family:var(--serif);font-size:28px;font-weight:300;color:var(--t1);line-height:1.1;margin-bottom:14px;}
+.m-brief-name em{font-style:italic;color:var(--ac);}
+.pos-row{display:flex;align-items:baseline;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--rl);}
+.pos-row:last-child{border-bottom:none;padding-bottom:0;}
+.pos-row:first-child{border-top:1px solid var(--rl);}
+.pos-lbl{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);}
+.pos-val{font-family:var(--serif);font-size:15px;font-weight:300;color:var(--t1);text-align:right;}
+.pos-val.ac{color:var(--ac);}
+.pos-val.dest{font-size:16px;font-weight:400;}
+.pace-card{margin:18px 28px 0;padding:14px 0;border-top:1px solid var(--rl);border-bottom:1px solid var(--rl);}
+.pace-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;}
+.pace-lbl{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);}
+.pace-val{font-family:var(--serif);font-size:15px;font-weight:300;color:var(--t1);}
+.pace-val.ac{color:var(--ac);}
+.m-narr{margin:18px 28px 0;padding:14px 0;border-top:1px solid var(--rl);}
+.m-narr-text{font-family:var(--serif);font-size:16px;font-weight:300;color:var(--t2);line-height:1.7;}
+.m-narr-text strong{color:var(--t1);font-weight:400;}
+.m-narr-text em{font-style:italic;color:var(--ac);}
+.roster-item{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--rl);}
+.roster-item:first-child{border-top:1px solid var(--rl);}
+.ri-l{display:flex;align-items:center;gap:14px;}
+.ri-dot{width:12px;height:1px;background:var(--t4);flex-shrink:0;}
+.ri-name{font-family:var(--serif);font-size:16px;font-weight:300;color:var(--t1);}
+.ri-r{display:flex;align-items:center;gap:10px;}
+.ri-pct{font-family:var(--serif);font-size:15px;font-weight:300;color:var(--t2);}
+.ri-pct.hi{color:var(--ac);}
+.ri-cat{font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--t4);width:50px;text-align:right;}
+
+/* ═══════════════════════════════
+   PATTERNS
+═══════════════════════════════ */
+.pat-head{padding:58px 28px 0;}
+.pat-title{font-family:var(--serif);font-size:40px;font-weight:300;color:var(--t1);line-height:1;margin-bottom:4px;}
+.pat-sub{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--t3);}
+.chart-block{padding:24px 28px 0;}
+.chart-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
+.chart-title{font-size:8px;letter-spacing:.26em;text-transform:uppercase;color:var(--t3);}
+.range-btns{display:flex;border:1px solid var(--rl);}
+.range-btn{font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);padding:5px 11px;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s;}
+.range-btn+.range-btn{border-left:1px solid var(--rl);}
+.range-btn.on{background:var(--t1);color:var(--bg);}
+.chart-wrap{width:100%;height:110px;}
+.chart-empty{font-family:var(--serif);font-size:14px;font-weight:300;font-style:italic;color:var(--t3);padding:18px 0;}
+.bk-card{margin:0 28px;padding:14px 0;border-top:1px solid var(--rl);border-bottom:1px solid var(--rl);}
+.bk-title{font-size:8px;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;}
+.bk-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--rl);}
+.bk-row:last-child{border-bottom:none;}
+.bk-lbl{font-size:12px;font-weight:300;color:var(--t2);}
+.bk-val{font-family:var(--serif);font-size:15px;font-weight:300;color:var(--t1);}
+.bk-val.ac{color:var(--ac);}
+.pat-item{margin:0 28px;padding:12px 0 12px 16px;border-left:1px solid var(--ac);border-bottom:1px solid var(--rl);}
+.pat-item:first-child{border-top:1px solid var(--rl);}
+.pat-from{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--ac);margin-bottom:5px;}
+.pat-text{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--t2);line-height:1.55;}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+
+<!-- ══════════════════════
+     ONBOARDING
+══════════════════════ -->
+<div class="ob" id="ob">
+<div class="ob-inner">
+
+  <!-- Step 1: Mission name -->
+  <div class="ob-step on" id="obs1">
+    <div class="ob-n">Step 1 of 3</div>
+    <div class="ob-q">What are you preparing for?</div>
+    <div class="ob-hint">Give your preparation a name.</div>
+    <div class="ob-examples">
+      <span class="ob-ex" onclick="fillOb('ob-name','Weight Loss Mission')">Weight loss</span>
+      <span class="ob-ex" onclick="fillOb('ob-name','UPSC 2027')">Exam prep</span>
+      <span class="ob-ex" onclick="fillOb('ob-name','Marathon Training')">Marathon</span>
+      <span class="ob-ex" onclick="fillOb('ob-name','Kedarnath Trek')">Trek</span>
+      <span class="ob-ex" onclick="fillOb('ob-name','40-Day Sadhana')">Sadhana</span>
+    </div>
+    <textarea class="ob-ta" id="ob-name" placeholder="The Re-entry" rows="2"></textarea>
+    <div class="ob-spacer"></div>
+    <button class="btn-primary" onclick="obNext(1)">Continue →</button>
+  </div>
+
+  <!-- Step 2: Destination -->
+  <div class="ob-step" id="obs2">
+    <div class="ob-n">Step 2 of 3</div>
+    <div class="ob-q">What does success look like, and when?</div>
+    <div class="ob-hint">A weight, an event, a completion — and a date.</div>
+    <label class="fld" style="margin-bottom:20px;">
+      <span class="flbl">Destination</span>
+      <input class="ob-inp" id="ob-dest" type="text" placeholder="82 kg by September 1">
+    </label>
+    <label class="fld" style="margin-bottom:20px;">
+      <span class="flbl">Target date</span>
+      <input class="ob-date" id="ob-date" type="date">
+    </label>
+    <div class="ob-spacer"></div>
+    <button class="btn-primary" onclick="obNext(2)">Continue →</button>
+  </div>
+
+  <!-- Step 3: First discipline -->
+  <div class="ob-step" id="obs3">
+    <div class="ob-n">Step 3 of 3</div>
+    <div class="ob-q">What is one thing you will do every day?</div>
+    <div class="ob-hint">Your first daily practice. You can add more later.</div>
+    <textarea class="ob-ta" id="ob-disc" placeholder="Morning walk" rows="2"></textarea>
+    <div class="ob-spacer"></div>
+    <button class="btn-primary" onclick="obNext(3)">Build my mission →</button>
+  </div>
+
+  <!-- Summary -->
+  <div class="sum-screen" id="sum">
+    <div class="sum-label">Your Mission</div>
+    <div class="sum-name" id="sum-name">The Re-entry</div>
+    <div class="sum-dest" id="sum-dest">82 kg by September 1, 2026</div>
+    <div class="sum-days" id="sum-days">85 days · Starts today</div>
+    <div class="sum-rule"></div>
+    <div class="sum-prac-label">First daily practice</div>
+    <div class="sum-prac" id="sum-prac"><em>Angamardana</em></div>
+    <div class="ob-spacer"></div>
+    <button class="btn-primary" onclick="beginMission()">Begin Mission →</button>
+  </div>
+
+</div><!-- /ob-inner -->
+</div><!-- /ob -->
+
+<!-- Profile sheet -->
+<div class="psheet" id="psheet">
+  <div class="psheet-inner">
+    <div class="psheet-title">Energy Profile</div>
+    <div class="psheet-sub">Used to calculate BMR and daily energy balance. Entered once.</div>
+    <div class="psheet-fields">
+      <div class="psheet-row">
+        <div class="psheet-field">
+          <label class="fld">
+            <span class="flbl">Age</span>
+            <input class="finp" id="p-age" type="number" placeholder="35" inputmode="numeric">
+          </label>
+        </div>
+        <div class="psheet-field">
+          <label class="fld">
+            <span class="flbl">Height (cm)</span>
+            <input class="finp" id="p-height" type="number" placeholder="175" inputmode="numeric">
+          </label>
+        </div>
+      </div>
+      <label class="fld">
+        <span class="flbl">Sex</span>
+        <div class="ob-seg">
+          <button class="ob-sb on" id="ps-m" onclick="setPSex('male')">Male</button>
+          <button class="ob-sb" id="ps-f" onclick="setPSex('female')">Female</button>
+        </div>
+      </label>
+      <label class="fld">
+        <span class="flbl">Current Weight (kg)</span>
+        <input class="finp" id="p-wt" type="number" step="0.1" placeholder="98.2" inputmode="decimal">
+      </label>
+    </div>
+    <button class="btn-primary" onclick="saveProfile()">Save →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════
+     TODAY
+══════════════════════ -->
+<div class="screen on" id="s-today" style="display:block;">
+
+  <div class="tod-top">
+    <div class="tod-meta" id="tod-meta">Mission Day <span id="tod-day">1</span></div>
+    <div class="dk-toggle" onclick="toggleDark()">
+      <span class="dkt-lbl" id="dkt-lbl">Light</span>
+      <div class="dkt-pill"><div class="dkt-knob"></div></div>
+    </div>
+  </div>
+
+  <!-- Next up -->
+  <div class="next-up">
+    <div class="nu-eyebrow">Next Up</div>
+    <div id="nu-content">
+      <div class="nu-disc" id="nu-name">—</div>
+      <div class="nu-tag" id="nu-tag"></div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="prog">
+    <div class="prog-row">
+      <div class="prog-label">Today's Progress</div>
+      <div class="prog-count" id="prog-count">0 of 0</div>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+  </div>
+
+  <!-- Energy strip -->
+  <div class="e-strip" id="e-strip">
+    <div id="e-strip-content"><div class="es-empty">Log today's food to see energy balance.</div></div>
+  </div>
+
+  <!-- Record status -->
+  <div class="rec-status" onclick="switchTab('record')">
+    <div class="rs-left">
+      <div class="rs-label">Today's Record</div>
+      <div class="rs-pills">
+        <span class="rs-pill" id="rp-w">Weight</span>
+        <span class="rs-pill" id="rp-f">Food</span>
+        <span class="rs-pill" id="rp-s">Steps</span>
+        <span class="rs-pill" id="rp-n">Notes</span>
+      </div>
+    </div>
+    <div class="rs-arr">→</div>
+  </div>
+
+  <!-- Discipline list -->
+  <div class="sh"><span class="sl">Today's Disciplines</span><div class="sr"></div></div>
+  <div class="disc-list" id="disc-list"></div>
+
+  <!-- Destination -->
+  <div class="dest-strip">
+    <div class="dest-icon">◎</div>
+    <div>
+      <div class="dest-lbl">Destination</div>
+      <div class="dest-val" id="tod-dest-val">—</div>
+      <div class="dest-sub" id="tod-dest-sub">—</div>
+    </div>
+  </div>
+
+  <!-- Projection card -->
+  <div id="proj-card" style="display:none;margin:14px 24px 0;padding:14px 15px;background:var(--bg-r);border:1px solid var(--br);border-left:2px solid var(--ac);border-radius:2px;">
+    <div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--ac);margin-bottom:7px;">At this pace</div>
+    <div style="font-family:var(--serif);font-size:17px;font-weight:300;color:var(--t1);line-height:1.55;" id="proj-text"></div>
+  </div>
+
+  <!-- Evening prompt -->
+  <div class="ev-prompt" id="ev-prompt" style="display:none;">
+    <div class="ev-lbl">This Evening</div>
+    <div class="ev-text" id="ev-text">Complete your remaining disciplines before sleep.</div>
+  </div>
+
+</div><!-- /today -->
+
+
+<!-- ══════════════════════
+     RECORD
+══════════════════════ -->
+<div class="screen" id="s-record">
+
+  <div class="compass">
+    <span class="cmp-lbl">Destination</span>
+    <span class="cmp-val" id="r-cmp-val">—</span>
+    <span class="cmp-days" id="r-cmp-days">—</span>
+  </div>
+
+  <div class="daynav">
+    <div class="dn-arr" id="dn-prev" onclick="navDay(-1)">←</div>
+    <div class="dn-date" id="dn-date">Monday, 9 June</div>
+    <div class="dn-arr dis" id="dn-next" onclick="navDay(1)">→</div>
+  </div>
+
+  <div class="page-head">
+    <div class="ph-day" id="ph-day">Monday</div>
+    <div class="ph-full" id="ph-full">June 9, 2026</div>
+  </div>
+  <div class="page-rule"></div>
+
+  <!-- Weight -->
+  <div class="je">
+    <div class="je-cat">Weight</div>
+    <div class="w-row">
+      <input class="w-inp" id="r-wt" type="number" step="0.1" placeholder="—" inputmode="decimal" oninput="onWtChange()">
+      <span class="w-unit">kg</span>
+    </div>
+    <div class="w-whisper">Destination <em id="r-dest-whisper">—</em></div>
+    <svg class="spark-svg" id="spark-svg" viewBox="0 0 320 32" preserveAspectRatio="none"></svg>
+  </div>
+
+  <!-- Food -->
+  <div class="je">
+    <div class="je-cat" style="justify-content:space-between;">
+      <span>Food</span>
+      <span style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ac);cursor:pointer;" onclick="estimateAll()">Estimate all →</span>
+    </div>
+    <div id="food-rows">
+      <div class="meal-row"><div class="ml-lbl">Breakfast</div><div class="ml-right"><textarea class="ml-ta" id="m-b" placeholder="What did you eat?" rows="1" oninput="onMealInput('b')" onblur="onMealBlur('b')"></textarea><div class="ml-kcal-row"><span class="ml-est" id="me-b"></span><input class="ml-knum" id="mk-b" type="number" placeholder="—" inputmode="numeric" oninput="onKcalEdit('b')"><span class="ml-kunit">kcal</span></div></div></div>
+      <div class="meal-row"><div class="ml-lbl">Lunch</div><div class="ml-right"><textarea class="ml-ta" id="m-l" placeholder="What did you eat?" rows="1" oninput="onMealInput('l')" onblur="onMealBlur('l')"></textarea><div class="ml-kcal-row"><span class="ml-est" id="me-l"></span><input class="ml-knum" id="mk-l" type="number" placeholder="—" inputmode="numeric" oninput="onKcalEdit('l')"><span class="ml-kunit">kcal</span></div></div></div>
+      <div class="meal-row"><div class="ml-lbl">Dinner</div><div class="ml-right"><textarea class="ml-ta" id="m-d" placeholder="What did you eat?" rows="1" oninput="onMealInput('d')" onblur="onMealBlur('d')"></textarea><div class="ml-kcal-row"><span class="ml-est" id="me-d"></span><input class="ml-knum" id="mk-d" type="number" placeholder="—" inputmode="numeric" oninput="onKcalEdit('d')"><span class="ml-kunit">kcal</span></div></div></div>
+      <div class="meal-row"><div class="ml-lbl">Other</div><div class="ml-right"><textarea class="ml-ta" id="m-o" placeholder="Snacks, tea…" rows="1" oninput="onMealInput('o')" onblur="onMealBlur('o')"></textarea><div class="ml-kcal-row"><span class="ml-est" id="me-o"></span><input class="ml-knum" id="mk-o" type="number" placeholder="—" inputmode="numeric" oninput="onKcalEdit('o')"><span class="ml-kunit">kcal</span></div></div></div>
+    </div>
+    <div class="food-total"><span class="ft-lbl">Total intake</span><span class="ft-val dim" id="ft-val">—</span><span class="ml-kunit" style="margin-left:4px;">kcal</span></div>
+  </div>
+
+  <!-- Steps -->
+  <div class="je">
+    <div class="je-cat">Steps</div>
+    <div class="s-row">
+      <input class="s-inp" id="r-steps" type="number" placeholder="—" inputmode="numeric" oninput="onStepsChange()">
+      <span class="s-unit">steps</span>
+    </div>
+    <div class="s-ref" id="steps-ref">Daily target: 10,000 steps</div>
+  </div>
+
+  <!-- Disciplines -->
+  <div class="je">
+    <div class="je-cat">Disciplines</div>
+    <div id="dl-list"></div>
+  </div>
+
+  <!-- Notes -->
+  <div class="je">
+    <div class="je-cat" style="justify-content:space-between;"><span>Notes</span><span style="font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--t4);border:1px solid var(--bs);padding:2px 6px;border-radius:2px;">Pattern data</span></div>
+    <textarea class="notes-ta" id="r-notes" placeholder="What shaped today?" rows="4"></textarea>
+  </div>
+
+  <!-- Energy summary -->
+  <div class="esumm" id="r-esumm">
+    <div class="esumm-title">Energy Summary</div>
+    <div id="r-esumm-content"><div class="esum-empty">Complete your profile to see energy calculations.</div></div>
+  </div>
+
+  <!-- Save -->
+  <div class="save-row">
+    <button class="btn-ghost" onclick="saveRecord()" style="flex:1;">Save Record</button>
+    <span class="save-conf" id="save-conf">Saved.</span>
+  </div>
+
+</div><!-- /record -->
+
+
+<!-- ══════════════════════
+     MISSION
+══════════════════════ -->
+<div class="screen" id="s-mission">
+
+  <div class="m-dest">
+    <div class="m-dest-ey">Destination</div>
+    <div class="m-dest-date" id="m-dest-date">—</div>
+    <div class="m-dest-wt" id="m-dest-wt">—</div>
+    <div class="m-dest-sub" id="m-dest-sub">—</div>
+  </div>
+  <div class="m-rule"></div>
+
+  <div class="m-brief">
+    <div class="m-brief-name" id="m-brief-name">—</div>
+    <div id="m-pos-table"></div>
+  </div>
+
+  <div class="pace-card" id="pace-card" style="display:none;">
+    <div class="pace-row"><span class="pace-lbl">Required pace</span><span class="pace-val" id="pc-req">—</span></div>
+    <div class="pace-row"><span class="pace-lbl">Current pace</span><span class="pace-val ac" id="pc-cur">—</span></div>
+    <div class="pace-row"><span class="pace-lbl">Avg daily deficit</span><span class="pace-val" id="pc-def">—</span></div>
+    <div class="pace-row"><span class="pace-lbl">Projected arrival</span><span class="pace-val ac" id="pc-proj">—</span></div>
+  </div>
+
+  <div class="m-narr" id="m-narr" style="display:none;">
+    <div class="m-narr-text" id="m-narr-text"></div>
+  </div>
+
+  <div class="sh"><span class="sl">Discipline Roster</span><div class="sr"></div></div>
+  <div style="padding:0 24px;" id="m-roster"></div>
+
+</div><!-- /mission -->
+
+
+<!-- ══════════════════════
+     PATTERNS
+══════════════════════ -->
+<div class="screen" id="s-patterns">
+
+  <div class="pat-head">
+    <div class="pat-title">Patterns</div>
+    <div class="pat-sub">What your record reveals.</div>
+  </div>
+
+  <!-- Weight chart -->
+  <div class="chart-block">
+    <div class="chart-header">
+      <div class="chart-title">Weight Trend</div>
+      <div class="range-btns">
+        <button class="range-btn" onclick="setRange(14,this)">14d</button>
+        <button class="range-btn on" onclick="setRange(30,this)">30d</button>
+        <button class="range-btn" onclick="setRange(0,this)">All</button>
+      </div>
+    </div>
+    <div class="chart-wrap" id="chart-wrap"></div>
+  </div>
+
+  <!-- Energy breakdown -->
+  <div class="sh"><span class="sl">Energy Breakdown</span><div class="sr"></div></div>
+  <div id="pat-energy" style="padding:0 24px;display:flex;flex-direction:column;gap:0;"></div>
+
+  <!-- Behavioral patterns -->
+  <div class="sh"><span class="sl">Patterns</span><div class="sr"></div></div>
+  <div id="pat-insights" style="padding:0 24px;display:flex;flex-direction:column;gap:8px;"></div>
+
+  <div style="height:20px;"></div>
+</div><!-- /patterns -->
+
+
+<!-- ── NAV ── -->
+<div class="nav" id="nav">
+  <div class="ni on" data-tab="today" onclick="switchTab('today')"><div class="nd"></div><div class="nl">Today</div></div>
+  <div class="ni" data-tab="record" onclick="switchTab('record')"><div class="nd"></div><div class="nl">Record</div></div>
+  <div class="ni" data-tab="mission" onclick="switchTab('mission')"><div class="nd"></div><div class="nl">Mission</div></div>
+  <div class="ni" data-tab="patterns" onclick="switchTab('patterns')"><div class="nd"></div><div class="nl">Patterns</div></div>
+</div>
+
+</div><!-- /phone -->
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════
+// CONSTANTS & STATE
+// ═══════════════════════════════════════════════
+
+const MEALS = ['b','l','d','o'];
+const MEAL_NAMES = {b:'Breakfast',l:'Lunch',d:'Dinner',o:'Other'};
+const MO = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DOW = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+let isDark = false;
+let activeTab = 'today';
+let dayOffset = 0; // 0=today, -1=yesterday…
+let chartRange = 30;
+let pSex = 'male';
+let mealEstimated = {b:false,l:false,d:false,o:false};
+
+// ── DEFAULT DISCIPLINES (used when mission is created) ──
+const DEFAULT_DISCS = [
+  {id:'d1',name:'Wake at 4:30 am',category:'Discipline',kcalPerMin:0,defaultDur:0},
+  {id:'d2',name:'Angamardana',category:'Sadhana',kcalPerMin:6.9,defaultDur:45},
+  {id:'d3',name:'10,000 Steps',category:'Fitness',kcalPerMin:0,defaultDur:0},
+  {id:'d4',name:'Kriya',category:'Sadhana',kcalPerMin:2.7,defaultDur:30},
+  {id:'d5',name:'Dumbbell Training',category:'Fitness',kcalPerMin:5.8,defaultDur:45},
+];
+
+// ── STORAGE KEYS ──
+const K_PROFILE = 'mos_profile';
+const K_RECORDS = 'mos_records';
+
+// ── LOADED STATE ──
+let profile = null;   // {mission:{…}, user:{…}}
+let records = {};     // {date: {…}}
+
+// ═══════════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════════
+
+function loadStorage(){
+  try{
+    const p=localStorage.getItem(K_PROFILE);
+    if(p) profile=JSON.parse(p);
+    const r=localStorage.getItem(K_RECORDS);
+    if(r) records=JSON.parse(r);
+  }catch(e){console.warn('Storage load error',e);}
+}
+function saveStorage(){
+  try{
+    if(profile) localStorage.setItem(K_PROFILE,JSON.stringify(profile));
+    localStorage.setItem(K_RECORDS,JSON.stringify(records));
+  }catch(e){console.warn('Storage save error',e);}
+}
+function todayKey(){return new Date().toISOString().slice(0,10);}
+function keyFor(offset){const d=new Date();d.setDate(d.getDate()+offset);return d.toISOString().slice(0,10);}
+
+// ═══════════════════════════════════════════════
+// PURE CALCULATIONS
+// ═══════════════════════════════════════════════
+
+function calcBMR(age,sex,heightCm,weightKg){
+  if(!age||!heightCm||!weightKg) return null;
+  const b = sex==='male'
+    ? 10*weightKg + 6.25*heightCm - 5*age + 5
+    : 10*weightKg + 6.25*heightCm - 5*age - 161;
+  return Math.round(b);
+}
+function stepsKcal(steps){return Math.round((steps||0)*0.04);}
+function exerciseKcal(discDone){
+  if(!profile||!profile.mission) return 0;
+  let total=0;
+  (profile.mission.disciplines||[]).forEach((disc,i)=>{
+    const d=discDone[i];
+    if(d&&d.done&&disc.kcalPerMin&&d.dur){
+      total+=Math.round(disc.kcalPerMin*d.dur);
+    }
+  });
+  return total;
+}
+function calcEnergy(weightKg,steps,discDone,intakeKcal){
+  if(!profile||!profile.user) return null;
+  const u=profile.user;
+  const w=weightKg||u.startWeight||90;
+  const bmr=calcBMR(u.age,u.sex,u.height,w);
+  if(!bmr) return null;
+  const neat=stepsKcal(steps);
+  const ex=exerciseKcal(discDone);
+  const tdee=bmr+neat+ex;
+  const balance=intakeKcal-tdee;
+  return{bmr,neat,ex,tdee,intake:intakeKcal,balance};
+}
+function missionDay(){
+  if(!profile||!profile.mission||!profile.mission.startDate) return 1;
+  const start=new Date(profile.mission.startDate+'T00:00:00');
+  const today=new Date(); today.setHours(0,0,0,0);
+  return Math.max(1,Math.round((today-start)/86400000)+1);
+}
+function daysLeft(){
+  if(!profile||!profile.mission||!profile.mission.targetDate) return null;
+  const target=new Date(profile.mission.targetDate+'T00:00:00');
+  const today=new Date(); today.setHours(0,0,0,0);
+  return Math.max(0,Math.round((target-today)/86400000));
+}
+function completionRate(discId){
+  const recs=Object.values(records);
+  if(!recs.length) return 0;
+  const withDisc=recs.filter(r=>r.disciplines);
+  if(!withDisc.length) return 0;
+  const idx=(profile.mission.disciplines||[]).findIndex(d=>d.id===discId);
+  if(idx<0) return 0;
+  const done=withDisc.filter(r=>r.disciplines[idx]&&r.disciplines[idx].done).length;
+  return Math.round((done/withDisc.length)*100);
+}
+function weeklyWeightRate(){
+  const entries=Object.entries(records)
+    .filter(([k,v])=>v.weight)
+    .map(([k,v])=>({d:new Date(k+'T00:00:00'),w:parseFloat(v.weight)}))
+    .sort((a,b)=>a.d-b.d);
+  if(entries.length<4) return null;
+  const recent=entries.slice(-Math.min(14,entries.length));
+  const span=(recent[recent.length-1].d-recent[0].d)/86400000;
+  if(span<1) return null;
+  const delta=recent[recent.length-1].w-recent[0].w;
+  return (delta/span)*7; // kg per week
+}
+function avgDeficit(){
+  const recs=Object.values(records).filter(r=>r.energy&&r.energy.balance!=null&&r.energy.intake>0);
+  if(!recs.length) return null;
+  return Math.round(recs.reduce((s,r)=>s+r.energy.balance,0)/recs.length);
+}
+function currentWeight(){
+  const entries=Object.entries(records)
+    .filter(([k,v])=>v.weight)
+    .sort((a,b)=>a[0]<b[0]?1:-1);
+  return entries.length?parseFloat(entries[0][1].weight):null;
+}
+function totalIntakeKcal(){
+  return ['b','l','d','o'].reduce((s,m)=>{
+    return s+(parseInt(document.getElementById('mk-'+m).value)||0);
+  },0);
+}
+
+// ═══════════════════════════════════════════════
+// FOOD DATABASE
+// ═══════════════════════════════════════════════
+
+const FOOD_DB=[
+  {k:['puttu kadala','puttu and kadala','puttu & kadala','puttu+kadala'],c:420,n:'Puttu ~180, kadala ~240'},
+  {k:['puttu egg','puttu and egg'],c:380,n:'Puttu ~180, egg curry ~200'},
+  {k:['puttu fish','puttu and fish'],c:400,n:'Puttu ~180, fish curry ~220'},
+  {k:['puttu banana','puttu and banana'],c:320,n:'Puttu ~180, banana ~140'},
+  {k:['puttu chicken','puttu and chicken'],c:460,n:'Puttu ~180, chicken ~280'},
+  {k:['puttu beef','puttu and beef'],c:480,n:'Puttu ~180, beef fry ~300'},
+  {k:['puttu sardine','puttu and sardine'],c:460,n:'Puttu ~180, sardine ~280'},
+  {k:['puttu mutton'],c:490,n:'Puttu ~180, mutton ~310'},
+  {k:['puttu'],c:180,n:'Plain puttu, 1 portion'},
+  {k:['idiyappam kadala','idiyappam and kadala'],c:420,n:'2 idiyappam ~200, kadala ~220'},
+  {k:['idiyappam egg','idiyappam and egg'],c:400,n:'2 idiyappam ~200, egg ~200'},
+  {k:['idiyappam stew','idiyappam and stew','idiyappam chicken stew'],c:430,n:'2 idiyappam ~200, stew ~230'},
+  {k:['idiyappam'],c:200,n:'2 idiyappam'},
+  {k:['appam stew','appam and stew','appam with stew'],c:430,n:'2 appam ~200, stew ~230'},
+  {k:['appam egg','appam and egg'],c:390,n:'2 appam ~200, egg ~190'},
+  {k:['appam chicken','appam with chicken'],c:460,n:'2 appam ~200, chicken ~260'},
+  {k:['appam fish'],c:420,n:'2 appam ~200, fish curry ~220'},
+  {k:['appam kadala'],c:410,n:'2 appam ~200, kadala ~210'},
+  {k:['appam'],c:200,n:'2 appam'},
+  {k:['masala dosa','masala dose'],c:380,n:'Masala dosa with chutney sambar'},
+  {k:['ghee dosa','ghee roast'],c:420,n:'Ghee dosa'},
+  {k:['set dosa','set dose'],c:350,n:'3 set dosas with sambar'},
+  {k:['dosa'],c:280,n:'1 dosa with chutney'},
+  {k:['idli sambar','idli and sambar'],c:280,n:'3 idli ~180, sambar ~100'},
+  {k:['idli'],c:180,n:'3 idli'},
+  {k:['uthappam','uttapam','uttappam'],c:300,n:'2 uthappam with sambar chutney'},
+  {k:['pathiri chicken','pathiri with chicken'],c:460,n:'3 pathiri ~240, chicken ~220'},
+  {k:['pathiri fish'],c:440,n:'3 pathiri ~240, fish ~200'},
+  {k:['pathiri beef'],c:480,n:'3 pathiri ~240, beef ~240'},
+  {k:['pathiri'],c:240,n:'3 pathiri'},
+  {k:['parotta beef','parotta and beef'],c:580,n:'2 parotta ~280, beef ~300'},
+  {k:['parotta chicken','parotta and chicken'],c:560,n:'2 parotta ~280, chicken ~280'},
+  {k:['parotta egg'],c:500,n:'2 parotta ~280, egg ~220'},
+  {k:['parotta'],c:280,n:'2 parotta'},
+  {k:['chapati chicken','roti chicken'],c:450,n:'3 chapati ~240, chicken ~210'},
+  {k:['chapati dal','roti dal'],c:400,n:'3 chapati ~240, dal ~160'},
+  {k:['chapati egg'],c:420,n:'3 chapati ~240, egg ~180'},
+  {k:['chapati','roti'],c:240,n:'3 chapati'},
+  {k:['fish curry meals','rice fish curry','rice and fish'],c:620,n:'Rice ~300, fish curry ~200, sides ~120'},
+  {k:['chicken curry meals','rice chicken curry','rice and chicken'],c:650,n:'Rice ~300, chicken ~240, sides ~110'},
+  {k:['beef curry meals','rice beef','rice and beef'],c:680,n:'Rice ~300, beef ~260, sides ~120'},
+  {k:['prawn curry meals','rice prawn'],c:600,n:'Rice ~300, prawn ~180, sides ~120'},
+  {k:['dal rice','rice dal'],c:520,n:'Rice ~300, dal ~160, sides ~60'},
+  {k:['egg curry meals','rice egg'],c:580,n:'Rice ~300, egg ~160, sides ~120'},
+  {k:['sadya','sadhya'],c:900,n:'Full sadya'},
+  {k:['meals','rice meals','full meals'],c:620,n:'Standard rice meals'},
+  {k:['chicken biriyani','chicken biryani'],c:650,n:'Chicken biriyani, 1 plate'},
+  {k:['mutton biriyani','mutton biryani'],c:700,n:'Mutton biriyani, 1 plate'},
+  {k:['beef biriyani','beef biryani'],c:680,n:'Beef biriyani, 1 plate'},
+  {k:['prawn biriyani','prawn biryani'],c:620,n:'Prawn biriyani, 1 plate'},
+  {k:['fish biriyani','meen biriyani'],c:600,n:'Fish biriyani, 1 plate'},
+  {k:['egg biriyani'],c:580,n:'Egg biriyani, 1 plate'},
+  {k:['veg biriyani','vegetable biriyani'],c:480,n:'Veg biriyani, 1 plate'},
+  {k:['biriyani','biryani'],c:650,n:'Biriyani, 1 plate'},
+  {k:['sardine curry','mathi curry','sardine'],c:280,n:'Sardine curry, 1 serving'},
+  {k:['fish fry','meen fry'],c:220,n:'2 pieces fish fry'},
+  {k:['fish curry','meen curry'],c:200,n:'Fish curry, 1 serving'},
+  {k:['fish molly','meen molee'],c:240,n:'Fish molly, 1 serving'},
+  {k:['prawn curry','chemmeen curry'],c:200,n:'Prawn curry, 1 serving'},
+  {k:['prawn fry'],c:180,n:'Prawn fry, 1 serving'},
+  {k:['chicken curry'],c:260,n:'Chicken curry, 1 serving'},
+  {k:['chicken fry','chicken roast'],c:300,n:'Chicken fry, 2 pieces'},
+  {k:['chicken stew'],c:230,n:'Chicken stew, 1 serving'},
+  {k:['beef fry','beef ularthiyathu'],c:300,n:'Beef fry, 1 serving'},
+  {k:['beef curry'],c:280,n:'Beef curry, 1 serving'},
+  {k:['mutton curry'],c:290,n:'Mutton curry, 1 serving'},
+  {k:['kadala curry','kadala'],c:240,n:'Kadala curry, 1 serving'},
+  {k:['egg curry','mutta curry'],c:160,n:'Egg curry, 1 egg'},
+  {k:['boiled egg','hard boiled egg'],c:70,n:'1 boiled egg'},
+  {k:['omelette','omellet','omelet','omlet'],c:180,n:'2-egg omelette'},
+  {k:['fried egg'],c:120,n:'1 fried egg'},
+  {k:['scrambled egg'],c:160,n:'2 scrambled eggs'},
+  {k:['egg'],c:70,n:'1 egg'},
+  {k:['pazham pori','banana fritter','ethakka appam'],c:200,n:'2 pazham pori'},
+  {k:['uzhunnu vada','urad vada','medu vada'],c:150,n:'2 vada'},
+  {k:['samosa'],c:130,n:'2 samosa'},
+  {k:['unniappam','unniyappam'],c:180,n:'4 unniappam'},
+  {k:['murukku'],c:180,n:'1 handful murukku'},
+  {k:['biscuit','biscuits'],c:120,n:'4 biscuits'},
+  {k:['bread'],c:160,n:'2 slices bread'},
+  {k:['dal fry','dal curry'],c:120,n:'Dal, 1 serving'},
+  {k:['sambar'],c:80,n:'Sambar, 1 serving'},
+  {k:['plain rice','white rice','boiled rice'],c:300,n:'1 plate rice'},
+  {k:['milk tea','chai','tea with milk','chaya'],c:80,n:'1 cup milk tea'},
+  {k:['black coffee'],c:5,n:'Black coffee, no sugar'},
+  {k:['filter coffee','coffee','kaapi'],c:80,n:'1 cup coffee with milk'},
+  {k:['black tea'],c:10,n:'Black tea, no milk'},
+  {k:['coconut water','tender coconut','elaneer'],c:60,n:'1 tender coconut'},
+  {k:['lassi'],c:180,n:'1 glass sweet lassi'},
+  {k:['buttermilk','moru'],c:40,n:'1 glass buttermilk'},
+  {k:['juice'],c:120,n:'1 glass juice'},
+  {k:['water'],c:0,n:'Water'},
+  {k:['banana','nendran'],c:120,n:'1 medium banana'},
+  {k:['mango','manga'],c:100,n:'1 medium mango'},
+  {k:['jackfruit','chakka'],c:160,n:'5 pieces jackfruit'},
+  {k:['apple'],c:80,n:'1 medium apple'},
+  {k:['salad'],c:80,n:'Mixed salad, 1 bowl'},
+  {k:['soup'],c:100,n:'1 bowl soup'},
+  {k:['noodles','maggi'],c:360,n:'1 packet Maggi'},
+  {k:['fried rice'],c:480,n:'Fried rice, 1 plate'},
+  {k:['naan','butter naan'],c:280,n:'2 naan'},
+  {k:['pizza'],c:600,n:'2 slices pizza'},
+  {k:['burger'],c:500,n:'1 burger'},
+  {k:['sandwich'],c:280,n:'1 sandwich'},
+];
+
+const QTY={'half':0.5,'1':1,'one':1,'2':2,'two':2,'3':3,'three':3,'4':4,'four':4,'5':5,'five':5,'6':6,'small':0.75,'large':1.4,'double':2};
+
+function lookupFood(text){
+  const t=text.toLowerCase().trim();
+  const parts=t.split(/[+,]|\band\b/).map(p=>p.trim()).filter(Boolean);
+  let total=0;let notes=[];let matched=false;
+  parts.forEach(part=>{
+    let best=null;let bestScore=0;
+    for(const e of FOOD_DB){
+      for(const k of e.k){
+        if(part.includes(k)||k.includes(part)){
+          const score=k.length;
+          if(score>bestScore){bestScore=score;best=e;}
+        }
+      }
+    }
+    if(best){
+      let qty=1;
+      for(const[w,m] of Object.entries(QTY)){
+        if(new RegExp('\\b'+w+'\\b').test(part)){qty=m;break;}
+      }
+      total+=Math.round(best.c*qty);
+      notes.push(best.n);
+      matched=true;
+    } else if(part.length>2){
+      total+=200;notes.push(`"${part}" ~200kcal est.`);
+    }
+  });
+  if(!matched&&parts.length===1) return null;
+  return{kcal:total,note:notes.slice(0,2).join(' · ')};
+}
+
+function runEstimate(meal){
+  const text=(document.getElementById('m-'+meal)||{}).value||'';
+  if(!text.trim()) return;
+  const result=lookupFood(text.trim());
+  const kEl=document.getElementById('mk-'+meal);
+  const nEl=document.getElementById('me-'+meal);
+  if(result){
+    kEl.value=result.kcal;
+    kEl.classList.add('est');
+    nEl.textContent=result.note;
+    nEl.classList.add('ready');
+    mealEstimated[meal]=true;
+  } else {
+    nEl.textContent='Not recognised — enter manually';
+    nEl.classList.remove('ready');
+  }
+  updateFoodTotal();
+  onRecordChange();
+}
+
+function onMealInput(m){
+  const ta=document.getElementById('m-'+m);
+  ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';
+  const text=ta.value.trim();
+  if(!text){
+    document.getElementById('mk-'+m).value='';
+    document.getElementById('mk-'+m).classList.remove('est');
+    document.getElementById('me-'+m).textContent='';
+    mealEstimated[m]=false;
+    updateFoodTotal();
+  } else {
+    mealEstimated[m]=false;
+  }
+}
+
+function onMealBlur(m){
+  const text=(document.getElementById('m-'+m)||{}).value||'';
+  if(text.trim()&&!mealEstimated[m]) setTimeout(()=>runEstimate(m),300);
+}
+
+function onKcalEdit(m){
+  const v=parseInt(document.getElementById('mk-'+m).value)||0;
+  document.getElementById('mk-'+m).classList.toggle('est',v>0);
+  if(v>0){document.getElementById('me-'+m).textContent='Edited';mealEstimated[m]=true;}
+  updateFoodTotal();onRecordChange();
+}
+
+function estimateAll(){
+  MEALS.forEach(m=>{
+    const text=(document.getElementById('m-'+m)||{}).value||'';
+    if(text.trim()&&!mealEstimated[m]) runEstimate(m);
+  });
+}
+
+function updateFoodTotal(){
+  let t=0;let c=0;
+  MEALS.forEach(m=>{const v=parseInt(document.getElementById('mk-'+m).value)||0;if(v>0){t+=v;c++;}});
+  const el=document.getElementById('ft-val');
+  if(t>0){el.textContent='~'+t.toLocaleString();el.classList.remove('dim');}
+  else{el.textContent='—';el.classList.add('dim');}
+}
+
+// ═══════════════════════════════════════════════
+// ONBOARDING
+// ═══════════════════════════════════════════════
+
+function fillOb(id,val){document.getElementById(id).value=val;}
+
+function obNext(step){
+  if(step===1){
+    const name=document.getElementById('ob-name').value.trim();
+    if(!name){document.getElementById('ob-name').focus();return;}
+    showObStep(2);
+    // Set default date 90 days out
+    const d=new Date();d.setDate(d.getDate()+90);
+    document.getElementById('ob-date').value=d.toISOString().slice(0,10);
+  } else if(step===2){
+    const dest=document.getElementById('ob-dest').value.trim();
+    const date=document.getElementById('ob-date').value;
+    if(!dest){document.getElementById('ob-dest').focus();return;}
+    if(!date){document.getElementById('ob-date').focus();return;}
+    showObStep(3);
+  } else if(step===3){
+    const disc=document.getElementById('ob-disc').value.trim();
+    if(!disc){document.getElementById('ob-disc').focus();return;}
+    buildSummary();
+  }
+}
+
+function showObStep(n){
+  document.querySelectorAll('.ob-step').forEach(s=>s.classList.remove('on'));
+  document.getElementById('obs'+n).classList.add('on');
+  document.getElementById('sum').classList.remove('on');
+}
+
+function buildSummary(){
+  const name=document.getElementById('ob-name').value.trim();
+  const dest=document.getElementById('ob-dest').value.trim();
+  const date=document.getElementById('ob-date').value;
+  const disc=document.getElementById('ob-disc').value.trim();
+
+  document.querySelectorAll('.ob-step').forEach(s=>s.classList.remove('on'));
+  document.getElementById('sum').classList.add('on');
+
+  document.getElementById('sum-name').innerHTML=name;
+  document.getElementById('sum-dest').textContent=dest;
+
+  const td=new Date(date+'T00:00:00');
+  const today=new Date();today.setHours(0,0,0,0);
+  const dl=Math.max(0,Math.round((td-today)/86400000));
+  const mo=MO[td.getMonth()];
+  document.getElementById('sum-days').textContent=`${dl} days · Starts today`;
+  document.getElementById('sum-prac').innerHTML=`<em>${disc}</em>`;
+}
+
+function beginMission(){
+  const name=document.getElementById('ob-name').value.trim();
+  const dest=document.getElementById('ob-dest').value.trim();
+  const date=document.getElementById('ob-date').value;
+  const disc=document.getElementById('ob-disc').value.trim();
+
+  // DEFAULT_DISCS already ordered: Wake → Angamardana → Steps → Kriya → Dumbbell
+  // Only append the user's onboarding discipline if it differs from all defaults
+  const defaultNames=DEFAULT_DISCS.map(d=>d.name.toLowerCase());
+  const userDiscLower=disc.toLowerCase();
+  const isDefault=defaultNames.some(n=>n.includes(userDiscLower)||userDiscLower.includes(n));
+  const disciplines=isDefault
+    ? [...DEFAULT_DISCS]
+    : [...DEFAULT_DISCS,{id:'u1',name:disc,category:'Discipline',kcalPerMin:0,defaultDur:0}];
+
+  profile={
+    mission:{
+      name,destinationText:dest,targetDate:date,
+      startDate:todayKey(),
+      disciplines
+    },
+    user:null
+  };
+  saveStorage();
+  document.getElementById('ob').classList.add('hide');
+  initApp();
+}
+
+// ═══════════════════════════════════════════════
+// PROFILE
+// ═══════════════════════════════════════════════
+
+function setPSex(s){
+  pSex=s;
+  document.getElementById('ps-m').classList.toggle('on',s==='male');
+  document.getElementById('ps-f').classList.toggle('on',s==='female');
+}
+
+function openProfile(){
+  document.getElementById('psheet').classList.add('on');
+  if(profile&&profile.user){
+    document.getElementById('p-age').value=profile.user.age||'';
+    document.getElementById('p-height').value=profile.user.height||'';
+    document.getElementById('p-wt').value=profile.user.startWeight||'';
+    setPSex(profile.user.sex||'male');
+  }
+}
+
+function saveProfile(){
+  const age=parseInt(document.getElementById('p-age').value)||null;
+  const height=parseInt(document.getElementById('p-height').value)||null;
+  const wt=parseFloat(document.getElementById('p-wt').value)||null;
+  if(!age||!height||!wt){alert('Please fill all fields.');return;}
+  profile.user={age,sex:pSex,height,startWeight:wt};
+  saveStorage();
+  document.getElementById('psheet').classList.remove('on');
+  updateEnergySummary();
+  updateEnergyToday();
+}
+
+// Prompt for profile if not set (shown inline in Record)
+function checkProfilePrompt(){
+  const el=document.getElementById('r-esumm-content');
+  if(!profile||!profile.user){
+    el.innerHTML='<div class="esum-empty" style="cursor:pointer;color:var(--ac);" onclick="openProfile()">Tap to set up energy profile →</div>';
+    return false;
+  }
+  return true;
+}
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+
+function switchTab(tab, direction){
+  if(tab === activeTab) return;
+
+  const prev = document.getElementById('s-' + activeTab);
+  const next = document.getElementById('s-' + tab);
+
+  // Determine slide direction if not explicitly passed
+  if(!direction){
+    const curIdx = TAB_ORDER.indexOf(activeTab);
+    const nxtIdx = TAB_ORDER.indexOf(tab);
+    direction = nxtIdx > curIdx ? 'forward' : 'back';
+  }
+
+  const outClass = direction === 'forward' ? 'slide-out-left'  : 'slide-out-right';
+  const inClass  = direction === 'forward' ? 'slide-in-right'  : 'slide-in-left';
+
+  // Remove all animation classes from all screens, hide inactive ones
+  document.querySelectorAll('.screen').forEach(s=>{
+    s.classList.remove('on','slide-in-right','slide-in-left','slide-out-left','slide-out-right');
+    s.style.display = 'none';
+  });
+
+  // Animate out the current screen
+  if(prev){
+    prev.style.display = 'block';
+    prev.classList.add(outClass);
+    prev.addEventListener('animationend', ()=>{
+      prev.style.display = 'none';
+      prev.classList.remove(outClass);
+    }, {once: true});
+  }
+
+  // Animate in the next screen
+  next.style.display = 'block';
+  next.classList.add(inClass);
+  next.addEventListener('animationend', ()=>{
+    next.classList.remove(inClass);
+    next.classList.add('on');
+  }, {once: true});
+
+  // Update nav
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  document.querySelector('[data-tab="'+tab+'"]').classList.add('on');
+
+  activeTab = tab;
+  next.scrollTop = 0;
+
+  if(tab==='record'){syncRecordInputs();updateEnergySummary();}
+  if(tab==='mission'){renderMission();}
+  if(tab==='patterns'){renderPatterns();}
+}
+
+// ═══════════════════════════════════════════════
+// DARK MODE
+// ═══════════════════════════════════════════════
+
+function toggleDark(){
+  isDark=!isDark;
+  document.getElementById('phone').classList.toggle('dk',isDark);
+  document.getElementById('ob').classList.toggle('dk',isDark);
+  document.getElementById('psheet').classList.toggle('dk',isDark);
+  document.getElementById('dkt-lbl').textContent=isDark?'Dark':'Light';
+  if(activeTab==='patterns') renderPatterns();
+}
+
+// ═══════════════════════════════════════════════
+// CLOCK & TIME
+// ═══════════════════════════════════════════════
+
+function updateClock(){
+  if(!profile||!profile.mission) return;
+  const now=new Date();
+  const h=now.getHours(),md=missionDay();
+  const el=document.getElementById('tod-meta');
+  if(el) el.innerHTML=`Mission Day <span>${md}</span>`;
+  // Evening prompt
+  const ep=document.getElementById('ev-prompt');
+  if(ep){
+    ep.style.display=(h>=17)?'block':'none';
+    if(h>=17){
+      const remaining=(profile.mission.disciplines||[]).length;
+      const doneCount=document.querySelectorAll('#disc-list .di.done').length;
+      const leftCount=remaining-doneCount;
+      document.getElementById('ev-text').textContent=
+        leftCount>0
+          ?`${leftCount} discipline${leftCount>1?'s':''} still open. Complete before sleep.`
+          :'All disciplines complete. Record your day.';
+    }
+  }
+}
+
+function startClock(){
+  updateClock();
+  const now=new Date();
+  const msToNext=(60-now.getSeconds())*1000-now.getMilliseconds();
+  setTimeout(()=>{updateClock();setInterval(updateClock,60000);},msToNext);
+}
+
+// ═══════════════════════════════════════════════
+// TODAY SCREEN
+// ═══════════════════════════════════════════════
+
+function renderToday(){
+  if(!profile||!profile.mission) return;
+  const m=profile.mission;
+  const discs=m.disciplines||[];
+
+  // Render discipline list
+  const list=document.getElementById('disc-list');
+  const todayRec=records[todayKey()]||{};
+  const todayDiscs=todayRec.disciplines||[];
+
+  list.innerHTML='';
+  discs.forEach((disc,i)=>{
+    const done=todayDiscs[i]?todayDiscs[i].done:false;
+    const rate=completionRate(disc.id);
+    const div=document.createElement('div');
+    div.className='di'+(done?' done':'');
+    div.innerHTML=`
+      <div class="di-l">
+        <div class="di-dot"></div>
+        <div>
+          <div class="di-name">${disc.name}</div>
+          ${rate>0?`<div class="di-sub">${rate}% mission avg${disc.kcalPerMin?` · ~${Math.round(disc.kcalPerMin*(disc.defaultDur||30))} kcal`:''}</div>`:''}
+        </div>
+      </div>
+      <div class="di-r">
+        ${i===0&&disc.id==='u1'?'':`<div class="di-tag">${disc.category}</div>`}
+      </div>`;
+    div.addEventListener('click',()=>toggleTodayDisc(i,div));
+    list.appendChild(div);
+  });
+
+  updateNextUp();
+  updateProgress();
+  updateDestinationDisplay();
+  updateProjectionCard();
+  updateRecordStatus();
+  updateEnergyToday();
+}
+
+function toggleTodayDisc(idx,el){
+  const key=todayKey();
+  if(!records[key]) records[key]={disciplines:[]};
+  if(!records[key].disciplines) records[key].disciplines=[];
+  while(records[key].disciplines.length<=idx) records[key].disciplines.push({done:false,dur:0});
+  records[key].disciplines[idx].done=!records[key].disciplines[idx].done;
+  saveStorage();
+  el.classList.toggle('done');
+  updateNextUp();
+  updateProgress();
+  updateRecordStatus();
+  // Sync to record screen if open
+  syncDlList();
+}
+
+function updateNextUp(){
+  const discs=profile.mission.disciplines||[];
+  const todayRec=records[todayKey()]||{};
+  const todayDiscs=todayRec.disciplines||[];
+  const next=discs.find((d,i)=>!(todayDiscs[i]&&todayDiscs[i].done));
+  const nameEl=document.getElementById('nu-name');
+  const tagEl=document.getElementById('nu-tag');
+  if(next){
+    nameEl.textContent=next.name;
+    nameEl.className='nu-disc';
+    tagEl.textContent=next.category;
+  } else {
+    nameEl.textContent='All done.';
+    nameEl.className='nu-disc done';
+    tagEl.textContent='';
+  }
+}
+
+function updateProgress(){
+  const discs=profile.mission.disciplines||[];
+  const todayRec=records[todayKey()]||{};
+  const todayDiscs=todayRec.disciplines||[];
+  const total=discs.length;
+  const done=todayDiscs.filter(d=>d&&d.done).length;
+  document.getElementById('prog-count').textContent=`${done} of ${total}`;
+  setTimeout(()=>{
+    const pct=total?Math.round((done/total)*100):0;
+    document.getElementById('prog-fill').style.width=pct+'%';
+  },50);
+}
+
+function updateProjectionCard(){
+  const card=document.getElementById('proj-card');
+  const textEl=document.getElementById('proj-text');
+  if(!card||!textEl) return;
+
+  // Need: target weight in mission destination text, current weight, weekly rate
+  if(!profile||!profile.mission) return;
+
+  const rate=weeklyWeightRate();            // kg/week, negative = losing
+  const curWt=currentWeight();
+  const allWts=Object.entries(records).filter(([k,v])=>v.weight).length;
+
+  // Need at least 4 weight entries for a meaningful projection
+  if(!rate||!curWt||allWts<4){card.style.display='none';return;}
+
+  // Extract numeric target from destinationText e.g. "82 kg by September 1" → 82
+  const destText=profile.mission.destinationText||'';
+  const destNumMatch=destText.match(/(\d+\.?\d*)\s*kg/i);
+  if(!destNumMatch){card.style.display='none';return;}
+  const targetWt=parseFloat(destNumMatch[1]);
+
+  const td=new Date(profile.mission.targetDate+'T00:00:00');
+  const today=new Date();today.setHours(0,0,0,0);
+  const dl=Math.max(0,Math.round((td-today)/86400000));
+
+  // Project arrival at current rate
+  const delta=curWt-targetWt;             // how much left to lose (positive)
+  const ratePerDay=rate/7;                // kg/day
+
+  card.style.display='block';
+
+  if(ratePerDay>=0){
+    // Weight going up or flat — not moving toward goal
+    textEl.innerHTML=`Weight is trending <strong>upward</strong> at ${Math.abs(rate).toFixed(2)} kg/week. At this pace the destination will not be reached by ${MO[td.getMonth()]} ${td.getDate()}.`;
+    return;
+  }
+
+  const daysToGoal=Math.round(delta/Math.abs(ratePerDay));
+  const arrival=new Date();arrival.setDate(arrival.getDate()+daysToGoal);
+  const diffDays=Math.round((td-arrival)/86400000); // positive = early, negative = late
+
+  const arrStr=`${MO[arrival.getMonth()]} ${arrival.getDate()}, ${arrival.getFullYear()}`;
+
+  if(diffDays>0){
+    textEl.innerHTML=`You'll reach <strong>${targetWt} kg</strong> by <em>${arrStr}</em> — <strong>${diffDays} days ahead</strong> of your target.`;
+  } else if(diffDays===0){
+    textEl.innerHTML=`You'll reach <strong>${targetWt} kg</strong> right on <em>${arrStr}</em>. Exactly on pace.`;
+  } else {
+    textEl.innerHTML=`At current pace, <strong>${targetWt} kg</strong> arrives <em>${arrStr}</em> — <strong>${Math.abs(diffDays)} days after</strong> your target. Pick up the pace.`;
+  }
+}
+
+function updateDestinationDisplay(){
+  const m=profile.mission;
+  const td=new Date(m.targetDate+'T00:00:00');
+  const today=new Date();today.setHours(0,0,0,0);
+  const dl=Math.max(0,Math.round((td-today)/86400000));
+  const dateStr=`${MO[td.getMonth()]} ${td.getDate()}, ${td.getFullYear()}`;
+  document.getElementById('tod-dest-val').textContent=`${m.destinationText} · ${dateStr}`;
+  document.getElementById('tod-dest-sub').textContent=`${dl} days until ${dateStr}`;
+}
+
+function updateRecordStatus(){
+  const rec=records[todayKey()]||{};
+  setPill('rp-w',!!rec.weight);
+  setPill('rp-f',!!(rec.food&&(rec.food.b||rec.food.l||rec.food.d)));
+  setPill('rp-s',!!(rec.steps&&rec.steps>0));
+  setPill('rp-n',!!(rec.notes&&rec.notes.trim()));
+}
+function setPill(id,on){document.getElementById(id).classList.toggle('on',on);}
+
+function updateEnergyToday(){
+  const rec=records[todayKey()];
+  const el=document.getElementById('e-strip-content');
+  if(!rec||!rec.energy||!rec.energy.intake){
+    el.innerHTML='<div class="es-empty">Log today\'s food to see energy balance.</div>';
+    document.getElementById('today-weight-display') && (document.getElementById('today-weight-display').textContent=rec&&rec.weight?rec.weight+' kg':'not logged');
+    return;
+  }
+  const e=rec.energy;
+  const sign=e.balance>0?'+':'';
+  el.innerHTML=`
+    <div class="es-row">
+      <span class="es-lbl">Intake</span>
+      <span class="es-val">~${e.intake.toLocaleString()} kcal</span>
+    </div>
+    <div class="es-row" style="margin-top:4px;">
+      <span class="es-lbl">TDEE</span>
+      <span class="es-val">~${e.tdee.toLocaleString()} kcal</span>
+    </div>
+    <div class="es-bal-row">
+      <span class="es-bal-lbl">Balance</span>
+      <span class="es-bal-num">${sign}${e.balance.toLocaleString()} kcal</span>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// RECORD SCREEN
+// ═══════════════════════════════════════════════
+
+function navDay(dir){
+  const n=dayOffset+dir;
+  if(n>0) return;
+  dayOffset=n;
+  document.getElementById('dn-prev').classList.toggle('dis',dayOffset<=-30);
+  document.getElementById('dn-next').classList.toggle('dis',dayOffset>=0);
+  syncRecordInputs();
+  updateEnergySummary();
+  buildSparkline();
+}
+
+function updateDayHeader(){
+  const d=new Date();d.setDate(d.getDate()+dayOffset);
+  const dayName=DOW[d.getDay()];
+  const full=`${MO[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+  const short=`${dayName}, ${d.getDate()} ${MO[d.getMonth()]}`;
+  document.getElementById('dn-date').textContent=short;
+  document.getElementById('ph-day').textContent=dayName;
+  document.getElementById('ph-full').textContent=dayOffset===0?full:`${full} · ${Math.abs(dayOffset)} day${Math.abs(dayOffset)>1?'s':''} ago`;
+
+  // Compass
+  if(profile&&profile.mission){
+    const m=profile.mission;
+    const td=new Date(m.targetDate+'T00:00:00');
+    const today=new Date();today.setHours(0,0,0,0);
+    const dl=Math.max(0,Math.round((td-today)/86400000));
+    document.getElementById('r-cmp-val').textContent=`${m.destinationText} · ${MO[td.getMonth()]} ${td.getDate()}`;
+    document.getElementById('r-cmp-days').textContent=`${dl} days`;
+    document.getElementById('r-dest-whisper').textContent=m.destinationText;
+  }
+}
+
+function syncRecordInputs(){
+  updateDayHeader();
+  const key=keyFor(dayOffset);
+  const rec=records[key]||{};
+
+  // Weight
+  document.getElementById('r-wt').value=rec.weight||'';
+
+  // Food
+  MEALS.forEach(m=>{
+    const f=rec.food?rec.food[m]:{};
+    const ta=document.getElementById('m-'+m);
+    const ki=document.getElementById('mk-'+m);
+    const ne=document.getElementById('me-'+m);
+    ta.value=f?f.text||'':'';
+    ki.value=f&&f.kcal?f.kcal:'';
+    ki.classList.toggle('est',!!(f&&f.kcal));
+    ne.textContent=f&&f.kcal?`~${f.kcal} kcal (saved)`:'';
+    ne.classList.toggle('ready',!!(f&&f.kcal));
+    mealEstimated[m]=!!(f&&f.kcal);
+    ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';
+  });
+
+  // Steps
+  document.getElementById('r-steps').value=rec.steps||'';
+  onStepsChange();
+
+  // Disciplines
+  syncDlList();
+  buildDlList();
+
+  // Notes
+  document.getElementById('r-notes').value=rec.notes||'';
+
+  updateFoodTotal();
+  buildSparkline();
+  checkProfilePrompt();
+}
+
+function buildDlList(){
+  if(!profile||!profile.mission) return;
+  const key=keyFor(dayOffset);
+  const rec=records[key]||{};
+  const dones=rec.disciplines||[];
+  const list=document.getElementById('dl-list');
+  list.innerHTML='';
+  (profile.mission.disciplines||[]).forEach((disc,i)=>{
+    const d=dones[i]||{done:false,dur:disc.defaultDur||0};
+    const div=document.createElement('div');
+    div.className='dl-item'+(d.done?' done':'');
+    const kest=disc.kcalPerMin&&d.dur?`~${Math.round(disc.kcalPerMin*d.dur)} kcal`:'';
+    div.innerHTML=`
+      <div class="dl-l">
+        <div class="dl-dot"></div>
+        <div class="dl-name">${disc.name}</div>
+      </div>
+      <div class="dl-r">
+        ${disc.kcalPerMin?`<input class="dl-dur" type="number" value="${d.dur||''}" placeholder="${disc.defaultDur||''}" inputmode="numeric" onclick="event.stopPropagation()" oninput="onDurInput(${i},this)"> <span class="dl-dunit">min</span> <span class="dl-kest" id="dk-${i}">${kest}</span>`:''}
+      </div>`;
+    div.addEventListener('click',()=>toggleDlItem(i,div));
+    list.appendChild(div);
+  });
+}
+
+function toggleDlItem(idx,el){
+  const key=keyFor(dayOffset);
+  if(!records[key]) records[key]={};
+  if(!records[key].disciplines) records[key].disciplines=[];
+  while(records[key].disciplines.length<=idx) records[key].disciplines.push({done:false,dur:0});
+  records[key].disciplines[idx].done=!records[key].disciplines[idx].done;
+  el.classList.toggle('done');
+  onRecordChange();
+  // If today, sync to Today screen
+  if(dayOffset===0) renderToday();
+}
+
+function onDurInput(idx,inp){
+  const key=keyFor(dayOffset);
+  if(!records[key]) records[key]={};
+  if(!records[key].disciplines) records[key].disciplines=[];
+  while(records[key].disciplines.length<=idx) records[key].disciplines.push({done:false,dur:0});
+  const dur=parseInt(inp.value)||0;
+  records[key].disciplines[idx].dur=dur;
+  const disc=(profile.mission.disciplines||[])[idx];
+  const el=document.getElementById('dk-'+idx);
+  if(el&&disc&&disc.kcalPerMin) el.textContent=dur?`~${Math.round(disc.kcalPerMin*dur)} kcal`:'';
+  onRecordChange();
+}
+
+function syncDlList(){
+  // Update dl-list done states from records without rebuilding
+  const key=keyFor(dayOffset);
+  const rec=records[key]||{};
+  const dones=rec.disciplines||[];
+  document.querySelectorAll('#dl-list .dl-item').forEach((el,i)=>{
+    el.classList.toggle('done',!!(dones[i]&&dones[i].done));
+  });
+}
+
+function onWtChange(){buildSparkline();onRecordChange();}
+
+function onStepsChange(){
+  const v=parseInt(document.getElementById('r-steps').value)||0;
+  const ref=document.getElementById('steps-ref');
+  if(v>=10000) ref.innerHTML='Daily target: 10,000 steps <span class="hit">· Done ✓</span>';
+  else if(v>0) ref.innerHTML=`Daily target: 10,000 steps · <span style="color:var(--t3)">${(10000-v).toLocaleString()} remaining</span>`;
+  else ref.textContent='Daily target: 10,000 steps';
+  onRecordChange();
+}
+
+function onRecordChange(){updateEnergySummary();}
+
+function updateEnergySummary(){
+  if(!checkProfilePrompt()) return;
+  const wt=parseFloat(document.getElementById('r-wt').value)||null;
+  const steps=parseInt(document.getElementById('r-steps').value)||0;
+  const key=keyFor(dayOffset);
+  const rec=records[key]||{};
+  const dones=rec.disciplines||[];
+  const intake=totalIntakeKcal();
+  const e=calcEnergy(wt,steps,dones,intake);
+  const el=document.getElementById('r-esumm-content');
+  if(!e){el.innerHTML='<div class="esum-empty">Enter weight to calculate energy balance.</div>';return;}
+  el.innerHTML=`
+    <div class="erow"><span class="erow-lbl">BMR</span><span class="erow-val dim">~${e.bmr.toLocaleString()} kcal</span></div>
+    <div class="erow"><span class="erow-lbl">NEAT (steps)</span><span class="erow-val dim">${steps?'~'+e.neat.toLocaleString()+' kcal':'—'}</span></div>
+    <div class="erow"><span class="erow-lbl">Exercise</span><span class="erow-val dim">${e.ex?'~'+e.ex.toLocaleString()+' kcal':'—'}</span></div>
+    <div class="erow"><span class="erow-lbl">TDEE</span><span class="erow-val">~${e.tdee.toLocaleString()} kcal</span></div>
+    <div class="erow"><span class="erow-lbl">Intake</span><span class="erow-val">${intake?'~'+intake.toLocaleString()+' kcal':'—'}</span></div>
+    <div class="ebal"><span class="ebal-lbl">Balance</span><span class="ebal-val">${intake?(e.balance>0?'+':'')+e.balance.toLocaleString()+' kcal':'—'}</span></div>`;
+}
+
+function saveRecord(){
+  const key=keyFor(dayOffset);
+  if(!records[key]) records[key]={};
+  const rec=records[key];
+
+  rec.weight=parseFloat(document.getElementById('r-wt').value)||null;
+
+  rec.food={};
+  MEALS.forEach(m=>{
+    const text=document.getElementById('m-'+m).value;
+    const kcal=parseInt(document.getElementById('mk-'+m).value)||0;
+    if(text||kcal) rec.food[m]={text,kcal};
+  });
+
+  rec.steps=parseInt(document.getElementById('r-steps').value)||0;
+  rec.notes=document.getElementById('r-notes').value;
+
+  // Disciplines already written on toggle — just ensure energy is stored
+  const intake=totalIntakeKcal();
+  if(profile&&profile.user){
+    const e=calcEnergy(rec.weight,rec.steps,rec.disciplines||[],intake);
+    if(e) rec.energy=e;
+  }
+
+  saveStorage();
+  updateRecordStatus();
+  updateEnergyToday();
+  buildSparkline();
+
+  // Mark today's day dot
+  const conf=document.getElementById('save-conf');
+  conf.classList.add('on');
+  setTimeout(()=>conf.classList.remove('on'),2200);
+
+  // Sync Today if this is today's record
+  if(dayOffset===0) renderToday();
+}
+
+// ── SPARKLINE ──
+function buildSparkline(){
+  const svg=document.getElementById('spark-svg');
+  if(!svg) return;
+  svg.innerHTML='';
+  const pts=[];
+  for(let i=-6;i<=0;i++){
+    const key=keyFor(i);
+    const rec=records[key];
+    let w=rec?parseFloat(rec.weight)||null:null;
+    // If viewing today and weight input has value, use it
+    if(i===0){
+      const inp=parseFloat(document.getElementById('r-wt').value)||null;
+      if(inp) w=inp;
+    }
+    pts.push({i,w});
+  }
+  const valid=pts.filter(p=>p.w!==null).map(p=>p.w);
+  if(valid.length<2) return;
+  const minW=Math.min(...valid)-0.3,maxW=Math.max(...valid)+0.3;
+  const W=320,H=28,pad=4;
+  const coords=pts.filter(p=>p.w!==null).map(p=>{
+    const x=pad+((p.i+6)/6)*(W-2*pad);
+    const y=H-pad-((p.w-minW)/(maxW-minW))*(H-2*pad);
+    return{x,y,today:p.i===0};
+  });
+  if(coords.length<2) return;
+  const line=document.createElementNS('http://www.w3.org/2000/svg','polyline');
+  line.setAttribute('points',coords.map(c=>`${c.x},${c.y}`).join(' '));
+  line.setAttribute('fill','none');
+  line.setAttribute('stroke',isDark?'#D4A853':'#8B6914');
+  line.setAttribute('stroke-width','1.5');
+  line.setAttribute('stroke-linejoin','round');
+  svg.appendChild(line);
+  coords.forEach(c=>{
+    const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx',c.x);circle.setAttribute('cy',c.y);
+    circle.setAttribute('r',c.today?3:1.8);
+    circle.setAttribute('fill',isDark?'#D4A853':'#8B6914');
+    svg.appendChild(circle);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// MISSION SCREEN
+// ═══════════════════════════════════════════════
+
+function renderMission(){
+  if(!profile||!profile.mission) return;
+  const m=profile.mission;
+  const td=new Date(m.targetDate+'T00:00:00');
+  const today=new Date();today.setHours(0,0,0,0);
+  const dl=Math.max(0,Math.round((td-today)/86400000));
+  const md=missionDay();
+
+  // Destination
+  document.getElementById('m-dest-date').textContent=`${MO[td.getMonth()]} ${td.getDate()}, ${td.getFullYear()}`;
+  document.getElementById('m-dest-wt').textContent=m.destinationText;
+  document.getElementById('m-dest-sub').textContent=`${dl} days remaining · Mission Day ${md}`;
+
+  // Brief name
+  document.getElementById('m-brief-name').textContent=m.name;
+
+  // Position table
+  const curWt=currentWeight();
+  const startWt=profile.user?profile.user.startWeight:null;
+  let posHtml='';
+  if(startWt) posHtml+=`<div class="pos-row"><div class="pos-lbl">Began</div><div class="pos-val">${startWt} kg · ${formatDate(m.startDate)}</div></div>`;
+  if(curWt) posHtml+=`<div class="pos-row"><div class="pos-lbl">Now</div><div class="pos-val ac">${curWt} kg · Day ${md}</div></div>`;
+  posHtml+=`<div class="pos-row"><div class="pos-lbl">Destination</div><div class="pos-val dest">${m.destinationText} · ${MO[td.getMonth()]} ${td.getDate()}</div></div>`;
+  document.getElementById('m-pos-table').innerHTML=posHtml;
+
+  // Pace card — only with enough weight data
+  const allWts=Object.entries(records).filter(([k,v])=>v.weight).length;
+  const paceCard=document.getElementById('pace-card');
+  if(allWts>=4&&startWt&&curWt){
+    paceCard.style.display='block';
+    const delta=startWt-parseFloat(curWt);
+    const weeksLeft=dl/7;
+    const reqPace=weeksLeft>0?(startWt-parseFloat(m.destinationText||curWt))/weeksLeft:0;
+    const curRate=weeklyWeightRate();
+    const defAvg=avgDeficit();
+    document.getElementById('pc-req').textContent=`−${Math.abs(reqPace).toFixed(1)} kg / week`;
+    document.getElementById('pc-cur').textContent=curRate?`${curRate.toFixed(2)} kg / week`:'Calculating…';
+    document.getElementById('pc-def').textContent=defAvg?`${defAvg>0?'+':''}${defAvg.toLocaleString()} kcal`:'—';
+    if(curRate&&curRate<0){
+      const daysToGoal=Math.round(Math.abs(startWt-parseFloat(m.destinationText||curWt))/(Math.abs(curRate)/7));
+      const arrival=new Date();arrival.setDate(arrival.getDate()+daysToGoal);
+      const diff=Math.round((td-arrival)/86400000);
+      document.getElementById('pc-proj').textContent=`${MO[arrival.getMonth()]} ${arrival.getDate()} · ${diff>0?diff+' days early':Math.abs(diff)+' days late'}`;
+    } else {
+      document.getElementById('pc-proj').textContent='More data needed';
+    }
+  } else {
+    paceCard.style.display='none';
+  }
+
+  // Narrative
+  const rCount=Object.keys(records).length;
+  const narr=document.getElementById('m-narr');
+  if(rCount>=3){
+    narr.style.display='block';
+    const doneDays=Object.values(records).filter(r=>{
+      const discs=r.disciplines||[];
+      return discs.length>0&&discs.every(d=>d&&d.done);
+    }).length;
+    const consistency=rCount>0?Math.round((doneDays/rCount)*100):0;
+    document.getElementById('m-narr-text').innerHTML=
+      `<strong>${rCount}</strong> days into the mission. <strong>${doneDays}</strong> were complete days — every discipline done. You've held the line <em>${consistency}% of the time.</em>`;
+  } else {
+    narr.style.display='none';
+  }
+
+  // Roster
+  const rosterEl=document.getElementById('m-roster');
+  rosterEl.innerHTML='';
+  (m.disciplines||[]).forEach(disc=>{
+    const rate=completionRate(disc.id);
+    const div=document.createElement('div');
+    div.className='roster-item';
+    div.innerHTML=`
+      <div class="ri-l"><div class="ri-dot"></div><div class="ri-name">${disc.name}</div></div>
+      <div class="ri-r">
+        <div class="ri-pct ${rate>=70?'hi':''}">${rate>0?rate+'%':'—'}</div>
+        <div class="ri-cat">${disc.category}</div>
+      </div>`;
+    rosterEl.appendChild(div);
+  });
+}
+
+function formatDate(dateStr){
+  if(!dateStr) return '';
+  const d=new Date(dateStr+'T00:00:00');
+  return `${MO[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+}
+
+// ═══════════════════════════════════════════════
+// PATTERNS SCREEN
+// ═══════════════════════════════════════════════
+
+function renderPatterns(){
+  buildWeightChart(chartRange);
+  renderEnergyBreakdown();
+  renderPatternInsights();
+}
+
+function setRange(r,btn){
+  chartRange=r;
+  document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  buildWeightChart(r);
+}
+
+function buildWeightChart(rangeDays){
+  const wrap=document.getElementById('chart-wrap');
+  if(!wrap) return;
+  const allEntries=Object.entries(records)
+    .filter(([k,v])=>v.weight)
+    .map(([k,v])=>({date:new Date(k+'T00:00:00'),w:parseFloat(v.weight)}))
+    .sort((a,b)=>a.date-b.date);
+  let entries=allEntries;
+  if(rangeDays>0){
+    const cutoff=new Date();cutoff.setDate(cutoff.getDate()-(rangeDays-1));cutoff.setHours(0,0,0,0);
+    entries=allEntries.filter(e=>e.date>=cutoff);
+  }
+  if(entries.length<2){
+    wrap.innerHTML=`<div class="chart-empty">Your weight trend will appear after ${rangeDays>0?'more':'7+'} days of logging.</div>`;
+    return;
+  }
+  const W=330,H=100,pL=8,pR=28,pT=8,pB=16;
+  const weights=entries.map(e=>e.w);
+  const targetWt=profile&&profile.mission?parseFloat(profile.mission.destinationText)||null:null;
+  const minW=Math.min(...weights,targetWt||Infinity)-0.5;
+  const maxW=Math.max(...weights)+0.5;
+  const minD=entries[0].date.getTime(),maxD=entries[entries.length-1].date.getTime();
+  const DR=maxD-minD||1;
+  const toX=d=>pL+((d-minD)/DR)*(W-pL-pR);
+  const toY=w=>pT+((maxW-w)/(maxW-minW))*(H-pT-pB);
+
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.setAttribute('preserveAspectRatio','none');
+  svg.style.width='100%';svg.style.height='100%';
+
+  // Target line
+  if(targetWt){
+    const ty=toY(targetWt);
+    const tl=document.createElementNS('http://www.w3.org/2000/svg','line');
+    tl.setAttribute('x1',pL);tl.setAttribute('y1',ty);tl.setAttribute('x2',W-pR);tl.setAttribute('y2',ty);
+    tl.setAttribute('stroke',isDark?'rgba(212,168,83,.18)':'rgba(139,105,20,.13)');
+    tl.setAttribute('stroke-width','1');tl.setAttribute('stroke-dasharray','3,4');
+    svg.appendChild(tl);
+    const tLabel=document.createElementNS('http://www.w3.org/2000/svg','text');
+    tLabel.setAttribute('x',W-pR+2);tLabel.setAttribute('y',ty+3);
+    tLabel.setAttribute('font-size','8');tLabel.setAttribute('fill',isDark?'rgba(212,168,83,.45)':'rgba(139,105,20,.5)');
+    tLabel.textContent=targetWt;
+    svg.appendChild(tLabel);
+  }
+
+  // Main line
+  const pl=document.createElementNS('http://www.w3.org/2000/svg','polyline');
+  pl.setAttribute('points',entries.map(e=>`${toX(e.date.getTime()).toFixed(1)},${toY(e.w).toFixed(1)}`).join(' '));
+  pl.setAttribute('fill','none');pl.setAttribute('stroke',isDark?'#D4A853':'#8B6914');
+  pl.setAttribute('stroke-width','1.8');pl.setAttribute('stroke-linejoin','round');
+  svg.appendChild(pl);
+
+  // Dots
+  entries.forEach((e,i)=>{
+    const isLast=i===entries.length-1;
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',toX(e.date.getTime()).toFixed(1));c.setAttribute('cy',toY(e.w).toFixed(1));
+    c.setAttribute('r',isLast?3.5:1.8);c.setAttribute('fill',isDark?'#D4A853':'#8B6914');
+    svg.appendChild(c);
+  });
+
+  // Y labels
+  [[maxW.toFixed(1),pT+8],[entries[entries.length-1].w,toY(entries[entries.length-1].w)-3]].forEach(([text,y])=>{
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',pL);t.setAttribute('y',y);t.setAttribute('font-size','8');
+    t.setAttribute('fill',isDark?'#6B6560':'#B5ADA5');t.textContent=text;
+    svg.appendChild(t);
+  });
+
+  wrap.innerHTML='';wrap.appendChild(svg);
+}
+
+function renderEnergyBreakdown(){
+  const el=document.getElementById('pat-energy');
+  const recs=Object.values(records).filter(r=>r.energy&&r.energy.tdee);
+  if(recs.length<5){
+    el.innerHTML=`<div class="chart-empty" style="text-align:left;padding:8px 0;">Energy breakdown will appear after 5 days of logged food and weight.</div>`;
+    return;
+  }
+  const avg=k=>Math.round(recs.reduce((s,r)=>s+(r.energy[k]||0),0)/recs.length);
+  el.innerHTML=`<div class="bk-card" style="margin:0;">
+    <div class="bk-title">${recs.length}-Day Averages</div>
+    <div class="bk-row"><span class="bk-lbl">BMR</span><span class="bk-val">${avg('bmr').toLocaleString()} kcal</span></div>
+    <div class="bk-row"><span class="bk-lbl">NEAT (steps)</span><span class="bk-val">${avg('neat').toLocaleString()} kcal</span></div>
+    <div class="bk-row"><span class="bk-lbl">Exercise</span><span class="bk-val">${avg('ex').toLocaleString()} kcal</span></div>
+    <div class="bk-row"><span class="bk-lbl">TDEE</span><span class="bk-val">${avg('tdee').toLocaleString()} kcal</span></div>
+    <div class="bk-row"><span class="bk-lbl">Intake</span><span class="bk-val">${avg('intake').toLocaleString()} kcal</span></div>
+    <div class="bk-row"><span class="bk-lbl">Avg Balance</span><span class="bk-val ac">${avg('balance')>0?'+':''}${avg('balance').toLocaleString()} kcal</span></div>
+  </div>`;
+}
+
+function renderPatternInsights(){
+  const el=document.getElementById('pat-insights');
+  const recs=Object.entries(records);
+  if(recs.length<7){
+    el.innerHTML=`<div class="chart-empty" style="text-align:left;padding:8px 0;">Patterns appear after 7 days of records.</div>`;
+    return;
+  }
+  const insights=[];
+
+  // Weight trend
+  const rate=weeklyWeightRate();
+  if(rate!==null){
+    const direction=rate<-0.1?'downward':rate>0.1?'upward':'stable';
+    insights.push(`Weight is trending <strong>${direction}</strong> at ${Math.abs(rate).toFixed(2)} kg/week over the last ${Math.min(14,recs.length)} days.`);
+  }
+
+  // Best completion day
+  const byDow={};
+  recs.forEach(([k,v])=>{
+    const dow=new Date(k+'T00:00:00').getDay();
+    const discs=v.disciplines||[];
+    const total=discs.length;
+    const done=discs.filter(d=>d&&d.done).length;
+    if(total>0){
+      if(!byDow[dow]) byDow[dow]={sum:0,count:0};
+      byDow[dow].sum+=done/total;byDow[dow].count++;
+    }
+  });
+  const bowEntries=Object.entries(byDow).filter(([,v])=>v.count>=2);
+  if(bowEntries.length>=3){
+    const best=bowEntries.sort((a,b)=>(b[1].sum/b[1].count)-(a[1].sum/a[1].count))[0];
+    const worst=bowEntries.sort((a,b)=>(a[1].sum/a[1].count)-(b[1].sum/b[1].count))[0];
+    insights.push(`${DOW[parseInt(best[0])]}s are your strongest day. ${DOW[parseInt(worst[0])]}s have the lowest discipline completion.`);
+  }
+
+  // Deficit on complete vs incomplete days
+  const completeDays=Object.values(records).filter(r=>{
+    const discs=r.disciplines||[];
+    return discs.length>0&&discs.every(d=>d&&d.done)&&r.energy&&r.energy.balance!=null;
+  });
+  const incompleteDays=Object.values(records).filter(r=>{
+    const discs=r.disciplines||[];
+    const total=discs.length;
+    const done=discs.filter(d=>d&&d.done).length;
+    return total>0&&done<total&&r.energy&&r.energy.balance!=null;
+  });
+  if(completeDays.length>=3&&incompleteDays.length>=3){
+    const avgComplete=Math.round(completeDays.reduce((s,r)=>s+r.energy.balance,0)/completeDays.length);
+    const avgIncomplete=Math.round(incompleteDays.reduce((s,r)=>s+r.energy.balance,0)/incompleteDays.length);
+    insights.push(`Complete discipline days average <strong>${avgComplete>0?'+':''}${avgComplete.toLocaleString()} kcal</strong> balance. Partial days average <strong>${avgIncomplete>0?'+':''}${avgIncomplete.toLocaleString()} kcal</strong>.`);
+  }
+
+  if(!insights.length){
+    el.innerHTML='<div class="chart-empty" style="text-align:left;padding:8px 0;">Keep logging — patterns will surface soon.</div>';
+    return;
+  }
+
+  el.innerHTML=insights.map(text=>`
+    <div class="pat-item">
+      <div class="pat-from">From your record</div>
+      <div class="pat-text">${text}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+
+function initApp(){
+  if(!profile||!profile.mission){
+    document.getElementById('ob').classList.remove('hide');
+    return;
+  }
+  document.getElementById('ob').classList.add('hide');
+  renderToday();
+  syncRecordInputs();
+  startClock();
+  // Progress bar animate
+  setTimeout(updateProgress,400);
+}
+
+function init(){
+  loadStorage();
+  if(!profile||!profile.mission){
+    document.getElementById('ob').classList.remove('hide');
+  } else {
+    document.getElementById('ob').classList.add('hide');
+    initApp();
+  }
+  document.querySelectorAll('textarea').forEach(ta=>{
+    ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';});
+  });
+  initSwipe();
+}
+
+// ═══════════════════════════════════════════════
+// SWIPE NAVIGATION
+// ═══════════════════════════════════════════════
+
+const TAB_ORDER = ['today','record','mission','patterns'];
+
+function initSwipe(){
+  const phone = document.getElementById('phone');
+  let startX = 0, startY = 0, startTime = 0;
+
+  phone.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    startTime = Date.now();
+  }, {passive: true});
+
+  phone.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    const dt = Date.now() - startTime;
+
+    // Swipe: horizontal > 60px, more horizontal than vertical, under 400ms
+    if(Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5 && dt < 400){
+      const cur = TAB_ORDER.indexOf(activeTab);
+      if(dx < 0 && cur < TAB_ORDER.length - 1){
+        // Swipe left → next tab (forward)
+        switchTab(TAB_ORDER[cur + 1], 'forward');
+      } else if(dx > 0 && cur > 0){
+        // Swipe right → previous tab (back)
+        switchTab(TAB_ORDER[cur - 1], 'back');
+      }
+    }
+  }, {passive: true});
+}
+
+init();
+</script>
+</body>
+</html>
