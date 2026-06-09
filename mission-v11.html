@@ -1,0 +1,2808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Mission OS — The Re-entry</title>
+
+<!-- PWA Meta -->
+<meta name="application-name" content="Mission OS">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mission OS">
+<meta name="theme-color" content="#F4EFE5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="The Re-entry — Personal Health Mission">
+
+<!-- Inline Manifest via data URI -->
+<link rel="manifest" href="data:application/manifest+json,{
+  %22name%22:%22Mission OS — The Re-entry%22,
+  %22short_name%22:%22Mission OS%22,
+  %22description%22:%22Personal health mission tracker%22,
+  %22start_url%22:%22.%22,
+  %22display%22:%22standalone%22,
+  %22orientation%22:%22portrait%22,
+  %22background_color%22:%22%23F4EFE5%22,
+  %22theme_color%22:%22%23F4EFE5%22,
+  %22icons%22:[
+    {%22src%22:%22data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23F4EFE5'/%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' font-family='Georgia,serif' font-size='320' font-weight='600' fill='%231B1814'%3EM%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any maskable%22}
+  ]
+}">
+
+<!-- Apple Touch Icon — inline SVG as data URI -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%23F4EFE5'/><text x='50%25' y='58%25' text-anchor='middle' font-family='Georgia,serif' font-size='320' font-weight='600' fill='%231B1814'>M</text></svg>">
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+input[type=number]{-moz-appearance:textfield;}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+
+:root{
+  --bg:#F4EFE5;
+  --bg-r:#ECE6DA;
+  --t1:#1B1814;
+  --t2:#3C3730;
+  --t3:#8C857B;
+  --t4:#BEB7AE;
+  --ac:#9A7B3C;
+  --rl:rgba(28,25,20,.09);
+  --rls:rgba(28,25,20,.16);
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'DM Sans',sans-serif;
+  --risk-on:#2E5C2E;
+  --risk-at:#7A3A1A;
+  --nav-h:72px;
+}
+.dk{
+  --bg:#161412;
+  --bg-r:#1E1C18;
+  --t1:#EDE7DB;
+  --t2:#B4ADA3;
+  --t3:#6A6460;
+  --t4:#3A3630;
+  --ac:#C9A45A;
+  --rl:rgba(237,231,219,.07);
+  --rls:rgba(237,231,219,.14);
+  --risk-on:#4A8C4A;
+  --risk-at:#C4602A;
+}
+
+html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:antialiased;min-height:100vh;width:100%;}
+.phone{width:100%;min-height:100vh;background:var(--bg);position:relative;transition:background .4s;overflow:hidden;}
+
+/* SCREENS */
+.screen{display:none;height:100vh;overflow-y:auto;padding-bottom:calc(var(--nav-h) + 24px);-webkit-overflow-scrolling:touch;position:absolute;top:0;left:0;width:100%;will-change:transform,opacity;}
+.screen.on{display:block;}
+.screen.slide-in-right{display:block;animation:sIR .32s cubic-bezier(.25,.46,.45,.94) both;}
+.screen.slide-in-left{display:block;animation:sIL .32s cubic-bezier(.25,.46,.45,.94) both;}
+.screen.slide-out-left{display:block;animation:sOL .32s cubic-bezier(.25,.46,.45,.94) both;pointer-events:none;}
+.screen.slide-out-right{display:block;animation:sOR .32s cubic-bezier(.25,.46,.45,.94) both;pointer-events:none;}
+@keyframes sIR{from{transform:translateX(100%);opacity:.5}to{transform:translateX(0);opacity:1}}
+@keyframes sIL{from{transform:translateX(-100%);opacity:.5}to{transform:translateX(0);opacity:1}}
+@keyframes sOL{from{transform:translateX(0);opacity:1}to{transform:translateX(-26%);opacity:0}}
+@keyframes sOR{from{transform:translateX(0);opacity:1}to{transform:translateX(26%);opacity:0}}
+
+/* FULL SCREEN OVERLAY */
+.overlay{position:fixed;inset:0;background:var(--bg);z-index:60;display:none;flex-direction:column;overflow-y:auto;transition:background .4s;}
+.overlay.on{display:flex;}
+.overlay.slide-in{animation:sIR .32s cubic-bezier(.25,.46,.45,.94) both;}
+.ov-top{display:flex;align-items:center;justify-content:space-between;padding:52px 28px 18px;border-bottom:1px solid var(--rl);}
+.ov-back{font-family:var(--serif);font-size:26px;font-weight:300;color:var(--t3);cursor:pointer;padding:6px;-webkit-tap-highlight-color:transparent;}
+.ov-back:active{color:var(--ac);}
+.ov-title{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--t3);}
+.ov-action{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ac);cursor:pointer;-webkit-tap-highlight-color:transparent;padding:6px;}
+
+/* ═══════════════════════════════════════
+   NAV — Premium editorial navigation
+   Active state: filled container, not border
+═══════════════════════════════════════ */
+.nav{
+  position:fixed;bottom:0;left:0;width:100%;
+  height:var(--nav-h);
+  padding:0 8px env(safe-area-inset-bottom,0px);
+  background:var(--bg);
+  border-top:1px solid var(--rls);
+  display:flex;justify-content:space-around;align-items:center;
+  z-index:40;
+  transition:background .4s,border-color .4s;
+}
+.ni{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:5px;flex:1;
+  opacity:.38;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:opacity .22s,background .22s;
+  position:relative;
+  padding:10px 8px 10px;
+  border-radius:8px;
+  margin:8px 4px;
+}
+.ni.on{
+  opacity:1;
+  background:var(--bg-r);
+}
+.nl{
+  font-size:9px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--t3);transition:color .22s;
+  font-family:var(--sans);font-weight:400;
+}
+.ni.on .nl{color:var(--t1);}
+
+/* SHARED */
+.sh{display:flex;align-items:center;gap:14px;padding:28px 28px 0;}
+.sl{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--t2);white-space:nowrap;flex-shrink:0;font-weight:500;}
+.sr{flex:1;height:1px;background:var(--rl);}
+.flbl{font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--t2);display:block;margin-bottom:10px;font-weight:500;}
+.finp{background:none;border:none;border-bottom:1px solid var(--rls);outline:none;width:100%;padding-bottom:10px;font-family:var(--serif);font-size:26px;font-weight:300;color:var(--t1);caret-color:var(--ac);transition:border-color .2s;}
+.finp:focus{border-bottom-color:var(--ac);}
+.finp::placeholder{color:var(--t4);}
+.btn-primary{width:100%;padding:18px 0;background:var(--t1);border:none;font-family:var(--sans);font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--bg);cursor:pointer;transition:opacity .2s;margin-top:28px;display:block;}
+.btn-primary:active{opacity:.75;}
+.btn-ghost{background:none;border:1px solid var(--rls);padding:16px 0;width:100%;font-family:var(--sans);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--t2);cursor:pointer;transition:all .2s;}
+.btn-ghost:active{border-color:var(--ac);color:var(--ac);}
+
+/* ═══ TODAY ═══ */
+.tod-top{padding:28px 28px 0;display:flex;justify-content:space-between;align-items:center;}
+.tod-meta{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);}
+.tod-meta span{color:var(--ac);}
+.dk-toggle{display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.dkt-lbl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);}
+.dkt-pill{width:28px;height:2px;background:var(--rls);position:relative;top:0;}
+.dkt-knob{width:8px;height:8px;border-radius:50%;background:var(--ac);position:absolute;top:-3px;left:0;transition:left .28s ease;}
+.dk .dkt-knob{left:20px;}
+
+/* Travel mode banner */
+.travel-banner{margin:18px 28px 0;padding:13px 16px;background:var(--bg-r);border-left:2px solid var(--ac);display:none;justify-content:space-between;align-items:center;}
+.travel-banner.on{display:flex;}
+.tb-lbl{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ac);}
+.tb-off{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+
+/* Weight quick entry */
+.wt-quick{padding:32px 28px 0;}
+.wq-label{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--t2);font-weight:500;margin-bottom:14px;display:flex;align-items:center;gap:14px;}
+.wq-label::after{content:'';flex:1;height:1px;background:var(--rl);}
+.wq-row{display:flex;align-items:baseline;gap:12px;}
+.wq-inp{background:none;border:none;border-bottom:1px solid var(--rls);outline:none;font-family:var(--serif);font-size:52px;font-weight:300;color:var(--t1);caret-color:var(--ac);width:140px;padding-bottom:4px;transition:border-color .2s;}
+.wq-inp:focus{border-bottom-color:var(--ac);}
+.wq-inp::placeholder{color:var(--t4);}
+.wq-unit{font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t3);}
+.wq-save{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ac);cursor:pointer;margin-left:auto;-webkit-tap-highlight-color:transparent;padding:6px 0;}
+.wq-saved{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--ac);opacity:0;transition:opacity .3s;margin-left:8px;}
+.wq-saved.on{opacity:1;}
+
+/* ═══ MISSION RISK CARD ═══ */
+.risk-card{margin:24px 28px 0;padding:18px 0;border-top:1px solid var(--rl);border-bottom:1px solid var(--rl);}
+.rc-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
+.rc-eyebrow{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--t2);font-weight:500;}
+.rc-status{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);font-weight:500;}
+.rc-status.on-track{color:var(--risk-on);}
+.rc-status.at-risk{color:var(--risk-at);}
+.rc-row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--rl);}
+.rc-row:last-child{border-bottom:none;}
+.rc-lbl{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);}
+.rc-val{font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t1);}
+.rc-val.projected{font-size:24px;}
+.rc-val.muted{color:var(--t3);}
+.rc-insufficient{font-family:var(--serif);font-size:18px;font-weight:300;font-style:italic;color:var(--t3);padding:4px 0;}
+.rc-entries{font-size:11px;letter-spacing:.12em;color:var(--t4);margin-top:8px;}
+
+/* Tomorrow meal card */
+.meal-card{
+  margin:24px 28px 0;
+  padding:18px 20px;
+  border:1px solid var(--rls);
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .18s;
+}
+.meal-card:active{background:var(--bg-r);}
+.mc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.mc-eyebrow{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--t2);font-weight:500;}
+.mc-arrow{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t4);}
+.mc-row{display:flex;align-items:baseline;gap:14px;padding:6px 0;}
+.mc-slot{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--t4);width:76px;flex-shrink:0;}
+.mc-dish{font-family:var(--serif);font-size:18px;font-weight:300;color:var(--t2);}
+.mc-kcal{font-size:11px;color:var(--t4);margin-left:auto;}
+.mc-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;padding-top:14px;border-top:1px solid var(--rl);}
+.mc-total-lbl{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);}
+.mc-total-val{font-family:var(--serif);font-size:18px;font-weight:300;color:var(--ac);}
+.mc-empty{font-family:var(--serif);font-size:17px;font-weight:300;font-style:italic;color:var(--t3);}
+
+/* Progress */
+.prog{padding:24px 28px 0;}
+.prog-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;}
+.prog-label{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);}
+.prog-count{font-family:var(--serif);font-size:16px;font-weight:300;color:var(--t2);}
+.prog-track{height:1px;background:var(--rl);}
+.prog-fill{height:1px;background:var(--ac);width:0%;transition:width 1.3s cubic-bezier(.16,1,.3,1);}
+
+/* Discipline list */
+.disc-list{padding:10px 28px 0;}
+.di{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 0;border-bottom:1px solid var(--rl);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.di:first-child{border-top:1px solid var(--rl);}
+.di-l{display:flex;align-items:flex-start;gap:20px;}
+.di-dot{width:18px;height:1px;background:var(--t4);flex-shrink:0;transition:background .28s;margin-top:11px;}
+.di.done .di-dot{background:var(--ac);}
+.di-name{font-family:var(--serif);font-size:24px;font-weight:300;color:var(--t1);transition:all .28s;letter-spacing:.01em;line-height:1.15;}
+.di.done .di-name{color:var(--t3);font-style:italic;}
+.di-sub{font-size:12px;color:var(--t3);margin-top:4px;letter-spacing:.04em;}
+.di-tag{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--t4);margin-top:3px;}
+
+/* Evening prompt */
+.ev-prompt{margin:22px 28px 0;padding:18px 0;border-top:1px solid var(--rl);}
+.ev-lbl{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;}
+.ev-text{font-family:var(--serif);font-size:18px;font-weight:300;font-style:italic;color:var(--t2);line-height:1.6;}
+
+/* ═══ MEAL DETAIL OVERLAY ═══ */
+.md-date-strip{padding:0 28px 18px;display:flex;align-items:center;justify-content:space-between;}
+.md-date-nav{display:flex;align-items:center;gap:18px;}
+.md-date-arr{font-family:var(--serif);font-size:26px;color:var(--t3);cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;}
+.md-date-arr:active{color:var(--ac);}
+.md-date-arr.dis{opacity:.2;pointer-events:none;}
+.md-date-lbl{font-family:var(--serif);font-size:17px;font-weight:300;font-style:italic;color:var(--t2);}
+.md-cal-btn{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.md-cal-btn:active{color:var(--ac);}
+
+/* Travel toggle in meal detail */
+.md-travel{margin:0 28px;padding:14px 0;border-top:1px solid var(--rl);display:flex;justify-content:space-between;align-items:center;}
+.md-travel-lbl{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);}
+.md-travel-toggle{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ac);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+
+/* Meal slot in detail */
+.meal-slot{padding:22px 28px;border-bottom:1px solid var(--rl);}
+.ms-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;}
+.ms-name{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--t2);font-weight:500;}
+.ms-kcal{font-family:var(--serif);font-size:17px;font-weight:300;color:var(--ac);}
+.ms-dish{font-family:var(--serif);font-size:28px;font-weight:300;color:var(--t1);line-height:1.1;margin-bottom:8px;}
+.ms-portion{font-size:15px;color:var(--t3);letter-spacing:.01em;line-height:1.6;margin-bottom:14px;}
+.ms-macros{display:flex;gap:24px;}
+.ms-macro{display:flex;flex-direction:column;gap:3px;}
+.ms-macro-val{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t1);}
+.ms-macro-lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--t4);}
+.ms-actions{display:flex;gap:20px;margin-top:14px;}
+.ms-btn{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);cursor:pointer;padding:6px 0;border-bottom:1px solid var(--rl);-webkit-tap-highlight-color:transparent;}
+.ms-btn:active{color:var(--ac);border-bottom-color:var(--ac);}
+.ms-btn.locked{color:var(--ac);}
+
+/* Day total */
+.md-total{padding:22px 28px;border-top:1px solid var(--rls);}
+.mdt-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;}
+.mdt-lbl{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);}
+.mdt-val{font-family:var(--serif);font-size:18px;font-weight:300;color:var(--t1);}
+.mdt-val.ac{color:var(--ac);}
+
+/* PDF share button */
+.md-share{margin:20px 28px 0;}
+
+/* ═══ CALENDAR OVERLAY ═══ */
+.cal-grid{padding:16px 28px;display:flex;flex-direction:column;gap:2px;}
+.cal-month-label{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--t3);padding:14px 0 10px;}
+.cal-week{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cal-dow{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t4);text-align:center;padding:6px 0;}
+.cal-day{padding:10px 4px;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative;}
+.cal-day-num{font-family:var(--serif);font-size:18px;font-weight:300;color:var(--t2);}
+.cal-day.today .cal-day-num{color:var(--ac);}
+.cal-day.has-plan .cal-day-num{color:var(--t1);}
+.cal-day.selected .cal-day-num{background:var(--t1);color:var(--bg);border-radius:50%;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;}
+.cal-day.past{opacity:.35;pointer-events:none;}
+.cal-day.empty{pointer-events:none;}
+.cal-dot{width:3px;height:3px;border-radius:50%;background:var(--ac);margin:3px auto 0;opacity:0;}
+.cal-day.has-plan .cal-dot{opacity:1;}
+
+/* ═══ RECORD ═══ */
+.compass{padding:58px 28px 16px;display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--rl);}
+.cmp-lbl{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ac);}
+.cmp-val{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--t3);}
+.cmp-days{font-size:11px;color:var(--t4);letter-spacing:.06em;}
+.daynav{display:flex;align-items:center;justify-content:space-between;padding:20px 28px 0;}
+.dn-arr{font-family:var(--serif);font-size:28px;font-weight:300;color:var(--t3);cursor:pointer;padding:8px;margin:-8px;-webkit-tap-highlight-color:transparent;transition:color .18s;user-select:none;}
+.dn-arr:active{color:var(--ac);}
+.dn-arr.dis{opacity:.14;pointer-events:none;}
+.dn-date{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--t3);text-align:center;letter-spacing:.04em;}
+.page-head{padding:18px 28px 0;}
+.ph-day{font-family:var(--serif);font-size:48px;font-weight:300;color:var(--t1);line-height:1;}
+.ph-full{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);margin-top:6px;}
+.page-rule{margin:18px 28px 0;height:1px;background:var(--rl);}
+.je{padding:22px 28px;border-bottom:1px solid var(--rl);}
+.je:last-child{border-bottom:none;}
+.je-cat{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--t2);font-weight:500;margin-bottom:14px;display:flex;align-items:center;}
+.w-row{display:flex;align-items:baseline;gap:10px;}
+.w-inp{background:none;border:none;border-bottom:1px solid var(--rls);outline:none;font-family:var(--serif);font-size:52px;font-weight:300;color:var(--t1);caret-color:var(--ac);width:170px;padding-bottom:4px;transition:border-color .2s;}
+.w-inp:focus{border-bottom-color:var(--ac);}
+.w-inp::placeholder{color:var(--t4);}
+.w-unit{font-family:var(--serif);font-size:24px;font-weight:300;color:var(--t3);}
+.w-whisper{font-size:12px;color:var(--t4);margin-top:10px;letter-spacing:.06em;}
+.w-whisper em{color:var(--ac);font-style:normal;}
+.spark-svg{width:100%;height:36px;margin-top:16px;opacity:.7;}
+.notes-ta{background:none;border:none;outline:none;font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t2);width:100%;resize:none;line-height:1.65;caret-color:var(--ac);}
+.notes-ta::placeholder{color:var(--t4);}
+
+/* Steps in record */
+.steps-row{display:flex;align-items:baseline;gap:10px;}
+.steps-inp{background:none;border:none;border-bottom:1px solid var(--rls);outline:none;font-family:var(--serif);font-size:36px;font-weight:300;color:var(--t1);caret-color:var(--ac);width:160px;padding-bottom:4px;transition:border-color .2s;}
+.steps-inp:focus{border-bottom-color:var(--ac);}
+.steps-inp::placeholder{color:var(--t4);}
+.steps-unit{font-family:var(--serif);font-size:17px;color:var(--t3);}
+
+/* Discipline log in record */
+.dl-item{display:flex;align-items:center;justify-content:space-between;padding:15px 0;border-bottom:1px solid var(--rl);}
+.dl-item:last-child{border-bottom:none;}
+.dl-name{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t2);}
+.dl-right{display:flex;align-items:center;gap:12px;}
+.dl-check{width:20px;height:20px;border:1px solid var(--rls);cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:all .2s;flex-shrink:0;}
+.dl-check.on{background:var(--t1);border-color:var(--t1);}
+.dl-check-mark{font-size:10px;color:var(--bg);opacity:0;transition:opacity .2s;}
+.dl-check.on .dl-check-mark{opacity:1;}
+
+/* Energy summary */
+.esumm{margin:22px 28px 0;padding:16px 0;border-top:1px solid var(--rl);}
+.esumm-title{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--t2);font-weight:500;margin-bottom:12px;}
+.erow{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--rl);}
+.erow:last-of-type{border-bottom:none;}
+.erow-lbl{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);}
+.erow-val{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t1);}
+.erow-val.dim{color:var(--t3);}
+.ebal{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px;padding-top:12px;border-top:1px solid var(--rls);}
+.ebal-lbl{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);}
+.ebal-val{font-family:var(--serif);font-size:30px;font-weight:300;color:var(--t1);}
+.save-row{margin:24px 28px 0;display:flex;flex-direction:column;gap:10px;}
+.save-conf{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--ac);opacity:0;transition:opacity .3s;text-align:center;}
+.save-conf.on{opacity:1;}
+
+/* ═══ MISSION ═══ */
+.m-head{padding:58px 28px 0;}
+.m-eyebrow{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;}
+.m-title{font-family:var(--serif);font-size:52px;font-weight:300;color:var(--t1);line-height:.97;margin-bottom:8px;}
+.m-title em{font-style:italic;color:var(--ac);}
+.m-sub{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);}
+.pos-table{margin:22px 28px 0;}
+.pos-row{display:flex;align-items:baseline;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--rl);}
+.pos-row:last-child{border-bottom:none;}
+.pos-row:first-child{border-top:1px solid var(--rl);}
+.pos-lbl{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);}
+.pos-val{font-family:var(--serif);font-size:18px;font-weight:300;color:var(--t1);text-align:right;}
+.pos-val.ac{color:var(--ac);}
+
+/* Mission settings */
+.m-settings{margin:24px 28px 0;padding:22px;background:var(--bg-r);}
+.ms-title{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);margin-bottom:18px;}
+.ms-fields{display:flex;flex-direction:column;gap:18px;}
+.ms-row{display:flex;gap:18px;}
+.ms-field{flex:1;}
+.ms-date{font-size:18px;background:none;border:none;border-bottom:1px solid var(--rl);color:var(--t1);outline:none;width:100%;font-family:var(--sans);padding-bottom:10px;transition:border-color .2s;}
+.ms-date:focus{border-bottom-color:var(--ac);}
+.ms-warning{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--risk-at);margin-top:12px;display:none;}
+.ms-warning.on{display:block;}
+
+/* Discipline roster */
+.roster-item{display:flex;align-items:flex-start;justify-content:space-between;padding:15px 0;border-bottom:1px solid var(--rl);}
+.roster-item:first-child{border-top:1px solid var(--rl);}
+.ri-l{display:flex;align-items:flex-start;gap:16px;}
+.ri-dot{width:14px;height:1px;background:var(--t4);flex-shrink:0;margin-top:11px;}
+.ri-name{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t1);line-height:1.15;}
+.ri-r{display:flex;align-items:center;gap:12px;padding-top:3px;}
+.ri-pct{font-family:var(--serif);font-size:18px;font-weight:300;color:var(--t2);}
+.ri-pct.hi{color:var(--ac);}
+.ri-cat{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--t4);}
+
+/* ═══ PATTERNS ═══ */
+.pat-head{padding:58px 28px 0;}
+.pat-title{font-family:var(--serif);font-size:52px;font-weight:300;color:var(--t1);line-height:.97;margin-bottom:6px;}
+.pat-sub{font-family:var(--serif);font-size:17px;font-weight:300;font-style:italic;color:var(--t3);}
+.chart-block{padding:26px 28px 0;}
+.chart-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;}
+.chart-title{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);}
+.range-btns{display:flex;border:1px solid var(--rl);}
+.range-btn{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);padding:7px 13px;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s;}
+.range-btn+.range-btn{border-left:1px solid var(--rl);}
+.range-btn.on{background:var(--t1);color:var(--bg);}
+.chart-wrap{width:100%;height:120px;}
+.chart-empty{font-family:var(--serif);font-size:16px;font-weight:300;font-style:italic;color:var(--t3);padding:20px 0;}
+.bk-card{margin:0 28px;padding:16px 0;border-top:1px solid var(--rl);border-bottom:1px solid var(--rl);}
+.bk-title{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);margin-bottom:12px;}
+.bk-row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--rl);}
+.bk-row:last-child{border-bottom:none;}
+.bk-lbl{font-size:14px;font-weight:300;color:var(--t2);}
+.bk-val{font-family:var(--serif);font-size:18px;font-weight:300;color:var(--t1);}
+.bk-val.ac{color:var(--ac);}
+.pat-item{margin:0 28px;padding:14px 0 14px 18px;border-left:1px solid var(--ac);border-bottom:1px solid var(--rl);}
+.pat-item:first-child{border-top:1px solid var(--rl);}
+.pat-from{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ac);margin-bottom:6px;}
+.pat-text{font-family:var(--serif);font-size:18px;font-weight:300;font-style:italic;color:var(--t2);line-height:1.6;}
+
+/* DB Browser */
+#db-cats::-webkit-scrollbar{display:none;}
+.db-cat-btn{flex-shrink:0;padding:12px 14px;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .18s;white-space:nowrap;}
+.db-cat-btn.on{color:var(--ac);border-bottom-color:var(--ac);}
+.db-result{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 28px;border-bottom:1px solid var(--rl);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s;}
+.db-result:active{background:var(--bg-r);}
+.db-result-selected{background:var(--bg-r);}
+.db-result-left{flex:1;}
+.db-result-name{font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t1);line-height:1.2;margin-bottom:4px;}
+.db-result-ml{font-size:11px;color:var(--ac);margin-bottom:4px;}
+.db-result-meta{font-size:13px;color:var(--t3);letter-spacing:0;}
+.db-result-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+.db-result-tag{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--t4);padding:3px 6px;border:1px solid var(--rl);}
+.db-result-tag.tg{color:var(--risk-on);border-color:var(--risk-on);}
+.db-result-tag.omega{color:var(--ac);border-color:var(--ac);}
+.db-result-right{text-align:right;flex-shrink:0;margin-left:14px;}
+.db-result-cal{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t1);}
+.db-result-unit{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t4);display:block;}
+.db-empty{font-family:var(--serif);font-size:18px;font-weight:300;font-style:italic;color:var(--t3);padding:32px 28px;}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+
+<!-- TODAY -->
+<div class="screen on" id="s-today">
+  <div class="tod-top">
+    <div class="tod-meta" id="tod-meta">Mission Day <span id="tod-day">1</span></div>
+    <div class="dk-toggle" onclick="toggleDark()">
+      <span class="dkt-lbl" id="dkt-lbl">Light</span>
+      <div class="dkt-pill"><div class="dkt-knob"></div></div>
+    </div>
+  </div>
+
+  <!-- Travel banner -->
+  <div class="travel-banner" id="travel-banner">
+    <span class="tb-lbl">Travel Mode</span>
+    <span class="tb-off" onclick="setTravelMode(false)">Exit →</span>
+  </div>
+
+  <!-- Weight quick entry -->
+  <div class="wt-quick">
+    <div class="wq-label">Today's Weight</div>
+    <div class="wq-row">
+      <input class="wq-inp" id="wq-inp" type="number" step="0.1" inputmode="decimal" placeholder="—">
+      <span class="wq-unit">kg</span>
+      <span class="wq-save" onclick="saveQuickWeight()">Save</span>
+      <span class="wq-saved" id="wq-saved">Saved.</span>
+    </div>
+  </div>
+
+  <!-- Mission Risk Card -->
+  <div class="risk-card" id="risk-card">
+    <div class="rc-header">
+      <span class="rc-eyebrow">Mission Status</span>
+      <span class="rc-status" id="rc-status">—</span>
+    </div>
+    <div id="rc-body"></div>
+  </div>
+
+  <!-- Tomorrow's Meal Card -->
+  <div class="meal-card" id="meal-card" onclick="openMealDetail(getTomorrowOffset())">
+    <div class="mc-header">
+      <span class="mc-eyebrow">Tomorrow's Meal</span>
+      <span class="mc-arrow">→</span>
+    </div>
+    <div id="mc-body"><div class="mc-empty">Generating plan…</div></div>
+  </div>
+
+  <!-- Progress -->
+  <div class="prog">
+    <div class="prog-row">
+      <div class="prog-label">Today's Disciplines</div>
+      <div class="prog-count" id="prog-count">0 of 5</div>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+  </div>
+
+  <!-- Discipline list -->
+  <div class="disc-list" id="disc-list"></div>
+
+  <!-- Evening prompt -->
+  <div class="ev-prompt" id="ev-prompt" style="display:none;">
+    <div class="ev-lbl">This Evening</div>
+    <div class="ev-text" id="ev-text">Complete your remaining disciplines before sleep.</div>
+  </div>
+
+  <div style="height:8px;"></div>
+</div>
+
+<!-- RECORD -->
+<div class="screen" id="s-record">
+  <div class="compass">
+    <span class="cmp-lbl">The Re-entry</span>
+    <span class="cmp-val" id="r-cmp-val">92 kg</span>
+    <span class="cmp-days" id="r-cmp-days">— days</span>
+  </div>
+  <div class="daynav">
+    <div class="dn-arr" id="dn-prev" onclick="navDay(-1)">←</div>
+    <div class="dn-date" id="dn-date">—</div>
+    <div class="dn-arr dis" id="dn-next" onclick="navDay(1)">→</div>
+  </div>
+  <div class="page-head">
+    <div class="ph-day" id="ph-day">—</div>
+    <div class="ph-full" id="ph-full">—</div>
+  </div>
+  <div class="page-rule"></div>
+
+  <!-- Weight -->
+  <div class="je">
+    <div class="je-cat">Weight</div>
+    <div class="w-row">
+      <input class="w-inp" id="r-wt" type="number" step="0.1" placeholder="—" inputmode="decimal" oninput="onWtChange()">
+      <span class="w-unit">kg</span>
+    </div>
+    <div class="w-whisper">Target <em id="r-dest-whisper">92 kg by Sep 1</em></div>
+    <svg class="spark-svg" id="spark-svg" viewBox="0 0 320 32" preserveAspectRatio="none"></svg>
+  </div>
+
+  <!-- Steps -->
+  <div class="je">
+    <div class="je-cat">Steps</div>
+    <div class="steps-row">
+      <input class="steps-inp" id="r-steps" type="number" placeholder="—" inputmode="numeric" oninput="onStepsChange()">
+      <span class="steps-unit">steps</span>
+    </div>
+  </div>
+
+  <!-- Disciplines -->
+  <div class="je">
+    <div class="je-cat">Disciplines</div>
+    <div id="dl-list"></div>
+  </div>
+
+  <!-- Notes -->
+  <div class="je">
+    <div class="je-cat">Notes</div>
+    <textarea class="notes-ta" id="r-notes" placeholder="What shaped today?" rows="3"></textarea>
+  </div>
+
+  <!-- Energy summary -->
+  <div class="esumm" id="r-esumm">
+    <div class="esumm-title">Energy Summary</div>
+    <div id="r-esumm-content"><div class="chart-empty">Log weight and steps to see energy calculations.</div></div>
+  </div>
+
+  <!-- Save -->
+  <div class="save-row">
+    <button class="btn-ghost" onclick="saveRecord()" style="flex:1;">Save Record</button>
+    <span class="save-conf" id="save-conf">Saved.</span>
+  </div>
+</div>
+
+<!-- MISSION -->
+<div class="screen" id="s-mission">
+  <div class="m-head">
+    <div class="m-eyebrow">Personal Mission</div>
+    <div class="m-title">The <em>Re-entry</em></div>
+    <div class="m-sub" id="m-sub">—</div>
+  </div>
+
+  <div class="pos-table" id="m-pos-table"></div>
+
+  <!-- Mission settings -->
+  <div class="sh"><span class="sl">Mission Parameters</span><div class="sr"></div></div>
+  <div class="m-settings">
+    <div class="ms-title">Adjusting recalculates everything.</div>
+    <div class="ms-fields">
+      <div class="ms-row">
+        <div class="ms-field">
+          <label class="flbl">Current Weight (kg)</label>
+          <input class="finp" id="ms-cw" type="number" step="0.1" inputmode="decimal" placeholder="102">
+        </div>
+        <div class="ms-field">
+          <label class="flbl">Target Weight (kg)</label>
+          <input class="finp" id="ms-tw" type="number" step="0.1" inputmode="decimal" placeholder="92">
+        </div>
+      </div>
+      <div>
+        <label class="flbl">Target Date</label>
+        <input class="ms-date" id="ms-td" type="date">
+      </div>
+    </div>
+    <div class="ms-warning" id="ms-warning">This pace exceeds 1 kg/week. Consider adjusting your target or date.</div>
+    <button class="btn-primary" onclick="applyMissionSettings()">Apply →</button>
+  </div>
+
+  <div class="sh"><span class="sl">Discipline Roster</span><div class="sr"></div></div>
+  <div style="padding:0 28px 20px;" id="m-roster"></div>
+</div>
+
+<!-- PATTERNS -->
+<div class="screen" id="s-patterns">
+  <div class="pat-head">
+    <div class="pat-title">Patterns</div>
+    <div class="pat-sub">What your record reveals.</div>
+  </div>
+  <div class="chart-block">
+    <div class="chart-header">
+      <div class="chart-title">Weight Trend</div>
+      <div class="range-btns">
+        <button class="range-btn" onclick="setRange(14,this)">14d</button>
+        <button class="range-btn on" onclick="setRange(30,this)">30d</button>
+        <button class="range-btn" onclick="setRange(0,this)">All</button>
+      </div>
+    </div>
+    <div class="chart-wrap" id="chart-wrap"></div>
+  </div>
+  <div class="sh"><span class="sl">Energy Breakdown</span><div class="sr"></div></div>
+  <div id="pat-energy" style="padding:0 28px;"></div>
+  <div class="sh"><span class="sl">Patterns</span><div class="sr"></div></div>
+  <div id="pat-insights" style="padding:0 28px;display:flex;flex-direction:column;gap:8px;"></div>
+  <div style="height:20px;"></div>
+</div>
+
+<!-- NAV -->
+<div class="nav" id="nav">
+  <div class="ni on" data-tab="today" onclick="switchTab('today')"><div class="nl">Today</div></div>
+  <div class="ni" data-tab="record" onclick="switchTab('record')"><div class="nl">Record</div></div>
+  <div class="ni" data-tab="mission" onclick="switchTab('mission')"><div class="nl">Mission</div></div>
+  <div class="ni" data-tab="patterns" onclick="switchTab('patterns')"><div class="nl">Patterns</div></div>
+</div>
+
+<!-- MEAL DETAIL OVERLAY -->
+<div class="overlay" id="meal-detail-overlay">
+  <div class="ov-top">
+    <span class="ov-back" onclick="closeMealDetail()">←</span>
+    <span class="ov-title" id="md-title">Meal Plan</span>
+    <span class="ov-action" onclick="shareMealPDF()">Share PDF</span>
+  </div>
+  <div class="md-date-strip">
+    <div class="md-date-nav">
+      <span class="md-date-arr" id="md-prev" onclick="navMealDate(-1)">←</span>
+      <span class="md-date-lbl" id="md-date-lbl">—</span>
+      <span class="md-date-arr" id="md-next" onclick="navMealDate(1)">→</span>
+    </div>
+    <span class="md-cal-btn" onclick="openCalendar()">Calendar</span>
+  </div>
+  <div class="md-travel">
+    <span class="md-travel-lbl" id="md-travel-lbl">Home Kitchen</span>
+    <span class="md-travel-toggle" id="md-travel-toggle" onclick="toggleMealTravel()">Switch to Travel</span>
+  </div>
+  <div id="md-slots"></div>
+  <div class="md-total" id="md-total"></div>
+  <div class="md-share">
+    <button class="btn-ghost" onclick="shareMealPDF()">Share as PDF →</button>
+  </div>
+  <div style="height:40px;"></div>
+</div>
+
+<!-- CALENDAR OVERLAY -->
+<div class="overlay" id="calendar-overlay">
+  <div class="ov-top">
+    <span class="ov-back" onclick="closeCalendar()">←</span>
+    <span class="ov-title">Select Date</span>
+    <span class="ov-action"></span>
+  </div>
+  <div class="cal-grid" id="cal-grid"></div>
+</div>
+
+<!-- FOOD DATABASE BROWSER OVERLAY -->
+<div class="overlay" id="db-overlay">
+  <div class="ov-top">
+    <span class="ov-back" onclick="closeDbBrowser()">←</span>
+    <span class="ov-title" id="db-overlay-title">Choose a Dish</span>
+    <span class="ov-action" id="db-overlay-slot" style="color:var(--t4);font-size:8px;letter-spacing:.14em;text-transform:uppercase;"></span>
+  </div>
+
+  <!-- Combination tray — shows selected items before confirming -->
+  <div id="db-tray" style="display:none;padding:12px 28px;background:var(--bg-r);border-bottom:1px solid var(--rls);">
+    <div style="font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;">Building combination</div>
+    <div id="db-tray-items" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div id="db-tray-total" style="font-family:var(--serif);font-size:13px;font-weight:300;color:var(--t3);"></div>
+      <div style="display:flex;gap:12px;">
+        <span style="font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);cursor:pointer;" onclick="clearDbTray()">Clear</span>
+        <span style="font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--ac);cursor:pointer;" onclick="confirmDbTray()">Confirm →</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div style="padding:12px 28px;border-bottom:1px solid var(--rl);">
+    <input id="db-search" type="text" placeholder="Search dishes…"
+      style="width:100%;background:none;border:none;border-bottom:1px solid var(--rls);outline:none;font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t1);caret-color:var(--ac);padding-bottom:8px;"
+      oninput="renderDbBrowser()">
+  </div>
+
+  <!-- Category filter tabs -->
+  <div id="db-cats" style="display:flex;gap:0;overflow-x:auto;padding:0 28px;border-bottom:1px solid var(--rl);-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+  </div>
+
+  <!-- Results -->
+  <div id="db-results" style="flex:1;overflow-y:auto;padding-bottom:40px;"></div>
+</div>
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════
+// PROFILE — Anirudh, hardcoded
+// ═══════════════════════════════════════════════
+const PROFILE = {
+  name: 'Anirudh',
+  age: 34,
+  sex: 'male',
+  heightCm: 178,
+};
+
+const DEFAULT_MISSION = {
+  startWeight: 102,
+  targetWeight: 92,
+  targetDate: '2026-09-01',
+  startDate: new Date().toISOString().slice(0,10),
+};
+
+const DISCIPLINES = [
+  {id:'d1', name:'Wake at 4:30 am',    category:'Discipline', kcalPerMin:0,   defaultDur:0,  travelName:'Wake at 4:30 am'},
+  {id:'d2', name:'Angamardana',         category:'Sadhana',    kcalPerMin:6.9, defaultDur:45, travelName:'Room Stretching'},
+  {id:'d3', name:'10,000 Steps',        category:'Fitness',    kcalPerMin:0,   defaultDur:0,  travelName:'10,000 Steps'},
+  {id:'d4', name:'Kriya',               category:'Sadhana',    kcalPerMin:2.7, defaultDur:30, travelName:'Kriya'},
+  {id:'d5', name:'Dumbbell Training',   category:'Fitness',    kcalPerMin:5.8, defaultDur:45, travelName:'Bodyweight Training'},
+];
+
+// ═══════════════════════════════════════════════
+// FOOD DATABASE
+// ═══════════════════════════════════════════════
+const FOOD_DB = {
+
+  breakfast: [
+    {id:'b01', name:'Puttu + Kadala Curry',       ml:'പുട്ട് + കടല കറി',    cal:420, pro:14, carb:68, fat:9,  cat:'puttu',      portion:'2 puttu + 1 bowl kadala',               travel:true},
+    {id:'b02', name:'Puttu + Banana',              ml:'പുട്ട് + വാഴപ്പഴം',   cal:340, pro:5,  carb:72, fat:4,  cat:'puttu',      portion:'2 puttu + 1 nendran banana',            travel:false},
+    {id:'b03', name:'Idli + Sambar + Chutney',     ml:'ഇഡ്ഡലി + സാമ്പാർ',   cal:290, pro:9,  carb:54, fat:4,  cat:'idli',       portion:'3 idli + 1 bowl sambar + chutney',      travel:true},
+    {id:'b04', name:'Idiyappam + Egg Roast',       ml:'ഇടിയപ്പം + മുട്ട റോസ്റ്റ്', cal:410, pro:16, carb:58, fat:12, cat:'idiyappam',  portion:'3 idiyappam + 1 egg roast',             travel:false},
+    {id:'b05', name:'Idiyappam + Coconut Milk',    ml:'ഇടിയപ്പം + തേങ്ങ പാൽ', cal:360, pro:6,  carb:62, fat:10, cat:'idiyappam',  portion:'3 idiyappam + sweetened coconut milk',  travel:false},
+    {id:'b06', name:'Appam + Egg Roast',           ml:'അപ്പം + മുട്ട',        cal:400, pro:14, carb:56, fat:13, cat:'appam',      portion:'2 appam + 1 egg roast',                 travel:false},
+    {id:'b07', name:'Appam + Vegetable Stew',      ml:'അപ്പം + ഇഷ്ടു',       cal:390, pro:7,  carb:62, fat:11, cat:'appam',      portion:'2 appam + coconut stew',                travel:false},
+    {id:'b08', name:'Dosa + Sambar + Chutney',     ml:'ദോശ + സാമ്പാർ',       cal:310, pro:8,  carb:55, fat:8,  cat:'dosa',       portion:'2 dosa + sambar + chutney',             travel:true},
+    {id:'b09', name:'Pathiri + Egg Curry',         ml:'പത്തിരി + മുട്ട',     cal:440, pro:17, carb:58, fat:14, cat:'pathiri',    portion:'2 pathiri + egg curry',                 travel:false},
+    {id:'b10', name:'Pazhamkanji + Pickle',        ml:'പഴംകഞ്ഞി + അച്ചാർ',   cal:220, pro:4,  carb:48, fat:1,  cat:'kanji',      portion:'1 bowl fermented kanji + mango pickle', travel:false},
+    {id:'b11', name:'Vellayappam + Kadala Curry',  ml:'വെള്ളയപ്പം + കടല',   cal:400, pro:12, carb:66, fat:8,  cat:'vellayappam', portion:'2 vellayappam + kadala curry',          travel:false},
+    {id:'b12', name:'Ragi Puttu + Kadala Curry',   ml:'റാഗി പുട്ട് + കടല',  cal:390, pro:13, carb:64, fat:7,  cat:'puttu',      portion:'2 ragi puttu + kadala curry',           travel:false},
+  ],
+
+  lunch_fish: [
+    {id:'lf01', name:'Sardine Curry (no coconut)', ml:'മത്തി കറി',           cal:180, pro:22, carb:4,  fat:9,  cat:'mathi',   portion:'3 sardines + light gravy, flesh-first',  travel:false},
+    {id:'lf02', name:'Mackerel Fry',               ml:'അയല ഫ്രൈ',           cal:220, pro:20, carb:3,  fat:14, cat:'ayala',   portion:'2 pieces mackerel fry',                  travel:false},
+    {id:'lf03', name:'Anchovy Curry (no coconut)', ml:'നത്തൽ കറി',          cal:160, pro:20, carb:3,  fat:8,  cat:'natholi', portion:'Full portion anchovies, light gravy',     travel:false},
+    {id:'lf04', name:'Sardine Fry',                ml:'മത്തി ഫ്രൈ',         cal:240, pro:21, carb:4,  fat:16, cat:'mathi',   portion:'3 sardines fried',                       travel:false},
+    {id:'lf05', name:'Mackerel Curry (no coconut)',ml:'അയല കറി',            cal:190, pro:21, carb:4,  fat:10, cat:'ayala',   portion:'1 mackerel + light gravy',               travel:false},
+    {id:'lf06', name:'Sardine Curry (coconut)',    ml:'മത്തി കറി (തേങ്ങ)',  cal:260, pro:20, carb:6,  fat:16, cat:'mathi',   portion:'3 sardines + coconut gravy (weekend)',   travel:false},
+    {id:'lf07', name:'Fish Molly',                 ml:'മീൻ മോളി',           cal:230, pro:18, carb:5,  fat:14, cat:'molly',   portion:'1 serving fish molly',                   travel:false},
+    {id:'lf08', name:'Anchovy Fry',                ml:'നത്തൽ ഫ്രൈ',         cal:200, pro:19, carb:3,  fat:13, cat:'natholi', portion:'Full portion anchovies fried',            travel:false},
+  ],
+
+  lunch_thoran: [
+    {id:'lt01', name:'Cabbage Thoran',     ml:'കാബേജ് തോരൻ',     cal:90,  pro:3, carb:9,  fat:5,  cat:'cabbage',   portion:'1 serving cabbage thoran'},
+    {id:'lt02', name:'Beans Thoran',       ml:'ബീൻസ് തോരൻ',      cal:85,  pro:3, carb:10, fat:4,  cat:'beans',     portion:'1 serving beans thoran'},
+    {id:'lt03', name:'Achinga Thoran',     ml:'അചിങ്ങ തോരൻ',     cal:80,  pro:4, carb:8,  fat:4,  cat:'achinga',   portion:'1 serving achinga thoran'},
+    {id:'lt04', name:'Cherupayar Thoran',  ml:'ചെറുപയർ തോരൻ',   cal:110, pro:6, carb:12, fat:4,  cat:'cherupayar',portion:'1 serving cherupayar thoran'},
+    {id:'lt05', name:'Ethakka Thoran',     ml:'ഏത്തക്ക തോരൻ',    cal:120, pro:2, carb:22, fat:4,  cat:'ethakka',   portion:'1 serving raw banana thoran'},
+    {id:'lt06', name:'Kaya Thoran',        ml:'കായ തോരൻ',        cal:115, pro:2, carb:20, fat:4,  cat:'kaya',      portion:'1 serving raw plantain thoran'},
+    {id:'lt07', name:'Chembu Thoran',      ml:'ചേമ്പ് തോരൻ',     cal:100, pro:2, carb:18, fat:3,  cat:'chembu',    portion:'1 serving taro thoran'},
+    {id:'lt08', name:'Beetroot Thoran',    ml:'ബീറ്റ്റൂട്ട് തോരൻ',cal:95,  pro:2, carb:14, fat:4,  cat:'beetroot',  portion:'1 serving beetroot thoran'},
+    {id:'lt09', name:'Carrot Thoran',      ml:'കാരറ്റ് തോരൻ',    cal:85,  pro:2, carb:12, fat:4,  cat:'carrot',    portion:'1 serving carrot thoran'},
+  ],
+
+  lunch_sprouts: [
+    {id:'ls01', name:'Sprouted Green Gram',  ml:'മുളപ്പിച്ച ചെറുപയർ', cal:80,  pro:6,  carb:12, fat:1, cat:'cherupayar', portion:'1 small bowl sprouted cherupayar (soak overnight)'},
+    {id:'ls02', name:'Boiled Kadala',        ml:'കടല',                 cal:110, pro:7,  carb:18, fat:2, cat:'kadala',     portion:'1 small bowl boiled black chickpea'},
+    {id:'ls03', name:'Sprouted Cowpea',      ml:'വൺപയർ',              cal:85,  pro:6,  carb:13, fat:1, cat:'cowpea',     portion:'1 small bowl sprouted cowpea'},
+    {id:'ls04', name:'Boiled Cherupayar',    ml:'ചെറുപയർ',            cal:90,  pro:6,  carb:14, fat:1, cat:'cherupayar', portion:'1 small bowl boiled green gram'},
+    {id:'ls05', name:'Lentil Sprouts',       ml:'പയർ',                 cal:75,  pro:5,  carb:11, fat:1, cat:'lentil',     portion:'1 small bowl lentil sprouts'},
+  ],
+
+  lunch_sweet: [
+    {id:'lsw01', name:'2 Dates',          ml:'2 ഈന്തപ്പഴം',  cal:60,  pro:0, carb:16, fat:0, cat:'dates',  portion:'2 medjool dates post-meal'},
+    {id:'lsw02', name:'1 Banana',         ml:'1 വാഴപ്പഴം',   cal:90,  pro:1, carb:22, fat:0, cat:'banana', portion:'1 small banana post-meal'},
+    {id:'lsw03', name:'Seasonal Fruit',   ml:'പഴം',           cal:70,  pro:1, carb:16, fat:0, cat:'fruit',  portion:'1 serving seasonal fruit'},
+    {id:'lsw04', name:'Small Mango',      ml:'ചെറിയ മാങ്ങ',  cal:80,  pro:1, carb:20, fat:0, cat:'mango',  portion:'1 small mango'},
+  ],
+
+  dinner_millet: [
+    {id:'dm01', name:'Ragi Puttu + Egg Roast',      ml:'റാഗി പുട്ട്',        cal:380, pro:18, carb:48, fat:13, cat:'ragi',       portion:'2 ragi puttu + 2 egg roast',           travel:false},
+    {id:'dm02', name:'Millet Kanji + Egg Roast',    ml:'മുത്താരി കഞ്ഞി',    cal:360, pro:16, carb:52, fat:10, cat:'mutta-kanji', portion:'1 bowl mutta-kanji + 2 boiled eggs',   travel:false},
+    {id:'dm03', name:'Little Millet Upma + Eggs',   ml:'ചെറിയ തിന ഉപ്മ',   cal:400, pro:17, carb:54, fat:13, cat:'millet-upma', portion:'1 cup millet upma + 2 boiled eggs',    travel:false},
+    {id:'dm04', name:'Ragi Roti + Egg Curry',       ml:'റാഗി റൊട്ടി',       cal:390, pro:18, carb:50, fat:13, cat:'ragi-roti',   portion:'2 ragi roti + 2 egg curry',            travel:false},
+    {id:'dm05', name:'Kodo Millet Rice + Egg Roast',ml:'കോഡോ അരി',          cal:370, pro:16, carb:56, fat:10, cat:'kodo',        portion:'1 cup kodo millet + 2 egg roast',       travel:false},
+    {id:'dm06', name:'Chapati + Egg Roast',         ml:'ചപ്പാത്തി + മുട്ട', cal:380, pro:16, carb:52, fat:12, cat:'chapati',     portion:'2 chapati + 2 egg roast (occasional)',  travel:true},
+  ],
+
+  dinner_salad: [
+    {id:'ds01', name:'Cucumber + Onion + Lime',     ml:'വെള്ളരി + ഉള്ളി',    cal:30, pro:1, carb:6,  fat:0, cat:'cucumber', portion:'1 bowl cucumber, onion, green chilli, lime'},
+    {id:'ds02', name:'Tomato + Shallot + Coriander',ml:'തക്കാളി + ഉള്ളി',    cal:35, pro:1, carb:7,  fat:0, cat:'tomato',   portion:'1 bowl tomato, shallot, coriander'},
+    {id:'ds03', name:'Carrot + Beetroot Grated',    ml:'കാരറ്റ് + ബീറ്റ്',   cal:55, pro:2, carb:11, fat:0, cat:'carrot',   portion:'1 bowl grated carrot and beetroot'},
+    {id:'ds04', name:'Raw Papaya Salad',            ml:'പച്ച പപ്പായ',          cal:40, pro:1, carb:8,  fat:0, cat:'papaya',   portion:'1 bowl grated raw papaya + lime'},
+    {id:'ds05', name:'Cabbage + Carrot Slaw',       ml:'കാബേജ് + കാരറ്റ്',  cal:45, pro:2, carb:8,  fat:1, cat:'cabbage',  portion:'1 bowl cabbage carrot slaw, lime + salt'},
+    {id:'ds06', name:'Onion + Tomato + Chilli',     ml:'ഉള്ളി + തക്കാളി',    cal:30, pro:1, carb:6,  fat:0, cat:'onion',    portion:'1 bowl onion, tomato, green chilli'},
+  ],
+
+  snack: [
+    {id:'sn01', name:'Banana + Tea (half sugar)',   ml:'വാഴപ്പഴം + ചായ',    cal:170, pro:1, carb:38, fat:1, cat:'banana', portion:'1 banana + 1 cup tea (half sugar)', travel:true},
+    {id:'sn02', name:'Banana + Black Coffee',       ml:'വാഴപ്പഴം + കാപ്പി',  cal:95,  pro:1, carb:22, fat:0, cat:'banana', portion:'1 banana + black coffee',           travel:true},
+    {id:'sn03', name:'Seasonal Fruit',              ml:'പഴം',                 cal:80,  pro:1, carb:18, fat:0, cat:'fruit',  portion:'1 serving seasonal fruit',          travel:true},
+    {id:'sn04', name:'3 Dates + Water',             ml:'3 ഈന്തപ്പഴം',        cal:90,  pro:1, carb:24, fat:0, cat:'dates',  portion:'3 dates + water',                   travel:true},
+  ],
+
+  // Travel / Arabic options
+  travel_meals: [
+    {id:'tr01', name:'Al Faham + Salad + 1 Khubz', ml:'അൽ ഫഹം',            cal:480, pro:34, carb:28, fat:22, cat:'alfaham',  portion:'Quarter grilled chicken + salad (no mayo) + 1 khubz', travel:true},
+    {id:'tr02', name:'Shawarma (no mayo)',           ml:'ഷവർമ്മ',            cal:420, pro:28, carb:38, fat:14, cat:'shawarma', portion:'1 chicken shawarma wrap, no mayo, no fries',           travel:true},
+    {id:'tr03', name:'Mandi (small portion)',        ml:'മന്ദി',              cal:520, pro:32, carb:48, fat:18, cat:'mandi',    portion:'Small mandi plate, focus on meat over rice',           travel:true},
+    {id:'tr04', name:'Hummus + Khubz',              ml:'ഹമ്മൂസ്',            cal:280, pro:10, carb:36, fat:11, cat:'hummus',   portion:'1 bowl hummus + 1 khubz',                              travel:true},
+    {id:'tr05', name:'Fattoush Salad',              ml:'ഫത്തൂഷ്',            cal:120, pro:3,  carb:18, fat:5,  cat:'fattoush', portion:'1 large fattoush salad',                               travel:true},
+    {id:'tr06', name:'Lentil Soup + Khubz',         ml:'ലെൻ്റിൽ സൂപ്പ്',    cal:240, pro:12, carb:36, fat:5,  cat:'soup',     portion:'1 bowl lentil soup + 1 khubz',                         travel:true},
+    {id:'tr07', name:'Grilled Fish',                ml:'ഗ്രിൽഡ് മീൻ',       cal:300, pro:38, carb:2,  fat:14, cat:'grilled',  portion:'1 serving grilled fish (hammour/seer)',                 travel:true},
+    {id:'tr08', name:'Hotel Breakfast (safe)',       ml:'',                   cal:380, pro:16, carb:42, fat:14, cat:'hotel',    portion:'2 boiled eggs + bread + fruit, skip butter/mayo',       travel:true},
+  ],
+
+  lunch_moru: {id:'moru', name:'Moru / Curd', ml:'മോര്', cal:40, pro:2, carb:4, fat:2, portion:'1 glass moru or small curd bowl — daily, non-negotiable'},
+  lunch_rice: {id:'rice', name:'Small Rice',  ml:'ചോറ്',  cal:200, pro:4, carb:44, fat:0, portion:'1 cup cooked rice (not heaped) — always'},
+
+  // Breakfast bases (standalone — for mix-and-match)
+  breakfast_base: [
+    {id:'bb01', name:'Puttu (2)',        ml:'പുട്ട്',       cal:180, pro:4,  carb:36, fat:2,  cat:'puttu'},
+    {id:'bb02', name:'Ragi Puttu (2)',   ml:'റാഗി പുട്ട്', cal:160, pro:5,  carb:32, fat:2,  cat:'puttu'},
+    {id:'bb03', name:'Idli (3)',         ml:'ഇഡ്ഡലി',      cal:150, pro:5,  carb:30, fat:1,  cat:'idli'},
+    {id:'bb04', name:'Idiyappam (3)',    ml:'ഇടിയപ്പം',    cal:200, pro:4,  carb:42, fat:1,  cat:'idiyappam'},
+    {id:'bb05', name:'Appam (2)',        ml:'അപ്പം',        cal:200, pro:4,  carb:38, fat:4,  cat:'appam'},
+    {id:'bb06', name:'Dosa (2)',         ml:'ദോശ',          cal:180, pro:5,  carb:34, fat:4,  cat:'dosa'},
+    {id:'bb07', name:'Pathiri (2)',      ml:'പത്തിരി',      cal:240, pro:6,  carb:44, fat:4,  cat:'pathiri'},
+    {id:'bb08', name:'Vellayappam (2)',  ml:'വെള്ളയപ്പം',  cal:200, pro:4,  carb:40, fat:3,  cat:'vellayappam'},
+    {id:'bb09', name:'Pazhamkanji',      ml:'പഴംകഞ്ഞി',    cal:180, pro:3,  carb:40, fat:1,  cat:'kanji'},
+    {id:'bb10', name:'Chapati (2)',      ml:'ചപ്പാത്തി',   cal:200, pro:5,  carb:36, fat:4,  cat:'chapati'},
+  ],
+
+  // Breakfast sides/curries (for mix-and-match)
+  breakfast_side: [
+    {id:'bs01', name:'Kadala Curry',        ml:'കടല കറി',          cal:240, pro:10, carb:32, fat:8,  cat:'kadala'},
+    {id:'bs02', name:'Cherupayar Curry',    ml:'ചെറുപയർ കറി',     cal:200, pro:10, carb:28, fat:6,  cat:'cherupayar'},
+    {id:'bs03', name:'Chicken Curry',       ml:'ചിക്കൻ കറി',       cal:260, pro:24, carb:6,  fat:16, cat:'chicken'},
+    {id:'bs04', name:'Egg Roast',           ml:'മുട്ട റോസ്റ്റ്',   cal:190, pro:12, carb:6,  fat:14, cat:'egg'},
+    {id:'bs05', name:'Egg Curry',           ml:'മുട്ട കറി',         cal:170, pro:12, carb:5,  fat:12, cat:'egg'},
+    {id:'bs06', name:'Fish Curry',          ml:'മീൻ കറി',           cal:200, pro:18, carb:4,  fat:12, cat:'fish'},
+    {id:'bs07', name:'Sambar',              ml:'സാമ്പാർ',           cal:80,  pro:4,  carb:12, fat:2,  cat:'sambar'},
+    {id:'bs08', name:'Coconut Chutney',     ml:'തേങ്ങ ചട്ണി',      cal:60,  pro:1,  carb:4,  fat:5,  cat:'chutney'},
+    {id:'bs09', name:'Coconut Milk (sweet)',ml:'തേങ്ങ പാൽ',        cal:140, pro:1,  carb:14, fat:9,  cat:'coconut'},
+    {id:'bs10', name:'Vegetable Stew',      ml:'ഇഷ്ടു',             cal:130, pro:3,  carb:12, fat:8,  cat:'stew'},
+    {id:'bs11', name:'Banana (1 nendran)',  ml:'വാഴപ്പഴം',         cal:140, pro:1,  carb:34, fat:0,  cat:'banana'},
+    {id:'bs12', name:'Mango Pickle',        ml:'മാങ്ങ അച്ചാർ',    cal:20,  pro:0,  carb:4,  fat:0,  cat:'pickle'},
+    {id:'bs13', name:'Mutton Curry',        ml:'മട്ടൻ കറി',         cal:290, pro:26, carb:5,  fat:18, cat:'mutton'},
+    {id:'bs14', name:'Beef Fry',            ml:'ബീഫ് ഫ്രൈ',        cal:300, pro:28, carb:3,  fat:20, cat:'beef'},
+  ],
+};
+
+// ═══════════════════════════════════════════════
+// ROTATION STATE & RULES
+// ═══════════════════════════════════════════════
+const ROTATION_RULES = {
+  breakfast: 3,    // no repeat within N days
+  lunch_fish: 2,
+  lunch_thoran: 2,
+  lunch_sprouts: 3,
+  lunch_sweet: 2,
+  dinner_millet: 3,
+  dinner_salad: 3,
+};
+
+// Coconut fish curry max 2x per week
+const COCONUT_FISH_IDS = ['lf06', 'lf07'];
+
+// ═══════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════
+const MO = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MO_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DOW = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DOW_SHORT = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+const K_RECORDS  = 'mos_records';
+const K_MISSION  = 'mos_mission';
+const K_MEALS    = 'mos_meals';
+const K_TRAVEL   = 'mos_travel';
+const K_DARK     = 'mos_dark';
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let isDark = false;
+let activeTab = 'today';
+let dayOffset = 0;
+let chartRange = 30;
+let mealDateOffset = 1; // 1=tomorrow by default
+let travelMode = false;
+let mission = null;
+let records = {};
+let meals = {};   // {dateKey: {breakfast, lunch_fish, lunch_thoran, lunch_sprouts, lunch_sweet, dinner_millet, dinner_salad, snack, locked:{}, travel:false}}
+let currentReplaceSlot = null;
+let currentReplaceDate = null;
+
+// ═══════════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════════
+function load(){
+  try{
+    const m = localStorage.getItem(K_MISSION);
+    mission = m ? JSON.parse(m) : {...DEFAULT_MISSION};
+    const r = localStorage.getItem(K_RECORDS);
+    records = r ? JSON.parse(r) : {};
+    const ml = localStorage.getItem(K_MEALS);
+    meals = ml ? JSON.parse(ml) : {};
+    travelMode = localStorage.getItem(K_TRAVEL) === 'true';
+    isDark = localStorage.getItem(K_DARK) === 'true';
+  } catch(e){ mission = {...DEFAULT_MISSION}; }
+}
+function save(){
+  try{
+    localStorage.setItem(K_MISSION, JSON.stringify(mission));
+    localStorage.setItem(K_RECORDS, JSON.stringify(records));
+    localStorage.setItem(K_MEALS, JSON.stringify(meals));
+    localStorage.setItem(K_TRAVEL, travelMode);
+    localStorage.setItem(K_DARK, isDark);
+  } catch(e){}
+}
+
+// ═══════════════════════════════════════════════
+// DATE HELPERS
+// ═══════════════════════════════════════════════
+function todayKey(){ return new Date().toISOString().slice(0,10); }
+function keyForOffset(offset){
+  const d = new Date(); d.setDate(d.getDate() + offset);
+  return d.toISOString().slice(0,10);
+}
+function keyToDate(key){ return new Date(key + 'T00:00:00'); }
+function formatDate(d){
+  return DOW[d.getDay()] + ', ' + d.getDate() + ' ' + MO_SHORT[d.getMonth()];
+}
+function formatDateFull(d){
+  return d.getDate() + ' ' + MO[d.getMonth()] + ' ' + d.getFullYear();
+}
+function daysFromToday(key){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = keyToDate(key);
+  return Math.round((target - today) / 86400000);
+}
+function daysLeft(){
+  const target = keyToDate(mission.targetDate);
+  const today = new Date(); today.setHours(0,0,0,0);
+  return Math.max(0, Math.round((target - today) / 86400000));
+}
+function missionDay(){
+  const start = keyToDate(mission.startDate);
+  const today = new Date(); today.setHours(0,0,0,0);
+  return Math.max(1, Math.round((today - start) / 86400000) + 1);
+}
+function getTomorrowOffset(){ return 1; }
+
+// ═══════════════════════════════════════════════
+// CALCULATIONS
+// ═══════════════════════════════════════════════
+function calcBMR(weightKg){
+  return Math.round(10 * weightKg + 6.25 * PROFILE.heightCm - 5 * PROFILE.age + 5);
+}
+function calcTDEE(weightKg, steps, discDoneArr){
+  const bmr = calcBMR(weightKg);
+  const neat = Math.round((steps || 0) * 0.04);
+  let ex = 0;
+  DISCIPLINES.forEach((d, i) => {
+    const done = discDoneArr && discDoneArr[i] && discDoneArr[i].done;
+    if(done && d.kcalPerMin && d.defaultDur) ex += Math.round(d.kcalPerMin * d.defaultDur);
+  });
+  const tef = Math.round((bmr + neat + ex) * 0.10);
+  return { bmr, neat, ex, tef, tdee: bmr + neat + ex + tef };
+}
+function calcDynamicDeficit(){
+  // Recalculate required deficit based on current weight vs target
+  const cw = currentWeight();
+  const tw = mission.targetWeight;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = keyToDate(mission.targetDate);
+  const weeksLeft = Math.max(0.5, (target - today) / (7 * 86400000));
+  const kgToLose = Math.max(0, cw - tw);
+  const kgPerWeek = kgToLose / weeksLeft;
+
+  // Cap at 1 kg/week for safety (1 kg fat ≈ 7,700 kcal → 1,100 kcal/day)
+  const safeKgPerWeek = Math.min(kgPerWeek, 1.0);
+  const deficitPerDay = Math.round(safeKgPerWeek * 7700 / 7);
+
+  return { deficitPerDay, kgPerWeek: Math.round(kgPerWeek * 100) / 100, safeKgPerWeek: Math.round(safeKgPerWeek * 100) / 100, capped: kgPerWeek > 1.0 };
+}
+
+function dailyTarget(weightKg, stepsOverride, discOverride){
+  // Use actual today's record if no overrides provided
+  const todayRec = records[todayKey()] || {};
+  const steps = stepsOverride !== undefined ? stepsOverride : (parseInt(todayRec.steps) || 10000);
+  const discs = discOverride !== undefined ? discOverride : (todayRec.disciplines || null);
+  const { tdee } = calcTDEE(weightKg, steps, discs);
+  const { deficitPerDay } = calcDynamicDeficit();
+  return Math.round(tdee - deficitPerDay);
+}
+
+function dailyTargetForRecord(weightKg, steps, discs){
+  // Explicit version for record screen — uses exact passed values
+  const { tdee } = calcTDEE(weightKg, steps, discs);
+  const { deficitPerDay } = calcDynamicDeficit();
+  return { target: Math.round(tdee - deficitPerDay), tdee, deficitPerDay };
+}
+function currentWeight(){
+  const entries = Object.entries(records)
+    .filter(([,v]) => v.weight)
+    .sort((a,b) => b[0] < a[0] ? -1 : 1);
+  return entries.length ? parseFloat(entries[0][1].weight) : mission.startWeight;
+}
+
+// ═══════════════════════════════════════════════
+// MISSION RISK — linear regression
+// ═══════════════════════════════════════════════
+function weightEntries(){
+  return Object.entries(records)
+    .filter(([,v]) => v.weight)
+    .map(([k,v]) => ({ d: keyToDate(k).getTime(), w: parseFloat(v.weight) }))
+    .sort((a,b) => a.d - b.d);
+}
+function linearRegression(pts){
+  const n = pts.length;
+  if(n < 2) return null;
+  const xm = pts.reduce((s,p) => s + p.x, 0) / n;
+  const ym = pts.reduce((s,p) => s + p.y, 0) / n;
+  const num = pts.reduce((s,p) => s + (p.x - xm) * (p.y - ym), 0);
+  const den = pts.reduce((s,p) => s + (p.x - xm) ** 2, 0);
+  if(!den) return null;
+  const slope = num / den;
+  const intercept = ym - slope * xm;
+  return { slope, intercept };
+}
+function calcMissionRisk(){
+  const entries = weightEntries();
+  if(entries.length < 4) return { state: 'insufficient', count: entries.length };
+
+  const use = entries.length >= 7 ? entries.slice(-7) : entries;
+  const pts = use.map(e => ({ x: e.d, y: e.w }));
+  const reg = linearRegression(pts);
+  if(!reg) return { state: 'insufficient', count: entries.length };
+
+  const msPerWeek = 7 * 86400000;
+  const ratePerWeek = reg.slope * msPerWeek; // kg/week (negative = losing)
+
+  const target = keyToDate(mission.targetDate);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const msLeft = target.getTime() - today.getTime();
+
+  const latestW = entries[entries.length - 1].w;
+  const projected = latestW + reg.slope * msLeft;
+
+  const required = (latestW - mission.targetWeight) / (msLeft / msPerWeek); // kg/week needed (positive)
+
+  const onTrack = projected <= mission.targetWeight + 0.5;
+
+  return {
+    state: onTrack ? 'on-track' : 'at-risk',
+    projected: Math.round(projected * 10) / 10,
+    currentRate: Math.round(Math.abs(ratePerWeek) * 100) / 100,
+    rateSign: ratePerWeek, // negative = losing
+    requiredRate: Math.round(required * 100) / 100,
+    targetDate: mission.targetDate,
+    targetWeight: mission.targetWeight,
+  };
+}
+function renderRiskCard(){
+  const data = calcMissionRisk();
+  const statusEl = document.getElementById('rc-status');
+  const bodyEl = document.getElementById('rc-body');
+
+  if(data.state === 'insufficient'){
+    statusEl.textContent = '—';
+    statusEl.className = 'rc-status';
+    bodyEl.innerHTML = `
+      <div class="rc-insufficient">Projection requires 4 weight entries.</div>
+      <div class="rc-entries">${data.count} of 4 entries logged</div>`;
+    return;
+  }
+
+  const targetD = keyToDate(data.targetDate);
+  const targetStr = MO_SHORT[targetD.getMonth()] + ' ' + targetD.getDate();
+
+  statusEl.textContent = data.state === 'on-track' ? 'On Track' : 'At Risk';
+  statusEl.className = 'rc-status ' + data.state;
+
+  const rateColor = data.rateSign < 0 ? '' : 'style="color:var(--risk-at)"';
+
+  bodyEl.innerHTML = `
+    <div class="rc-row">
+      <span class="rc-lbl">Projected</span>
+      <span class="rc-val projected">${data.projected} kg by ${targetStr}</span>
+    </div>
+    <div class="rc-row">
+      <span class="rc-lbl">Current Rate</span>
+      <span class="rc-val" ${rateColor}>${data.rateSign < 0 ? '' : '+'}${data.rateSign >= 0 ? data.currentRate : -data.currentRate} kg / week</span>
+    </div>
+    <div class="rc-row">
+      <span class="rc-lbl">Required Rate</span>
+      <span class="rc-val muted">${data.requiredRate} kg / week</span>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// MEAL ENGINE — RULE-BASED
+// ═══════════════════════════════════════════════
+function getRecentCategories(slot, days){
+  const cats = [];
+  for(let i = 1; i <= days; i++){
+    const key = keyForOffset(-i);
+    const m = meals[key];
+    if(m && m[slot]) cats.push(m[slot].cat);
+  }
+  return cats;
+}
+function pickFromPool(pool, recentCats, extra){
+  // Filter out recently used categories
+  let candidates = pool.filter(item => !recentCats.includes(item.cat));
+  // Apply extra filter if provided
+  if(extra) candidates = candidates.filter(extra);
+  // Fallback: if all filtered, use full pool with extra filter only
+  if(!candidates.length) candidates = extra ? pool.filter(extra) : pool;
+  if(!candidates.length) candidates = pool;
+  // Pick randomly from candidates
+  return candidates[Math.floor(Math.random() * candidates.length)];
+}
+function coconutCountThisWeek(dateKey){
+  let count = 0;
+  const d = keyToDate(dateKey);
+  for(let i = 0; i < 7; i++){
+    const k = new Date(d); k.setDate(k.getDate() - i);
+    const key = k.toISOString().slice(0,10);
+    const m = meals[key];
+    if(m && m.lunch_fish && COCONUT_FISH_IDS.includes(m.lunch_fish.id)) count++;
+  }
+  return count;
+}
+function generateMeal(dateKey, forTravel){
+  const locked = (meals[dateKey] && meals[dateKey].locked) || {};
+  const plan = {};
+
+  // Breakfast — ONLY from breakfast_main (pure meal items, no beverages)
+  plan.breakfast = locked.breakfast || pickFromPool(
+    FOOD_DB.breakfast.filter(d => d.cat && !['beverage','snack'].includes(d.cat)),
+    getRecentCategories('breakfast', ROTATION_RULES.breakfast)
+  );
+
+  if(forTravel){
+    plan.lunch_fish    = locked.lunch_fish    || pickFromPool(FOOD_DB.travel_meals, getRecentCategories('lunch_fish', 2));
+    plan.lunch_thoran  = null;
+    plan.lunch_sprouts = null;
+    plan.lunch_sweet   = locked.lunch_sweet   || FOOD_DB.lunch_sweet[0];
+    plan.lunch_rice    = null;
+    plan.lunch_moru    = null;
+    plan.dinner_millet = locked.dinner_millet || pickFromPool(
+      FOOD_DB.dinner_millet.filter(d => d.travel),
+      getRecentCategories('dinner_millet', ROTATION_RULES.dinner_millet)
+    );
+    plan.dinner_salad  = locked.dinner_salad  || pickFromPool(FOOD_DB.dinner_salad, getRecentCategories('dinner_salad', ROTATION_RULES.dinner_salad));
+  } else {
+    plan.lunch_rice    = FOOD_DB.lunch_rice;
+    plan.lunch_fish    = locked.lunch_fish    || pickFromPool(
+      FOOD_DB.lunch_fish,
+      getRecentCategories('lunch_fish', ROTATION_RULES.lunch_fish),
+      item => COCONUT_FISH_IDS.includes(item.id) ? coconutCountThisWeek(dateKey) < 2 : true
+    );
+    plan.lunch_thoran  = locked.lunch_thoran  || pickFromPool(FOOD_DB.lunch_thoran,  getRecentCategories('lunch_thoran',  ROTATION_RULES.lunch_thoran));
+    plan.lunch_sprouts = locked.lunch_sprouts || pickFromPool(FOOD_DB.lunch_sprouts, getRecentCategories('lunch_sprouts', ROTATION_RULES.lunch_sprouts));
+    plan.lunch_sweet   = locked.lunch_sweet   || pickFromPool(FOOD_DB.lunch_sweet,   getRecentCategories('lunch_sweet',   ROTATION_RULES.lunch_sweet));
+    plan.lunch_moru    = FOOD_DB.lunch_moru;
+    // dinner_millet must only pick actual dinner_millet items — filter by presence of defaultDur or known dinner items
+    plan.dinner_millet = locked.dinner_millet || pickFromPool(
+      FOOD_DB.dinner_millet,
+      getRecentCategories('dinner_millet', ROTATION_RULES.dinner_millet)
+    );
+    plan.dinner_salad  = locked.dinner_salad  || pickFromPool(FOOD_DB.dinner_salad,  getRecentCategories('dinner_salad',  ROTATION_RULES.dinner_salad));
+  }
+
+  plan.snack = locked.snack || FOOD_DB.snack[0];
+  plan.travel = forTravel;
+  plan.locked = locked;
+
+  return plan;
+}
+function getMealPlan(dateKey){
+  if(!meals[dateKey]){
+    meals[dateKey] = generateMeal(dateKey, travelMode);
+    save();
+  }
+  return meals[dateKey];
+}
+function mealDayTotals(plan){
+  if(!plan) return { cal:0, pro:0, carb:0, fat:0 };
+  const slots = ['breakfast','lunch_rice','lunch_fish','lunch_thoran','lunch_sprouts','lunch_sweet','lunch_moru','dinner_millet','dinner_salad','snack'];
+  return slots.reduce((t, s) => {
+    const item = plan[s];
+    if(!item) return t;
+    return { cal: t.cal + (item.cal||0), pro: t.pro + (item.pro||0), carb: t.carb + (item.carb||0), fat: t.fat + (item.fat||0) };
+  }, {cal:0, pro:0, carb:0, fat:0});
+}
+
+// ═══════════════════════════════════════════════
+// TODAY SCREEN
+// ═══════════════════════════════════════════════
+function renderToday(){
+  // Mission day
+  document.getElementById('tod-day').textContent = missionDay();
+
+  // Travel banner
+  document.getElementById('travel-banner').classList.toggle('on', travelMode);
+
+  // Pre-fill weight input if today already logged
+  const todayRec = records[todayKey()] || {};
+  const wqInp = document.getElementById('wq-inp');
+  if(todayRec.weight) wqInp.value = todayRec.weight;
+  else wqInp.value = '';
+
+  // Risk card
+  renderRiskCard();
+
+  // Tomorrow meal card
+  renderTomorrowCard();
+
+  // Disciplines
+  renderDiscList();
+  updateProgress();
+
+  // Evening prompt
+  updateEveningPrompt();
+}
+
+function saveQuickWeight(){
+  const val = parseFloat(document.getElementById('wq-inp').value);
+  if(!val) return;
+  const key = todayKey();
+  if(!records[key]) records[key] = {};
+  records[key].weight = val;
+  save();
+  const conf = document.getElementById('wq-saved');
+  conf.classList.add('on');
+  setTimeout(() => conf.classList.remove('on'), 2000);
+  renderRiskCard();
+  renderSparkline();
+  if(activeTab === 'record') syncRecordInputs();
+}
+
+function renderTomorrowCard(){
+  const key = keyForOffset(1);
+  const plan = getMealPlan(key);
+  const totals = mealDayTotals(plan);
+  const el = document.getElementById('mc-body');
+
+  const lunchDish = plan.travel ? (plan.lunch_fish ? plan.lunch_fish.name : '—') : `Rice + ${plan.lunch_fish ? plan.lunch_fish.name : '—'}`;
+
+  el.innerHTML = `
+    <div class="mc-row">
+      <span class="mc-slot">Breakfast</span>
+      <span class="mc-dish">${plan.breakfast ? plan.breakfast.name : '—'}</span>
+      <span class="mc-kcal">${plan.breakfast ? plan.breakfast.cal : '—'}</span>
+    </div>
+    <div class="mc-row">
+      <span class="mc-slot">Lunch</span>
+      <span class="mc-dish">${lunchDish}</span>
+      <span class="mc-kcal">${plan.lunch_fish ? (plan.lunch_fish.cal + (plan.lunch_rice ? plan.lunch_rice.cal : 0)) : '—'}</span>
+    </div>
+    <div class="mc-row">
+      <span class="mc-slot">Dinner</span>
+      <span class="mc-dish">${plan.dinner_millet ? plan.dinner_millet.name : '—'}</span>
+      <span class="mc-kcal">${plan.dinner_millet ? plan.dinner_millet.cal : '—'}</span>
+    </div>
+    <div class="mc-total">
+      <span class="mc-total-lbl">Day Total</span>
+      <span class="mc-total-val">~${totals.cal} kcal</span>
+    </div>`;
+}
+
+function renderDiscList(){
+  const list = document.getElementById('disc-list');
+  const todayRec = records[todayKey()] || {};
+  const todayDiscs = todayRec.disciplines || [];
+  list.innerHTML = '';
+  DISCIPLINES.forEach((disc, i) => {
+    const done = todayDiscs[i] && todayDiscs[i].done;
+    const displayName = travelMode ? disc.travelName : disc.name;
+    const div = document.createElement('div');
+    div.className = 'di' + (done ? ' done' : '');
+    div.innerHTML = `
+      <div class="di-l">
+        <div class="di-dot"></div>
+        <div>
+          <div class="di-name">${displayName}</div>
+          ${disc.kcalPerMin ? `<div class="di-sub">~${Math.round(disc.kcalPerMin * disc.defaultDur)} kcal · ${disc.defaultDur} min</div>` : ''}
+        </div>
+      </div>
+      <div class="di-tag">${disc.category}</div>`;
+    div.addEventListener('click', () => toggleTodayDisc(i, div));
+    list.appendChild(div);
+  });
+}
+
+function toggleTodayDisc(idx, el){
+  const key = todayKey();
+  if(!records[key]) records[key] = {};
+  if(!records[key].disciplines) records[key].disciplines = [];
+  while(records[key].disciplines.length <= idx) records[key].disciplines.push({done:false, dur:0});
+  records[key].disciplines[idx].done = !records[key].disciplines[idx].done;
+  save();
+  el.classList.toggle('done');
+  updateProgress();
+  updateEveningPrompt();
+  if(activeTab === 'record') syncDlList();
+}
+
+function updateProgress(){
+  const todayRec = records[todayKey()] || {};
+  const todayDiscs = todayRec.disciplines || [];
+  const total = DISCIPLINES.length;
+  const done = todayDiscs.filter(d => d && d.done).length;
+  document.getElementById('prog-count').textContent = `${done} of ${total}`;
+  setTimeout(() => {
+    const pct = total ? Math.round((done/total)*100) : 0;
+    document.getElementById('prog-fill').style.width = pct + '%';
+  }, 50);
+}
+
+function updateEveningPrompt(){
+  const h = new Date().getHours();
+  const ep = document.getElementById('ev-prompt');
+  if(!ep) return;
+  ep.style.display = h >= 17 ? 'block' : 'none';
+  if(h >= 17){
+    const todayRec = records[todayKey()] || {};
+    const done = (todayRec.disciplines || []).filter(d => d && d.done).length;
+    const left = DISCIPLINES.length - done;
+    document.getElementById('ev-text').textContent = left > 0
+      ? `${left} discipline${left > 1 ? 's' : ''} still open.`
+      : 'All disciplines complete. Record your day.';
+  }
+}
+
+// ═══════════════════════════════════════════════
+// TRAVEL MODE
+// ═══════════════════════════════════════════════
+function setTravelMode(val){
+  travelMode = val;
+  save();
+  renderToday();
+  // Regenerate today and tomorrow meal plans
+  const keys = [todayKey(), keyForOffset(1)];
+  keys.forEach(k => {
+    if(meals[k]) { meals[k] = generateMeal(k, val); }
+  });
+  save();
+  renderTomorrowCard();
+}
+
+// ═══════════════════════════════════════════════
+// MEAL DETAIL OVERLAY
+// ═══════════════════════════════════════════════
+function openMealDetail(offsetFromToday){
+  mealDateOffset = offsetFromToday;
+  renderMealDetail();
+  const ov = document.getElementById('meal-detail-overlay');
+  ov.classList.add('on','slide-in');
+  ov.addEventListener('animationend', () => ov.classList.remove('slide-in'), {once:true});
+}
+function closeMealDetail(){
+  document.getElementById('meal-detail-overlay').classList.remove('on');
+  renderTomorrowCard();
+}
+
+function renderMealDetail(){
+  const key = keyForOffset(mealDateOffset);
+  const plan = getMealPlan(key);
+  const d = keyToDate(key);
+  const totals = mealDayTotals(plan);
+  const target = keyToDate(mission.targetDate);
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  // Header date
+  document.getElementById('md-title').textContent = formatDate(d);
+  document.getElementById('md-date-lbl').textContent = formatDateFull(d);
+
+  // Nav arrows
+  const prevOff = mealDateOffset - 1;
+  const nextOff = mealDateOffset + 1;
+  const nextDate = keyToDate(keyForOffset(nextOff));
+  document.getElementById('md-prev').classList.toggle('dis', prevOff < 0);
+  document.getElementById('md-next').classList.toggle('dis', nextDate > target);
+
+  // Travel toggle label
+  document.getElementById('md-travel-lbl').textContent = plan.travel ? 'Travel Mode' : 'Home Kitchen';
+  document.getElementById('md-travel-toggle').textContent = plan.travel ? 'Switch to Home' : 'Switch to Travel';
+
+  // Build slots
+  const slotsEl = document.getElementById('md-slots');
+  slotsEl.innerHTML = '';
+
+  if(!plan.travel){
+    // BREAKFAST
+    appendMealSlot(slotsEl, 'Breakfast', plan.breakfast, 'breakfast', key);
+    // LUNCH (composite)
+    appendLunchComposite(slotsEl, plan, key);
+    // DINNER
+    appendDinnerComposite(slotsEl, plan, key);
+    // SNACK
+    appendMealSlot(slotsEl, 'Snack', plan.snack, 'snack', key);
+  } else {
+    appendMealSlot(slotsEl, 'Breakfast', plan.breakfast, 'breakfast', key);
+    appendMealSlot(slotsEl, 'Lunch / Dinner', plan.lunch_fish, 'lunch_fish', key);
+    appendMealSlot(slotsEl, 'Dinner', plan.dinner_millet, 'dinner_millet', key);
+    appendMealSlot(slotsEl, 'Snack', plan.snack, 'snack', key);
+  }
+
+  // Day total
+  const targetCal = dailyTarget(currentWeight());
+  const gap = totals.cal - targetCal;
+  const gapColor = gap > 150 ? 'var(--risk-at)' : gap < -150 ? 'var(--risk-on)' : 'var(--t1)';
+  const gapLabel = gap > 150 ? 'Over target' : gap < -150 ? 'Under target' : 'On target';
+  const { deficitPerDay, safeKgPerWeek } = calcDynamicDeficit();
+
+  document.getElementById('md-total').innerHTML = `
+    <div class="mdt-row"><span class="mdt-lbl">Planned Calories</span><span class="mdt-val ac">~${totals.cal} kcal</span></div>
+    <div class="mdt-row"><span class="mdt-lbl">Meal Target</span><span class="mdt-val">~${targetCal} kcal</span></div>
+    <div class="mdt-row">
+      <span class="mdt-lbl">${gapLabel}</span>
+      <span class="mdt-val" style="color:${gapColor};">${gap > 0 ? '+' : ''}${gap} kcal</span>
+    </div>
+    <div style="height:1px;background:var(--rl);margin:8px 0;"></div>
+    <div class="mdt-row"><span class="mdt-lbl">Protein</span><span class="mdt-val">${totals.pro}g</span></div>
+    <div class="mdt-row"><span class="mdt-lbl">Carbs</span><span class="mdt-val">${totals.carb}g</span></div>
+    <div class="mdt-row"><span class="mdt-lbl">Fat</span><span class="mdt-val">${totals.fat}g</span></div>
+    <div style="height:1px;background:var(--rl);margin:8px 0;"></div>
+    <div class="mdt-row"><span class="mdt-lbl" style="color:var(--t3);font-size:10px;">Deficit</span><span class="mdt-val" style="font-size:15px;color:var(--t3);">${deficitPerDay} kcal/day · ${safeKgPerWeek} kg/week</span></div>`;
+}
+
+function appendMealSlot(container, label, item, slotKey, dateKey){
+  if(!item) return;
+  const locked = meals[dateKey] && meals[dateKey].locked && meals[dateKey].locked[slotKey];
+  const div = document.createElement('div');
+  div.className = 'meal-slot';
+  div.innerHTML = `
+    <div class="ms-header">
+      <span class="ms-name">${label}</span>
+      <span class="ms-kcal">${item.cal} kcal</span>
+    </div>
+    <div class="ms-dish">${item.name}</div>
+    ${item.ml ? `<div class="ms-portion" style="color:var(--ac);font-size:11px;margin-bottom:4px;">${item.ml}</div>` : ''}
+    <div class="ms-portion">${item.portion}</div>
+    <div class="ms-macros">
+      <div class="ms-macro"><span class="ms-macro-val">${item.pro||0}g</span><span class="ms-macro-lbl">Protein</span></div>
+      <div class="ms-macro"><span class="ms-macro-val">${item.carb||0}g</span><span class="ms-macro-lbl">Carbs</span></div>
+      <div class="ms-macro"><span class="ms-macro-val">${item.fat||0}g</span><span class="ms-macro-lbl">Fat</span></div>
+    </div>
+    <div class="ms-actions">
+      <span class="ms-btn ${locked ? 'locked' : ''}" onclick="toggleLock('${dateKey}','${slotKey}',this)">${locked ? 'Locked' : 'Lock'}</span>
+      <span class="ms-btn" onclick="openReplace('${dateKey}','${slotKey}')">Replace</span>
+    </div>`;
+  container.appendChild(div);
+}
+
+function appendLunchComposite(container, plan, dateKey){
+  const items = [
+    {label:'Rice',    item: plan.lunch_rice},
+    {label:'Fish',    item: plan.lunch_fish,    slot:'lunch_fish'},
+    {label:'Thoran',  item: plan.lunch_thoran,  slot:'lunch_thoran'},
+    {label:'Sprouts', item: plan.lunch_sprouts, slot:'lunch_sprouts'},
+    {label:'Moru',    item: plan.lunch_moru},
+    {label:'Sweet',   item: plan.lunch_sweet,   slot:'lunch_sweet'},
+  ];
+  const totalCal  = items.reduce((s,i) => s + (i.item ? i.item.cal    : 0), 0);
+  const totalPro  = items.reduce((s,i) => s + (i.item ? (i.item.pro||0) : 0), 0);
+  const totalCarb = items.reduce((s,i) => s + (i.item ? (i.item.carb||0): 0), 0);
+  const totalFat  = items.reduce((s,i) => s + (i.item ? (i.item.fat||0) : 0), 0);
+
+  const div = document.createElement('div');
+  div.className = 'meal-slot';
+  div.innerHTML = `
+    <div class="ms-header">
+      <span class="ms-name">Lunch</span>
+      <span class="ms-kcal">${totalCal} kcal</span>
+    </div>
+    ${items.filter(i => i.item).map(i => `
+      <div style="display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--rl);">
+        <div style="flex:1;">
+          <span style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--t4);display:block;margin-bottom:2px;">${i.label}</span>
+          <span style="font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t1);">${i.item.name}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;padding-left:12px;">
+          <span style="font-size:11px;color:var(--t4);">${i.item.cal} kcal</span>
+          ${i.slot ? `<span style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);cursor:pointer;border-bottom:1px solid var(--rl);padding-bottom:1px;" onclick="openReplace('${dateKey}','${i.slot}')">Replace</span>` : ''}
+        </div>
+      </div>`).join('')}
+    <div class="ms-macros" style="margin-top:12px;">
+      <div class="ms-macro"><span class="ms-macro-val">${totalPro}g</span><span class="ms-macro-lbl">Protein</span></div>
+      <div class="ms-macro"><span class="ms-macro-val">${totalCarb}g</span><span class="ms-macro-lbl">Carbs</span></div>
+      <div class="ms-macro"><span class="ms-macro-val">${totalFat}g</span><span class="ms-macro-lbl">Fat</span></div>
+    </div>
+    <div style="font-family:var(--serif);font-size:13px;font-style:italic;color:var(--t4);margin-top:10px;">Moru is non-negotiable · Fish flesh over gravy</div>`;
+  container.appendChild(div);
+}
+
+function appendDinnerComposite(container, plan, dateKey){
+  const milletCal = plan.dinner_millet ? plan.dinner_millet.cal : 0;
+  const saladCal  = plan.dinner_salad  ? plan.dinner_salad.cal  : 0;
+  const total = milletCal + saladCal;
+
+  const div = document.createElement('div');
+  div.className = 'meal-slot';
+  div.innerHTML = `
+    <div class="ms-header">
+      <span class="ms-name">Dinner</span>
+      <span class="ms-kcal">${total} kcal</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--rl);">
+      <div style="flex:1;">
+        <span style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--t4);display:block;margin-bottom:2px;">Millet Base</span>
+        <span style="font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t1);">${plan.dinner_millet ? plan.dinner_millet.name : '—'}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;padding-left:12px;">
+        <span style="font-size:11px;color:var(--t4);">${milletCal} kcal</span>
+        <span style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);cursor:pointer;border-bottom:1px solid var(--rl);padding-bottom:1px;" onclick="openReplace('${dateKey}','dinner_millet')">Replace</span>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;">
+      <div style="flex:1;">
+        <span style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--t4);display:block;margin-bottom:2px;">Salad</span>
+        <span style="font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t1);">${plan.dinner_salad ? plan.dinner_salad.name : '—'}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;padding-left:12px;">
+        <span style="font-size:11px;color:var(--t4);">${saladCal} kcal</span>
+        <span style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);cursor:pointer;border-bottom:1px solid var(--rl);padding-bottom:1px;" onclick="openReplace('${dateKey}','dinner_salad')">Replace</span>
+      </div>
+    </div>
+    <div style="font-family:var(--serif);font-size:13px;font-style:italic;color:var(--t4);margin-top:10px;">Minimum 2 eggs always · Salad daily non-negotiable</div>
+    <div class="ms-actions">
+      <span class="ms-btn" onclick="openReplace('${dateKey}','dinner_millet')">Replace Millet</span>
+      <span class="ms-btn" onclick="openReplace('${dateKey}','dinner_salad')">Replace Salad</span>
+    </div>`;
+  container.appendChild(div);
+}
+
+function toggleLock(dateKey, slot, el){
+  if(!meals[dateKey]) return;
+  if(!meals[dateKey].locked) meals[dateKey].locked = {};
+  const isLocked = !!meals[dateKey].locked[slot];
+  if(isLocked){
+    delete meals[dateKey].locked[slot];
+    el.textContent = 'Lock';
+    el.classList.remove('locked');
+  } else {
+    meals[dateKey].locked[slot] = meals[dateKey][slot];
+    el.textContent = 'Locked';
+    el.classList.add('locked');
+  }
+  save();
+}
+
+function toggleMealTravel(){
+  const key = keyForOffset(mealDateOffset);
+  if(!meals[key]) meals[key] = {};
+  meals[key].travel = !meals[key].travel;
+  meals[key] = generateMeal(key, meals[key].travel);
+  save();
+  renderMealDetail();
+}
+
+function navMealDate(dir){
+  mealDateOffset += dir;
+  renderMealDetail();
+}
+
+// ═══════════════════════════════════════════════
+// FOOD DATABASE — Full 156-item database
+// ═══════════════════════════════════════════════
+const MASTER_DB = [{"id":"b001","name":"Puttu","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~150g)","calories":180,"protein":4,"carbs":36,"fat":2,"fiber":2,"satietyScore":6,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Kannur","Vegetarian"]},{"id":"b002","name":"Ragi Puttu","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~150g)","calories":160,"protein":5,"carbs":32,"fat":2,"fiber":4,"satietyScore":7,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Kannur","Vegetarian","Fiber","WeightLoss"]},{"id":"b003","name":"Chemba Puttu","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~150g)","calories":170,"protein":4,"carbs":34,"fat":2,"fiber":3,"satietyScore":6,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Kannur","Vegetarian"]},{"id":"b004","name":"Appam","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~100g)","calories":200,"protein":4,"carbs":38,"fat":4,"fiber":1,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Kannur","Vegetarian"]},{"id":"b005","name":"Orotti (Uruli Appam)","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~120g)","calories":220,"protein":4,"carbs":42,"fat":5,"fiber":2,"satietyScore":6,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Kannur","Vegetarian"]},{"id":"b006","name":"Idli","mealSlot":"breakfast","category":"breakfast_main","servingSize":"3 pieces (~150g)","calories":150,"protein":5,"carbs":30,"fat":1,"fiber":1,"satietyScore":5,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian","WeightLoss"]},{"id":"b007","name":"Dosa","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~100g)","calories":180,"protein":5,"carbs":34,"fat":4,"fiber":1,"satietyScore":5,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian"]},{"id":"b008","name":"Set Dosa","mealSlot":"breakfast","category":"breakfast_main","servingSize":"3 pieces (~150g)","calories":240,"protein":6,"carbs":44,"fat":5,"fiber":1,"satietyScore":6,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian"]},{"id":"b009","name":"Uthappam","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~150g)","calories":220,"protein":6,"carbs":38,"fat":6,"fiber":2,"satietyScore":6,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian"]},{"id":"b010","name":"Rava Dosa","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~100g)","calories":200,"protein":5,"carbs":36,"fat":6,"fiber":1,"satietyScore":4,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian"]},{"id":"b011","name":"Wheat Dosa","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~100g)","calories":190,"protein":5,"carbs":34,"fat":5,"fiber":2,"satietyScore":5,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian","WeightLoss"]},{"id":"b012","name":"Ragi Dosa","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~100g)","calories":170,"protein":5,"carbs":30,"fat":4,"fiber":3,"satietyScore":6,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian","Fiber","WeightLoss","TGFriendly"]},{"id":"b013","name":"Green Gram Dosa","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~100g)","calories":180,"protein":8,"carbs":28,"fat":4,"fiber":4,"satietyScore":7,"proteinScore":5,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian","Protein","Fiber","TGFriendly","WeightLoss"]},{"id":"b014","name":"Upma","mealSlot":"breakfast","category":"breakfast_main","servingSize":"1 bowl (~200g)","calories":220,"protein":5,"carbs":38,"fat":7,"fiber":2,"satietyScore":6,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian"]},{"id":"b015","name":"Broken Wheat Upma","mealSlot":"breakfast","category":"breakfast_main","servingSize":"1 bowl (~200g)","calories":200,"protein":6,"carbs":36,"fat":5,"fiber":4,"satietyScore":7,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian","Fiber","WeightLoss"]},{"id":"b016","name":"Aval Nanachathu","mealSlot":"breakfast","category":"breakfast_main","servingSize":"1 bowl (~150g)","calories":210,"protein":3,"carbs":44,"fat":3,"fiber":2,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian"]},{"id":"b017","name":"Ela Ada","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~120g)","calories":230,"protein":3,"carbs":46,"fat":4,"fiber":2,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":false,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Breakfast","Kerala","Kannur","Vegetarian","Weekend"]},{"id":"b018","name":"Kozhukkatta","mealSlot":"breakfast","category":"breakfast_main","servingSize":"3 pieces (~120g)","calories":220,"protein":3,"carbs":44,"fat":3,"fiber":2,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":false,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Breakfast","Kerala","Vegetarian","Weekend"]},{"id":"b019","name":"Kinnathappam","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~120g)","calories":240,"protein":4,"carbs":46,"fat":5,"fiber":1,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":false,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Breakfast","Kerala","Kannur","Vegetarian","Weekend"]},{"id":"b020","name":"Kappa (Tapioca) Boiled","mealSlot":"breakfast","category":"breakfast_main","servingSize":"1 cup (~150g)","calories":190,"protein":2,"carbs":44,"fat":0,"fiber":2,"satietyScore":6,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Kannur","Vegetarian"]},{"id":"b021","name":"Sweet Potato Boiled","mealSlot":"breakfast","category":"breakfast_main","servingSize":"1 medium (~150g)","calories":130,"protein":2,"carbs":30,"fat":0,"fiber":4,"satietyScore":7,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian","Fiber","WeightLoss","TGFriendly"]},{"id":"b022","name":"Oats Porridge","mealSlot":"breakfast","category":"breakfast_main","servingSize":"1 bowl (~250ml)","calories":180,"protein":6,"carbs":30,"fat":4,"fiber":5,"satietyScore":8,"proteinScore":4,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Vegetarian","Fiber","WeightLoss","TGFriendly"]},{"id":"b023","name":"Idiyappam","mealSlot":"breakfast","category":"breakfast_main","servingSize":"3 pieces (~150g)","calories":200,"protein":4,"carbs":42,"fat":1,"fiber":1,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Kannur","Vegetarian"]},{"id":"b024","name":"Vellayappam","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~100g)","calories":200,"protein":4,"carbs":40,"fat":3,"fiber":1,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Kannur","Vegetarian"]},{"id":"b025","name":"Pazhamkanji","mealSlot":"breakfast","category":"breakfast_main","servingSize":"1 bowl (~300ml)","calories":180,"protein":3,"carbs":40,"fat":1,"fiber":1,"satietyScore":7,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Kannur","Vegetarian","WeightLoss"]},{"id":"bs001","name":"Kadala Curry","mealSlot":"breakfast","category":"breakfast_side","servingSize":"1 bowl (~150g)","calories":240,"protein":10,"carbs":32,"fat":8,"fiber":8,"satietyScore":8,"proteinScore":6,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Kannur","Vegetarian","Protein","Fiber","TGFriendly"]},{"id":"bs002","name":"Cherupayar Curry","mealSlot":"breakfast","category":"breakfast_side","servingSize":"1 bowl (~150g)","calories":200,"protein":10,"carbs":28,"fat":6,"fiber":7,"satietyScore":8,"proteinScore":6,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Kannur","Vegetarian","Protein","Fiber","TGFriendly","WeightLoss"]},{"id":"bs003","name":"Egg Curry","mealSlot":"breakfast","category":"breakfast_side","servingSize":"1 egg + gravy (~120g)","calories":170,"protein":12,"carbs":5,"fat":12,"fiber":1,"satietyScore":7,"proteinScore":7,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Egg","Protein"]},{"id":"bs004","name":"Egg Roast","mealSlot":"breakfast","category":"breakfast_side","servingSize":"1 egg + masala (~100g)","calories":190,"protein":12,"carbs":6,"fat":14,"fiber":1,"satietyScore":7,"proteinScore":7,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Kannur","Egg","Protein"]},{"id":"bs005","name":"Omelette","mealSlot":"breakfast","category":"breakfast_side","servingSize":"2 egg omelette (~100g)","calories":180,"protein":13,"carbs":2,"fat":14,"fiber":0,"satietyScore":7,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Breakfast","Egg","Protein","Travel"]},{"id":"bs006","name":"Chicken Curry","mealSlot":"breakfast","category":"breakfast_side","servingSize":"1 serving (~120g)","calories":260,"protein":24,"carbs":6,"fat":16,"fiber":1,"satietyScore":8,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Chicken","Protein","HighProtein"]},{"id":"bs007","name":"Chicken Stew","mealSlot":"breakfast","category":"breakfast_side","servingSize":"1 bowl (~150g)","calories":230,"protein":22,"carbs":8,"fat":12,"fiber":2,"satietyScore":8,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Chicken","Protein"]},{"id":"bs008","name":"Mathi Curry","mealSlot":"breakfast","category":"breakfast_side","servingSize":"3 sardines + gravy (~150g)","calories":240,"protein":22,"carbs":5,"fat":14,"fiber":1,"satietyScore":8,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Kannur","Fish","Omega3","TGFriendly","Protein"]},{"id":"bs009","name":"Ayala Curry","mealSlot":"breakfast","category":"breakfast_side","servingSize":"1 piece + gravy (~150g)","calories":250,"protein":22,"carbs":4,"fat":16,"fiber":1,"satietyScore":8,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Kannur","Fish","Omega3","TGFriendly","Protein"]},{"id":"bs010","name":"Potato Curry","mealSlot":"breakfast","category":"breakfast_side","servingSize":"1 bowl (~150g)","calories":160,"protein":3,"carbs":30,"fat":5,"fiber":3,"satietyScore":6,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian"]},{"id":"bs011","name":"Vegetable Stew","mealSlot":"breakfast","category":"breakfast_side","servingSize":"1 bowl (~150g)","calories":130,"protein":3,"carbs":12,"fat":8,"fiber":3,"satietyScore":6,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian"]},{"id":"bs012","name":"Pumpkin Curry","mealSlot":"breakfast","category":"breakfast_side","servingSize":"1 bowl (~150g)","calories":120,"protein":2,"carbs":20,"fat":5,"fiber":3,"satietyScore":6,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian","Fiber"]},{"id":"bs013","name":"Coconut Chutney","mealSlot":"breakfast","category":"breakfast_side","servingSize":"2 tbsp (~40g)","calories":60,"protein":1,"carbs":4,"fat":5,"fiber":1,"satietyScore":3,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian"]},{"id":"bs014","name":"Tomato Chutney","mealSlot":"breakfast","category":"breakfast_side","servingSize":"2 tbsp (~40g)","calories":35,"protein":1,"carbs":6,"fat":1,"fiber":1,"satietyScore":3,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian","TGFriendly"]},{"id":"bs015","name":"Sambar","mealSlot":"breakfast","category":"breakfast_side","servingSize":"1 bowl (~150ml)","calories":80,"protein":4,"carbs":12,"fat":2,"fiber":3,"satietyScore":5,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian","Fiber","TGFriendly"]},{"id":"bs016","name":"Banana (Nendran)","mealSlot":"breakfast","category":"breakfast_side","servingSize":"1 medium (~120g)","calories":140,"protein":1,"carbs":34,"fat":0,"fiber":3,"satietyScore":6,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Kannur","Vegetarian","Fruit","Fiber"]},{"id":"bs017","name":"Mango Pickle","mealSlot":"breakfast","category":"breakfast_side","servingSize":"1 tsp (~10g)","calories":20,"protein":0,"carbs":4,"fat":0,"fiber":0,"satietyScore":2,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Breakfast","Kerala","Vegetarian"]},{"id":"bs018","name":"Fish Roast","mealSlot":"breakfast","category":"breakfast_side","servingSize":"2 pieces (~120g)","calories":220,"protein":22,"carbs":3,"fat":13,"fiber":1,"satietyScore":8,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Breakfast","Kerala","Fish","Protein","Omega3"]},{"id":"bs019","name":"Coconut Milk (sweetened)","mealSlot":"breakfast","category":"breakfast_side","servingSize":"100ml","calories":140,"protein":1,"carbs":14,"fat":9,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Breakfast","Kerala","Vegetarian","Weekend"]},{"id":"ls001","name":"Kerala Red Rice","mealSlot":"lunch","category":"lunch_staple","servingSize":"1 cup cooked (~180g)","calories":240,"protein":5,"carbs":52,"fat":1,"fiber":2,"satietyScore":7,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Vegetarian"]},{"id":"ls002","name":"White Rice","mealSlot":"lunch","category":"lunch_staple","servingSize":"1 cup cooked (~180g)","calories":230,"protein":4,"carbs":50,"fat":0,"fiber":1,"satietyScore":6,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian"]},{"id":"ls003","name":"Brown Rice","mealSlot":"lunch","category":"lunch_staple","servingSize":"1 cup cooked (~180g)","calories":220,"protein":5,"carbs":46,"fat":2,"fiber":4,"satietyScore":8,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Vegetarian","Fiber","WeightLoss","TGFriendly"]},{"id":"ls004","name":"Millet Rice","mealSlot":"lunch","category":"lunch_staple","servingSize":"1 cup cooked (~180g)","calories":210,"protein":6,"carbs":44,"fat":2,"fiber":5,"satietyScore":8,"proteinScore":4,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Vegetarian","Fiber","WeightLoss","TGFriendly"]},{"id":"f001","name":"Mathi Curry (No Coconut)","mealSlot":"lunch","category":"fish","servingSize":"3 sardines + gravy (~180g)","calories":180,"protein":22,"carbs":4,"fat":9,"fiber":1,"satietyScore":9,"proteinScore":9,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Fish","Omega3","TGFriendly","HighProtein","WeightLoss"]},{"id":"f002","name":"Mathi Curry (Coconut)","mealSlot":"lunch","category":"fish","servingSize":"3 sardines + coconut gravy (~180g)","calories":260,"protein":20,"carbs":6,"fat":16,"fiber":1,"satietyScore":8,"proteinScore":8,"tgFriendly":false,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Lunch","Kerala","Kannur","Fish","Omega3","Weekend"]},{"id":"f003","name":"Mathi Fry","mealSlot":"lunch","category":"fish","servingSize":"3 sardines (~120g)","calories":240,"protein":21,"carbs":4,"fat":16,"fiber":0,"satietyScore":8,"proteinScore":9,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Fish","Omega3","TGFriendly","Protein"]},{"id":"f004","name":"Ayala Curry (No Coconut)","mealSlot":"lunch","category":"fish","servingSize":"1 piece + gravy (~180g)","calories":190,"protein":21,"carbs":4,"fat":10,"fiber":1,"satietyScore":9,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Fish","Omega3","TGFriendly","HighProtein","WeightLoss"]},{"id":"f005","name":"Ayala Fry","mealSlot":"lunch","category":"fish","servingSize":"2 pieces (~120g)","calories":220,"protein":20,"carbs":3,"fat":14,"fiber":0,"satietyScore":8,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Fish","Omega3","TGFriendly","Protein"]},{"id":"f006","name":"Netholi Fry","mealSlot":"lunch","category":"fish","servingSize":"1 serving (~100g)","calories":200,"protein":19,"carbs":3,"fat":13,"fiber":0,"satietyScore":8,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Fish","Omega3","TGFriendly","Protein"]},{"id":"f007","name":"Netholi Curry","mealSlot":"lunch","category":"fish","servingSize":"1 serving + gravy (~150g)","calories":160,"protein":20,"carbs":3,"fat":8,"fiber":1,"satietyScore":8,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Fish","Omega3","TGFriendly","Protein","WeightLoss"]},{"id":"f008","name":"Neymeen Curry","mealSlot":"lunch","category":"fish","servingSize":"1 piece + gravy (~180g)","calories":220,"protein":26,"carbs":4,"fat":11,"fiber":1,"satietyScore":9,"proteinScore":9,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Fish","TGFriendly","HighProtein"]},{"id":"f009","name":"Neymeen Fry","mealSlot":"lunch","category":"fish","servingSize":"1 piece (~120g)","calories":230,"protein":25,"carbs":3,"fat":13,"fiber":0,"satietyScore":8,"proteinScore":9,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Lunch","Kerala","Kannur","Fish","HighProtein"]},{"id":"f010","name":"Tuna Curry","mealSlot":"lunch","category":"fish","servingSize":"1 serving (~150g)","calories":200,"protein":28,"carbs":4,"fat":8,"fiber":1,"satietyScore":9,"proteinScore":10,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Fish","Omega3","TGFriendly","HighProtein","WeightLoss"]},{"id":"f011","name":"Tuna Roast","mealSlot":"lunch","category":"fish","servingSize":"1 serving (~150g)","calories":210,"protein":28,"carbs":3,"fat":10,"fiber":1,"satietyScore":9,"proteinScore":10,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Fish","Omega3","TGFriendly","HighProtein","WeightLoss"]},{"id":"f012","name":"Prawn Curry","mealSlot":"lunch","category":"fish","servingSize":"1 serving (~150g)","calories":200,"protein":20,"carbs":5,"fat":11,"fiber":1,"satietyScore":8,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Fish","Protein"]},{"id":"f013","name":"Prawn Roast","mealSlot":"lunch","category":"fish","servingSize":"1 serving (~150g)","calories":220,"protein":22,"carbs":4,"fat":13,"fiber":1,"satietyScore":8,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Fish","Protein"]},{"id":"f014","name":"Squid Curry","mealSlot":"lunch","category":"fish","servingSize":"1 serving (~150g)","calories":180,"protein":18,"carbs":6,"fat":9,"fiber":1,"satietyScore":7,"proteinScore":7,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Fish","Protein"]},{"id":"f015","name":"Squid Roast","mealSlot":"lunch","category":"fish","servingSize":"1 serving (~150g)","calories":200,"protein":20,"carbs":5,"fat":11,"fiber":1,"satietyScore":7,"proteinScore":7,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Fish","Protein"]},{"id":"f016","name":"Crab Curry","mealSlot":"lunch","category":"fish","servingSize":"1 serving (~200g)","calories":190,"protein":22,"carbs":6,"fat":9,"fiber":1,"satietyScore":8,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Fish","Protein","Weekend"]},{"id":"f017","name":"Fish Molee","mealSlot":"lunch","category":"fish","servingSize":"1 serving (~180g)","calories":230,"protein":18,"carbs":5,"fat":14,"fiber":1,"satietyScore":8,"proteinScore":7,"tgFriendly":false,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Lunch","Kerala","Fish","Weekend"]},{"id":"f018","name":"Dry Fish Curry","mealSlot":"lunch","category":"fish","servingSize":"1 serving (~100g)","calories":170,"protein":18,"carbs":6,"fat":9,"fiber":1,"satietyScore":7,"proteinScore":7,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Lunch","Kerala","Kannur","Fish"]},{"id":"c001","name":"Chicken Curry","mealSlot":"lunch","category":"chicken","servingSize":"1 serving (~150g)","calories":260,"protein":24,"carbs":6,"fat":16,"fiber":1,"satietyScore":9,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Chicken","Protein","HighProtein"]},{"id":"c002","name":"Chicken Roast","mealSlot":"lunch","category":"chicken","servingSize":"2 pieces (~150g)","calories":300,"protein":26,"carbs":4,"fat":20,"fiber":1,"satietyScore":8,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Chicken","Protein"]},{"id":"c003","name":"Chicken Fry","mealSlot":"lunch","category":"chicken","servingSize":"2 pieces (~150g)","calories":340,"protein":26,"carbs":8,"fat":22,"fiber":0,"satietyScore":7,"proteinScore":8,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Lunch","Kerala","Chicken","Protein","TreatMeal"]},{"id":"e001","name":"Egg Curry","mealSlot":"lunch","category":"egg","servingSize":"2 eggs + gravy (~180g)","calories":280,"protein":18,"carbs":8,"fat":20,"fiber":1,"satietyScore":8,"proteinScore":7,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Egg","Protein"]},{"id":"e002","name":"Egg Roast","mealSlot":"lunch","category":"egg","servingSize":"2 eggs + masala (~150g)","calories":300,"protein":18,"carbs":8,"fat":22,"fiber":1,"satietyScore":8,"proteinScore":7,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Egg","Protein"]},{"id":"e003","name":"Boiled Egg","mealSlot":"any","category":"egg","servingSize":"1 egg (~50g)","calories":70,"protein":6,"carbs":0,"fat":5,"fiber":0,"satietyScore":6,"proteinScore":6,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Breakfast","Lunch","Dinner","Egg","Protein","Travel","WeightLoss"]},{"id":"vc001","name":"Sambar","mealSlot":"lunch","category":"vegetable_curry","servingSize":"1 bowl (~200ml)","calories":80,"protein":4,"carbs":12,"fat":2,"fiber":3,"satietyScore":5,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","Fiber","TGFriendly"]},{"id":"vc002","name":"Moru Curry","mealSlot":"lunch","category":"vegetable_curry","servingSize":"1 bowl (~150ml)","calories":60,"protein":3,"carbs":6,"fat":3,"fiber":1,"satietyScore":4,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Vegetarian","TGFriendly"]},{"id":"vc003","name":"Pulissery","mealSlot":"lunch","category":"vegetable_curry","servingSize":"1 bowl (~150ml)","calories":90,"protein":3,"carbs":10,"fat":4,"fiber":1,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","TGFriendly"]},{"id":"vc004","name":"Avial","mealSlot":"lunch","category":"vegetable_curry","servingSize":"1 bowl (~150g)","calories":140,"protein":3,"carbs":14,"fat":8,"fiber":4,"satietyScore":6,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","Fiber"]},{"id":"vc005","name":"Olan","mealSlot":"lunch","category":"vegetable_curry","servingSize":"1 bowl (~150g)","calories":120,"protein":3,"carbs":12,"fat":7,"fiber":3,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian"]},{"id":"vc006","name":"Kaalan","mealSlot":"lunch","category":"vegetable_curry","servingSize":"1 bowl (~150g)","calories":150,"protein":4,"carbs":16,"fat":8,"fiber":2,"satietyScore":6,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian"]},{"id":"vc007","name":"Erissery","mealSlot":"lunch","category":"vegetable_curry","servingSize":"1 bowl (~150g)","calories":160,"protein":5,"carbs":20,"fat":8,"fiber":4,"satietyScore":7,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","Fiber"]},{"id":"vc008","name":"Pumpkin Curry","mealSlot":"lunch","category":"vegetable_curry","servingSize":"1 bowl (~150g)","calories":120,"protein":2,"carbs":20,"fat":5,"fiber":3,"satietyScore":6,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","Fiber","TGFriendly"]},{"id":"vc009","name":"Kadala Curry","mealSlot":"lunch","category":"vegetable_curry","servingSize":"1 bowl (~150g)","calories":240,"protein":10,"carbs":32,"fat":8,"fiber":8,"satietyScore":8,"proteinScore":6,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","Protein","Fiber","TGFriendly"]},{"id":"vc010","name":"Cherupayar Curry","mealSlot":"lunch","category":"vegetable_curry","servingSize":"1 bowl (~150g)","calories":200,"protein":10,"carbs":28,"fat":6,"fiber":7,"satietyScore":8,"proteinScore":6,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","Protein","Fiber","TGFriendly","WeightLoss"]},{"id":"vc011","name":"Moru (Buttermilk)","mealSlot":"lunch","category":"vegetable_curry","servingSize":"1 glass (~200ml)","calories":40,"protein":2,"carbs":4,"fat":2,"fiber":0,"satietyScore":4,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Vegetarian","TGFriendly","WeightLoss"]},{"id":"vc012","name":"Plain Curd","mealSlot":"lunch","category":"vegetable_curry","servingSize":"1 small bowl (~100g)","calories":60,"protein":3,"carbs":5,"fat":3,"fiber":0,"satietyScore":4,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Lunch","Vegetarian","TGFriendly","WeightLoss"]},{"id":"th001","name":"Beans Thoran","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g)","calories":85,"protein":3,"carbs":10,"fat":4,"fiber":4,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Vegetarian","Fiber","TGFriendly"]},{"id":"th002","name":"Cabbage Thoran","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g)","calories":90,"protein":3,"carbs":9,"fat":5,"fiber":3,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Vegetarian","Fiber","TGFriendly"]},{"id":"th003","name":"Beetroot Thoran","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g)","calories":95,"protein":2,"carbs":14,"fat":4,"fiber":3,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","Fiber","TGFriendly"]},{"id":"th004","name":"Carrot Thoran","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g)","calories":85,"protein":2,"carbs":12,"fat":4,"fiber":3,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","Fiber","TGFriendly"]},{"id":"th005","name":"Achinga Thoran","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g)","calories":80,"protein":4,"carbs":8,"fat":4,"fiber":4,"satietyScore":5,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Vegetarian","Fiber","TGFriendly"]},{"id":"th006","name":"Cherupayar Thoran","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g)","calories":110,"protein":6,"carbs":12,"fat":4,"fiber":5,"satietyScore":6,"proteinScore":4,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Vegetarian","Protein","Fiber","TGFriendly"]},{"id":"th007","name":"Ethakka Thoran","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g)","calories":120,"protein":2,"carbs":22,"fat":4,"fiber":3,"satietyScore":6,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Vegetarian","Fiber"]},{"id":"th008","name":"Kaya Thoran","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g)","calories":115,"protein":2,"carbs":20,"fat":4,"fiber":3,"satietyScore":6,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Vegetarian","Fiber"]},{"id":"th009","name":"Chembu Thoran","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g)","calories":100,"protein":2,"carbs":18,"fat":3,"fiber":3,"satietyScore":5,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","Fiber"]},{"id":"th010","name":"Kovakka Mezhukkupuratti","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g)","calories":80,"protein":2,"carbs":10,"fat":4,"fiber":3,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","Fiber","TGFriendly"]},{"id":"th011","name":"Vendakka Mezhukkupuratti","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g)","calories":75,"protein":2,"carbs":8,"fat":4,"fiber":3,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","Fiber","TGFriendly"]},{"id":"th012","name":"Bitter Gourd Fry","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g)","calories":70,"protein":2,"carbs":7,"fat":4,"fiber":3,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","Fiber","TGFriendly","WeightLoss"]},{"id":"sp001","name":"Sprouted Green Gram","mealSlot":"lunch","category":"sprouts","servingSize":"1 small bowl (~80g)","calories":80,"protein":6,"carbs":12,"fat":1,"fiber":4,"satietyScore":7,"proteinScore":5,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","Protein","Fiber","TGFriendly","WeightLoss"]},{"id":"sp002","name":"Boiled Kadala","mealSlot":"lunch","category":"sprouts","servingSize":"1 small bowl (~80g)","calories":110,"protein":7,"carbs":18,"fat":2,"fiber":6,"satietyScore":8,"proteinScore":5,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Vegetarian","Protein","Fiber","TGFriendly"]},{"id":"sp003","name":"Sprouted Cowpea","mealSlot":"lunch","category":"sprouts","servingSize":"1 small bowl (~80g)","calories":85,"protein":6,"carbs":13,"fat":1,"fiber":5,"satietyScore":7,"proteinScore":5,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","Protein","Fiber","TGFriendly","WeightLoss"]},{"id":"sp004","name":"Boiled Cherupayar","mealSlot":"lunch","category":"sprouts","servingSize":"1 small bowl (~80g)","calories":90,"protein":6,"carbs":14,"fat":1,"fiber":5,"satietyScore":7,"proteinScore":5,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","Protein","Fiber","TGFriendly","WeightLoss"]},{"id":"sp005","name":"Lentil Sprouts","mealSlot":"lunch","category":"sprouts","servingSize":"1 small bowl (~80g)","calories":75,"protein":5,"carbs":11,"fat":1,"fiber":4,"satietyScore":7,"proteinScore":4,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Lunch","Vegetarian","Protein","Fiber","TGFriendly","WeightLoss"]},{"id":"dm001","name":"Ragi Puttu + Egg Roast","mealSlot":"dinner","category":"dinner_millet","servingSize":"2 puttu + 2 eggs (~250g)","calories":380,"protein":18,"carbs":48,"fat":13,"fiber":4,"satietyScore":8,"proteinScore":6,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Kannur","Egg","Fiber","WeightLoss"]},{"id":"dm002","name":"Muthari Kanji","mealSlot":"dinner","category":"dinner_millet","servingSize":"1 bowl (~300ml)","calories":220,"protein":6,"carbs":44,"fat":3,"fiber":5,"satietyScore":8,"proteinScore":4,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Kannur","Vegetarian","Fiber","TGFriendly","WeightLoss"]},{"id":"dm003","name":"Little Millet Upma","mealSlot":"dinner","category":"dinner_millet","servingSize":"1 cup cooked (~200g)","calories":240,"protein":6,"carbs":42,"fat":6,"fiber":5,"satietyScore":7,"proteinScore":4,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Vegetarian","Fiber","TGFriendly","WeightLoss"]},{"id":"dm004","name":"Ragi Roti","mealSlot":"dinner","category":"dinner_millet","servingSize":"2 rotis (~120g)","calories":200,"protein":6,"carbs":36,"fat":4,"fiber":5,"satietyScore":7,"proteinScore":4,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Vegetarian","Fiber","TGFriendly","WeightLoss"]},{"id":"dm005","name":"Kodo Millet Rice","mealSlot":"dinner","category":"dinner_millet","servingSize":"1 cup cooked (~180g)","calories":200,"protein":6,"carbs":42,"fat":2,"fiber":5,"satietyScore":8,"proteinScore":4,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Vegetarian","Fiber","TGFriendly","WeightLoss"]},{"id":"dm006","name":"Wheat Chapati","mealSlot":"dinner","category":"dinner_millet","servingSize":"2 chapatis (~100g)","calories":200,"protein":5,"carbs":36,"fat":4,"fiber":3,"satietyScore":6,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Vegetarian"]},{"id":"dm007","name":"Multigrain Chapati","mealSlot":"dinner","category":"dinner_millet","servingSize":"2 chapatis (~100g)","calories":190,"protein":6,"carbs":34,"fat":4,"fiber":5,"satietyScore":7,"proteinScore":4,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Vegetarian","Fiber","WeightLoss"]},{"id":"dm008","name":"Idiyappam","mealSlot":"dinner","category":"dinner_millet","servingSize":"3 pieces (~150g)","calories":200,"protein":4,"carbs":42,"fat":1,"fiber":1,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Kannur","Vegetarian"]},{"id":"dm009","name":"Rice Kanji","mealSlot":"dinner","category":"dinner_millet","servingSize":"1 bowl (~300ml)","calories":180,"protein":3,"carbs":40,"fat":1,"fiber":1,"satietyScore":7,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Kannur","Vegetarian","WeightLoss"]},{"id":"dm010","name":"Ragi Porridge","mealSlot":"dinner","category":"dinner_millet","servingSize":"1 bowl (~250ml)","calories":180,"protein":5,"carbs":34,"fat":3,"fiber":5,"satietyScore":8,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Vegetarian","Fiber","TGFriendly","WeightLoss"]},{"id":"dm011","name":"Oats Kanji","mealSlot":"dinner","category":"dinner_millet","servingSize":"1 bowl (~250ml)","calories":170,"protein":6,"carbs":28,"fat":4,"fiber":5,"satietyScore":8,"proteinScore":4,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Vegetarian","Fiber","TGFriendly","WeightLoss"]},{"id":"dm012","name":"Wheat Kanji","mealSlot":"dinner","category":"dinner_millet","servingSize":"1 bowl (~250ml)","calories":180,"protein":5,"carbs":36,"fat":2,"fiber":3,"satietyScore":7,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Vegetarian","Fiber","WeightLoss"]},{"id":"ds001","name":"Cucumber + Onion + Lime","mealSlot":"dinner","category":"dinner_salad","servingSize":"1 bowl (~120g)","calories":30,"protein":1,"carbs":6,"fat":0,"fiber":1,"satietyScore":4,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Vegetarian","TGFriendly","WeightLoss"]},{"id":"ds002","name":"Tomato + Shallot Salad","mealSlot":"dinner","category":"dinner_salad","servingSize":"1 bowl (~120g)","calories":35,"protein":1,"carbs":7,"fat":0,"fiber":2,"satietyScore":4,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Vegetarian","TGFriendly","WeightLoss"]},{"id":"ds003","name":"Carrot + Beetroot Salad","mealSlot":"dinner","category":"dinner_salad","servingSize":"1 bowl (~120g)","calories":55,"protein":2,"carbs":11,"fat":0,"fiber":3,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Vegetarian","Fiber","TGFriendly","WeightLoss"]},{"id":"ds004","name":"Raw Papaya Salad","mealSlot":"dinner","category":"dinner_salad","servingSize":"1 bowl (~120g)","calories":40,"protein":1,"carbs":8,"fat":0,"fiber":2,"satietyScore":5,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Kannur","Vegetarian","Fiber","TGFriendly","WeightLoss"]},{"id":"ds005","name":"Cabbage + Carrot Slaw","mealSlot":"dinner","category":"dinner_salad","servingSize":"1 bowl (~120g)","calories":45,"protein":2,"carbs":8,"fat":1,"fiber":3,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Vegetarian","Fiber","TGFriendly","WeightLoss"]},{"id":"ds006","name":"Onion + Tomato + Chilli","mealSlot":"dinner","category":"dinner_salad","servingSize":"1 bowl (~120g)","calories":30,"protein":1,"carbs":6,"fat":0,"fiber":1,"satietyScore":4,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Kannur","Vegetarian","TGFriendly","WeightLoss"]},{"id":"ds007","name":"Sprouts Salad","mealSlot":"dinner","category":"dinner_salad","servingSize":"1 bowl (~120g)","calories":90,"protein":6,"carbs":14,"fat":1,"fiber":4,"satietyScore":7,"proteinScore":5,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Dinner","Vegetarian","Protein","Fiber","TGFriendly","WeightLoss"]},{"id":"soup001","name":"Vegetable Soup","mealSlot":"dinner","category":"soup","servingSize":"1 bowl (~250ml)","calories":80,"protein":3,"carbs":12,"fat":2,"fiber":3,"satietyScore":6,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Dinner","Vegetarian","Fiber","TGFriendly","WeightLoss","Travel"]},{"id":"soup002","name":"Lentil Soup","mealSlot":"dinner","category":"soup","servingSize":"1 bowl (~250ml)","calories":130,"protein":8,"carbs":20,"fat":2,"fiber":5,"satietyScore":7,"proteinScore":5,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Dinner","Vegetarian","Protein","Fiber","TGFriendly","WeightLoss","Travel","Arabic"]},{"id":"soup003","name":"Chicken Soup","mealSlot":"dinner","category":"soup","servingSize":"1 bowl (~250ml)","calories":120,"protein":14,"carbs":6,"fat":4,"fiber":1,"satietyScore":7,"proteinScore":7,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Dinner","Chicken","Protein","TGFriendly","WeightLoss","Travel"]},{"id":"soup004","name":"Tomato Soup","mealSlot":"dinner","category":"soup","servingSize":"1 bowl (~250ml)","calories":80,"protein":2,"carbs":14,"fat":2,"fiber":2,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Dinner","Vegetarian","Fiber","TGFriendly","WeightLoss","Travel"]},{"id":"soup005","name":"Pumpkin Soup","mealSlot":"dinner","category":"soup","servingSize":"1 bowl (~250ml)","calories":90,"protein":2,"carbs":16,"fat":3,"fiber":2,"satietyScore":6,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Vegetarian","Fiber","TGFriendly","WeightLoss"]},{"id":"sn001","name":"Banana (Nendran)","mealSlot":"snack","category":"fruit","servingSize":"1 medium (~120g)","calories":140,"protein":1,"carbs":34,"fat":0,"fiber":3,"satietyScore":6,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Kannur","Fruit","Fiber","TGFriendly"]},{"id":"sn002","name":"Banana (Small)","mealSlot":"snack","category":"fruit","servingSize":"1 medium (~80g)","calories":90,"protein":1,"carbs":22,"fat":0,"fiber":2,"satietyScore":5,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Kannur","Fruit","Fiber","TGFriendly"]},{"id":"sn003","name":"Papaya","mealSlot":"snack","category":"fruit","servingSize":"1 cup (~150g)","calories":60,"protein":1,"carbs":14,"fat":0,"fiber":3,"satietyScore":5,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Fruit","Fiber","TGFriendly","WeightLoss"]},{"id":"sn004","name":"Watermelon","mealSlot":"snack","category":"fruit","servingSize":"2 cups (~300g)","calories":90,"protein":2,"carbs":22,"fat":0,"fiber":1,"satietyScore":5,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Fruit","TGFriendly","WeightLoss"]},{"id":"sn005","name":"Pineapple","mealSlot":"snack","category":"fruit","servingSize":"1 cup (~150g)","calories":80,"protein":1,"carbs":20,"fat":0,"fiber":2,"satietyScore":5,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Fruit","TGFriendly","WeightLoss"]},{"id":"sn006","name":"Guava","mealSlot":"snack","category":"fruit","servingSize":"1 medium (~100g)","calories":70,"protein":2,"carbs":14,"fat":1,"fiber":5,"satietyScore":6,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Fruit","Fiber","TGFriendly","WeightLoss"]},{"id":"sn007","name":"Orange","mealSlot":"snack","category":"fruit","servingSize":"1 medium (~130g)","calories":62,"protein":1,"carbs":15,"fat":0,"fiber":3,"satietyScore":5,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Fruit","Fiber","TGFriendly","WeightLoss"]},{"id":"sn008","name":"Apple","mealSlot":"snack","category":"fruit","servingSize":"1 medium (~150g)","calories":80,"protein":0,"carbs":21,"fat":0,"fiber":4,"satietyScore":6,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Fruit","Fiber","TGFriendly","WeightLoss"]},{"id":"sn009","name":"Mango","mealSlot":"snack","category":"fruit","servingSize":"1 small (~150g)","calories":100,"protein":1,"carbs":24,"fat":0,"fiber":3,"satietyScore":5,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":4,"tags":["Snack","Kerala","Kannur","Fruit","TGFriendly","Weekend"]},{"id":"sn010","name":"Rambutan","mealSlot":"snack","category":"fruit","servingSize":"5 pieces (~100g)","calories":75,"protein":1,"carbs":18,"fat":0,"fiber":1,"satietyScore":4,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Kannur","Fruit","TGFriendly"]},{"id":"sn011","name":"2 Dates","mealSlot":"snack","category":"fruit","servingSize":"2 dates (~40g)","calories":60,"protein":0,"carbs":16,"fat":0,"fiber":2,"satietyScore":4,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Fruit","Fiber","TGFriendly","Travel","Arabic"]},{"id":"sn012","name":"3 Dates","mealSlot":"snack","category":"fruit","servingSize":"3 dates (~60g)","calories":90,"protein":1,"carbs":24,"fat":0,"fiber":3,"satietyScore":5,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Fruit","Fiber","TGFriendly","Travel","Arabic"]},{"id":"sn013","name":"Milk Tea (half sugar)","mealSlot":"snack","category":"beverage","servingSize":"1 cup (~200ml)","calories":80,"protein":2,"carbs":12,"fat":3,"fiber":0,"satietyScore":3,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Kannur","Vegetarian"]},{"id":"sn014","name":"Black Coffee","mealSlot":"snack","category":"beverage","servingSize":"1 cup (~200ml)","calories":5,"protein":0,"carbs":1,"fat":0,"fiber":0,"satietyScore":2,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Vegetarian","TGFriendly","WeightLoss","Travel"]},{"id":"sn015","name":"Coconut Water","mealSlot":"snack","category":"beverage","servingSize":"1 tender coconut (~250ml)","calories":60,"protein":1,"carbs":14,"fat":0,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Kannur","Vegetarian","TGFriendly"]},{"id":"tr001","name":"Al Faham + Salad + Khubz","mealSlot":"travel","category":"travel_arabic","servingSize":"Quarter chicken + salad + 1 khubz","calories":480,"protein":34,"carbs":28,"fat":22,"fiber":3,"satietyScore":9,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Travel","Arabic","Chicken","Protein","HighProtein"]},{"id":"tr002","name":"Shawarma (no mayo)","mealSlot":"travel","category":"travel_arabic","servingSize":"1 wrap (~250g)","calories":420,"protein":28,"carbs":38,"fat":14,"fiber":3,"satietyScore":8,"proteinScore":7,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Travel","Arabic","Chicken","Protein"]},{"id":"tr003","name":"Chicken Mandi (small)","mealSlot":"travel","category":"travel_arabic","servingSize":"Small plate (~300g)","calories":520,"protein":32,"carbs":48,"fat":18,"fiber":2,"satietyScore":9,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Travel","Arabic","Chicken","Protein"]},{"id":"tr004","name":"Kuzhimandi","mealSlot":"travel","category":"travel_arabic","servingSize":"1 serving (~300g)","calories":540,"protein":30,"carbs":50,"fat":20,"fiber":2,"satietyScore":9,"proteinScore":7,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Travel","Arabic","Chicken","Protein","Kannur"]},{"id":"tr005","name":"Hummus + Khubz","mealSlot":"travel","category":"travel_arabic","servingSize":"1 bowl + 1 khubz","calories":280,"protein":10,"carbs":36,"fat":11,"fiber":6,"satietyScore":6,"proteinScore":4,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Travel","Arabic","Vegetarian","Fiber","TGFriendly"]},{"id":"tr006","name":"Fattoush Salad","mealSlot":"travel","category":"travel_arabic","servingSize":"1 large bowl (~200g)","calories":120,"protein":3,"carbs":18,"fat":5,"fiber":3,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Travel","Arabic","Vegetarian","Fiber","TGFriendly","WeightLoss"]},{"id":"tr007","name":"Lentil Soup (Arabic)","mealSlot":"travel","category":"travel_arabic","servingSize":"1 bowl (~250ml)","calories":130,"protein":8,"carbs":20,"fat":2,"fiber":5,"satietyScore":7,"proteinScore":5,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Travel","Arabic","Vegetarian","Protein","Fiber","TGFriendly","WeightLoss"]},{"id":"tr008","name":"Grilled Chicken","mealSlot":"travel","category":"travel_arabic","servingSize":"1 serving (~150g)","calories":250,"protein":32,"carbs":2,"fat":12,"fiber":0,"satietyScore":9,"proteinScore":9,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Travel","Arabic","Chicken","Protein","HighProtein","TGFriendly","WeightLoss"]},{"id":"tr009","name":"Chicken Wrap","mealSlot":"travel","category":"travel_arabic","servingSize":"1 wrap (~220g)","calories":380,"protein":26,"carbs":34,"fat":14,"fiber":2,"satietyScore":8,"proteinScore":7,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Travel","Arabic","Chicken","Protein"]},{"id":"tr010","name":"Egg Wrap","mealSlot":"travel","category":"travel_arabic","servingSize":"1 wrap (~180g)","calories":320,"protein":16,"carbs":34,"fat":14,"fiber":2,"satietyScore":7,"proteinScore":6,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Travel","Arabic","Egg","Protein"]},{"id":"tr011","name":"Grilled Fish","mealSlot":"travel","category":"travel_arabic","servingSize":"1 serving (~200g)","calories":300,"protein":38,"carbs":2,"fat":14,"fiber":0,"satietyScore":9,"proteinScore":10,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Travel","Arabic","Fish","Protein","HighProtein","TGFriendly","WeightLoss","Omega3"]},{"id":"tr012","name":"Hotel Breakfast (Safe)","mealSlot":"travel","category":"travel_arabic","servingSize":"2 boiled eggs + bread + fruit","calories":380,"protein":16,"carbs":42,"fat":14,"fiber":3,"satietyScore":7,"proteinScore":5,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Travel","Egg","Protein","WeightLoss"]},{"id":"lsw001","name":"2 Dates (post-lunch)","mealSlot":"lunch","category":"lunch_sweet","servingSize":"2 dates (~40g)","calories":60,"protein":0,"carbs":16,"fat":0,"fiber":2,"satietyScore":4,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Lunch","Fruit","Fiber","TGFriendly","Travel"]},{"id":"lsw002","name":"Small Banana (post-lunch)","mealSlot":"lunch","category":"lunch_sweet","servingSize":"1 small banana (~80g)","calories":90,"protein":1,"carbs":22,"fat":0,"fiber":2,"satietyScore":5,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Fruit","Fiber","TGFriendly"]},{"id":"lsw003","name":"Seasonal Fruit (post-lunch)","mealSlot":"lunch","category":"lunch_sweet","servingSize":"1 serving (~100g)","calories":70,"protein":1,"carbs":16,"fat":0,"fiber":2,"satietyScore":4,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Fruit","Fiber","TGFriendly","WeightLoss"]},{"id":"lsw004","name":"Small Mango (post-lunch)","mealSlot":"lunch","category":"lunch_sweet","servingSize":"1 small mango (~150g)","calories":80,"protein":1,"carbs":20,"fat":0,"fiber":3,"satietyScore":4,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":4,"tags":["Lunch","Kerala","Kannur","Fruit","TGFriendly","Weekend"]}];
+
+// Category display labels
+const CAT_LABELS = {
+  'breakfast_main':'Breakfast', 'breakfast_side':'Bfast Sides',
+  'fish':'Fish & Seafood', 'chicken':'Chicken', 'egg':'Eggs',
+  'vegetable_curry':'Veg Curry', 'thoran':'Thoran',
+  'sprouts':'Sprouts', 'lunch_staple':'Rice',
+  'lunch_sweet':'Post-Lunch', 'dinner_millet':'Dinner Base',
+  'dinner_salad':'Salad', 'soup':'Soup',
+  'fruit':'Fruits', 'beverage':'Drinks', 'travel_arabic':'Travel / Arabic'
+};
+const CAT_ORDER = ['breakfast_main','breakfast_side','fish','chicken','egg','vegetable_curry','thoran','sprouts','lunch_staple','lunch_sweet','dinner_millet','dinner_salad','soup','fruit','beverage','travel_arabic'];
+
+// DB browser state
+let dbActiveCat = 'all';
+let dbTrayItems = []; // [{id, name, calories, protein, carbs, fat, servingSize, tgFriendly, category}]
+
+function openReplace(dateKey, slot){
+  currentReplaceSlot = slot;
+  currentReplaceDate = dateKey;
+  dbActiveCat = 'all';
+  dbTrayItems = [];
+  document.getElementById('db-search').value = '';
+  document.getElementById('db-overlay-title').textContent = 'Choose a Dish';
+  document.getElementById('db-overlay-slot').textContent = (SLOT_LABELS[slot] || slot).toUpperCase();
+  renderDbTray();
+  renderDbCategories();
+  renderDbBrowser();
+  const ov = document.getElementById('db-overlay');
+  ov.classList.add('on','slide-in');
+  ov.addEventListener('animationend', () => ov.classList.remove('slide-in'), {once:true});
+}
+
+function closeDbBrowser(){
+  document.getElementById('db-overlay').classList.remove('on');
+  dbTrayItems = [];
+}
+
+function renderDbTray(){
+  const tray = document.getElementById('db-tray');
+  const itemsEl = document.getElementById('db-tray-items');
+  const totalEl = document.getElementById('db-tray-total');
+
+  if(!dbTrayItems.length){
+    tray.style.display = 'none';
+    return;
+  }
+
+  tray.style.display = 'block';
+  itemsEl.innerHTML = '';
+
+  dbTrayItems.forEach((item, idx) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;justify-content:space-between;align-items:baseline;';
+    row.innerHTML = `
+      <span style="font-family:var(--serif);font-size:15px;font-weight:300;color:var(--t1);flex:1;">${item.name}</span>
+      <span style="font-size:9px;color:var(--t3);margin:0 10px;">${item.calories} kcal</span>
+      <span style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--risk-at);cursor:pointer;" onclick="removeDbTrayItem(${idx})">✕</span>`;
+    itemsEl.appendChild(row);
+  });
+
+  const totalCal = dbTrayItems.reduce((s,i) => s + i.calories, 0);
+  const totalPro = dbTrayItems.reduce((s,i) => s + i.protein, 0);
+  const totalCarb = dbTrayItems.reduce((s,i) => s + i.carbs, 0);
+  const totalFat = dbTrayItems.reduce((s,i) => s + i.fat, 0);
+  totalEl.textContent = `${totalCal} kcal · P:${totalPro}g C:${totalCarb}g F:${totalFat}g`;
+}
+
+function removeDbTrayItem(idx){
+  dbTrayItems.splice(idx, 1);
+  renderDbTray();
+  renderDbBrowser(); // re-render to uncheck removed item
+}
+
+function clearDbTray(){
+  dbTrayItems = [];
+  renderDbTray();
+  renderDbBrowser();
+}
+
+function confirmDbTray(){
+  if(!dbTrayItems.length) return;
+  const combined = buildCombinedItem(dbTrayItems);
+  saveToSlot(combined);
+  closeDbBrowser();
+  renderMealDetail();
+  renderTomorrowCard();
+}
+
+function buildCombinedItem(items){
+  if(items.length === 1){
+    const item = items[0];
+    return {
+      id: item.id,
+      name: item.name,
+      ml: '',
+      cal: item.calories,
+      pro: item.protein,
+      carb: item.carbs,
+      fat: item.fat,
+      cat: item.category,
+      portion: item.servingSize,
+      tgFriendly: item.tgFriendly,
+    };
+  }
+  // Multiple items — combine
+  return {
+    id: items.map(i => i.id).join('+'),
+    name: items.map(i => i.name).join(' + '),
+    ml: '',
+    cal: items.reduce((s,i) => s + i.calories, 0),
+    pro: items.reduce((s,i) => s + i.protein, 0),
+    carb: items.reduce((s,i) => s + i.carbs, 0),
+    fat: items.reduce((s,i) => s + i.fat, 0),
+    cat: items[0].category,
+    portion: items.map(i => i.servingSize).join(' + '),
+    tgFriendly: items.every(i => i.tgFriendly),
+  };
+}
+
+function saveToSlot(item){
+  if(!meals[currentReplaceDate]) meals[currentReplaceDate] = {};
+  meals[currentReplaceDate][currentReplaceSlot] = item;
+  if(!meals[currentReplaceDate].locked) meals[currentReplaceDate].locked = {};
+  meals[currentReplaceDate].locked[currentReplaceSlot] = item;
+  save();
+}
+
+function renderDbCategories(){
+  const el = document.getElementById('db-cats');
+  el.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.className = 'db-cat-btn' + (dbActiveCat === 'all' ? ' on' : '');
+  allBtn.textContent = 'All';
+  allBtn.onclick = () => { dbActiveCat = 'all'; renderDbCategories(); renderDbBrowser(); };
+  el.appendChild(allBtn);
+  CAT_ORDER.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'db-cat-btn' + (dbActiveCat === cat ? ' on' : '');
+    btn.textContent = CAT_LABELS[cat] || cat;
+    btn.onclick = () => { dbActiveCat = cat; renderDbCategories(); renderDbBrowser(); };
+    el.appendChild(btn);
+  });
+}
+
+function renderDbBrowser(){
+  const query = (document.getElementById('db-search').value || '').toLowerCase().trim();
+  const el = document.getElementById('db-results');
+  let items = MASTER_DB;
+  if(dbActiveCat !== 'all') items = items.filter(i => i.category === dbActiveCat);
+  if(query) items = items.filter(i =>
+    i.name.toLowerCase().includes(query) ||
+    (i.tags||[]).some(t => t.toLowerCase().includes(query))
+  );
+  if(!items.length){ el.innerHTML = '<div class="db-empty">No dishes found.</div>'; return; }
+
+  const selectedIds = new Set(dbTrayItems.map(i => i.id));
+
+  el.innerHTML = '';
+  items.forEach(item => {
+    const isTG = item.tgFriendly;
+    const isOmega = (item.tags||[]).includes('Omega3');
+    const isSelected = selectedIds.has(item.id);
+    const div = document.createElement('div');
+    div.className = 'db-result' + (isSelected ? ' db-result-selected' : '');
+    div.innerHTML = `
+      <div class="db-result-left">
+        <div class="db-result-name">${item.name}${isSelected ? ' <span style="color:var(--ac);font-size:11px;">✓ Added</span>' : ''}</div>
+        <div class="db-result-meta">${item.servingSize} · P:${item.protein}g C:${item.carbs}g F:${item.fat}g</div>
+        <div class="db-result-tags">
+          ${isTG ? '<span class="db-result-tag tg">TG ✓</span>' : ''}
+          ${isOmega ? '<span class="db-result-tag omega">Ω3</span>' : ''}
+          ${item.frequencyLimitPerWeek ? `<span class="db-result-tag">Max ${item.frequencyLimitPerWeek}×/week</span>` : ''}
+        </div>
+      </div>
+      <div class="db-result-right">
+        <span class="db-result-cal">${item.calories}</span>
+        <span class="db-result-unit">kcal</span>
+      </div>`;
+    div.addEventListener('click', () => toggleDbItem(item));
+    el.appendChild(div);
+  });
+}
+
+function toggleDbItem(item){
+  const idx = dbTrayItems.findIndex(i => i.id === item.id);
+  if(idx >= 0){
+    // Already in tray — remove it
+    dbTrayItems.splice(idx, 1);
+  } else {
+    // Add to tray (max 4 items per combination)
+    if(dbTrayItems.length >= 4){
+      // Replace last item with new one if at limit — or just add a visual note
+      // Actually: just add, let user manage via tray
+      dbTrayItems.push(item);
+    } else {
+      dbTrayItems.push(item);
+    }
+  }
+
+  // If only 1 item and user taps it — treat as single confirm (no tray needed for single items)
+  // But we show tray for clarity. User can always hit Confirm.
+  // Auto-confirm on first tap if tray was empty before this tap
+  if(dbTrayItems.length === 1){
+    // Show tray but also show a hint
+    document.getElementById('db-overlay-title').textContent = 'Add more or Confirm';
+  } else if(dbTrayItems.length > 1){
+    document.getElementById('db-overlay-title').textContent = `${dbTrayItems.length} items selected`;
+  }
+
+  renderDbTray();
+  renderDbBrowser();
+}
+
+function applyDbReplace(item){
+  // Legacy single-item apply — kept for compatibility
+  const converted = buildCombinedItem([item]);
+  saveToSlot(converted);
+  closeDbBrowser();
+  renderMealDetail();
+  renderTomorrowCard();
+}
+
+const SLOT_LABELS = {
+  breakfast:'Breakfast', lunch_fish:'Fish', lunch_thoran:'Thoran',
+  lunch_sprouts:'Sprouts', lunch_sweet:'Post-Lunch Sweet',
+  dinner_millet:'Dinner Base', dinner_salad:'Salad', snack:'Snack',
+};
+
+// ═══════════════════════════════════════════════
+// CALENDAR OVERLAY
+// ═══════════════════════════════════════════════
+function openCalendar(){
+  renderCalendar();
+  document.getElementById('calendar-overlay').classList.add('on','slide-in');
+  document.getElementById('calendar-overlay').addEventListener('animationend', () => document.getElementById('calendar-overlay').classList.remove('slide-in'), {once:true});
+}
+function closeCalendar(){
+  document.getElementById('calendar-overlay').classList.remove('on');
+}
+function renderCalendar(){
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+  const today = new Date(); today.setHours(0,0,0,0);
+  const targetDate = keyToDate(mission.targetDate);
+  const selectedKey = keyForOffset(mealDateOffset);
+
+  // Iterate month by month
+  let cur = new Date(today.getFullYear(), today.getMonth(), 1);
+  const endMonth = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+
+  while(cur <= endMonth){
+    const monthLabel = document.createElement('div');
+    monthLabel.className = 'cal-month-label';
+    monthLabel.textContent = MO[cur.getMonth()] + ' ' + cur.getFullYear();
+    grid.appendChild(monthLabel);
+
+    // DOW headers
+    const dowRow = document.createElement('div');
+    dowRow.className = 'cal-week';
+    DOW_SHORT.forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'cal-dow';
+      el.textContent = d;
+      dowRow.appendChild(el);
+    });
+    grid.appendChild(dowRow);
+
+    // Days
+    const firstDay = new Date(cur.getFullYear(), cur.getMonth(), 1);
+    const lastDay = new Date(cur.getFullYear(), cur.getMonth() + 1, 0);
+    let week = document.createElement('div');
+    week.className = 'cal-week';
+
+    // Empty cells before first day
+    for(let i = 0; i < firstDay.getDay(); i++){
+      const empty = document.createElement('div');
+      empty.className = 'cal-day empty';
+      week.appendChild(empty);
+    }
+
+    for(let day = 1; day <= lastDay.getDate(); day++){
+      const date = new Date(cur.getFullYear(), cur.getMonth(), day);
+      const dateKey = date.toISOString().slice(0,10);
+      const isPast = date < today;
+      const isToday = date.getTime() === today.getTime();
+      const isTarget = date > targetDate;
+      const hasPlan = !!meals[dateKey];
+      const isSelected = dateKey === selectedKey;
+
+      const cell = document.createElement('div');
+      cell.className = 'cal-day' +
+        (isToday ? ' today' : '') +
+        (isPast || isTarget ? ' past' : '') +
+        (hasPlan ? ' has-plan' : '') +
+        (isSelected ? ' selected' : '');
+      cell.innerHTML = `<div class="cal-day-num">${day}</div><div class="cal-dot"></div>`;
+      if(!isPast && !isTarget){
+        cell.addEventListener('click', () => {
+          const offset = Math.round((date - today) / 86400000);
+          mealDateOffset = offset;
+          closeCalendar();
+          renderMealDetail();
+        });
+      }
+      week.appendChild(cell);
+      if(date.getDay() === 6){
+        grid.appendChild(week);
+        week = document.createElement('div');
+        week.className = 'cal-week';
+      }
+    }
+    if(week.children.length) grid.appendChild(week);
+
+    cur.setMonth(cur.getMonth() + 1);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// PDF SHARE — blob URL (works in sandboxed environments)
+// ═══════════════════════════════════════════════
+function shareMealPDF(){
+  const key = keyForOffset(mealDateOffset);
+  const plan = getMealPlan(key);
+  const totals = mealDayTotals(plan);
+  const d = keyToDate(key);
+  const targetCal = dailyTarget(currentWeight());
+
+  let lunchRows = '';
+  let dinnerRows = '';
+  let travelRows = '';
+
+  if(!plan.travel){
+    lunchRows = [
+      {l:'Rice',    i:plan.lunch_rice},
+      {l:'Fish',    i:plan.lunch_fish},
+      {l:'Thoran',  i:plan.lunch_thoran},
+      {l:'Sprouts', i:plan.lunch_sprouts},
+      {l:'Moru',    i:plan.lunch_moru},
+      {l:'Sweet',   i:plan.lunch_sweet},
+    ].filter(x=>x.i).map(x=>`
+      <div class="item-row"><span>${x.l}: ${x.i.name}</span><span>${x.i.cal} kcal</span></div>
+      <div class="item-note">${x.i.portion}</div>
+    `).join('');
+
+    dinnerRows = [
+      {l:'Millet Base', i:plan.dinner_millet},
+      {l:'Salad',       i:plan.dinner_salad},
+    ].filter(x=>x.i).map(x=>`
+      <div class="item-row"><span>${x.l}: ${x.i.name}</span><span>${x.i.cal} kcal</span></div>
+      <div class="item-note">${x.i.portion}</div>
+    `).join('');
+  } else {
+    travelRows = [
+      {l:'Meal',   i:plan.lunch_fish},
+      {l:'Dinner', i:plan.dinner_millet},
+    ].filter(x=>x.i).map(x=>`
+      <div class="item-row"><span>${x.l}: ${x.i.name}</span><span>${x.i.cal} kcal</span></div>
+      <div class="item-note">${x.i.portion}</div>
+    `).join('');
+  }
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>Meal Plan — ${formatDate(d)}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Cormorant Garamond',Georgia,serif;
+    background:#F5F0E8;
+    color:#1B1814;
+    min-height:100vh;
+    display:flex;align-items:flex-start;justify-content:center;
+    padding:40px 20px;
+  }
+  .receipt{
+    width:100%;max-width:420px;
+    background:#F5F0E8;
+    padding:52px 44px 60px;
+  }
+  /* MASTHEAD */
+  .masthead{text-align:center;margin-bottom:36px;}
+  .m-logo{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:600;color:#1B1814;line-height:1;letter-spacing:-.02em;margin-bottom:6px;}
+  .m-title{font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:.36em;text-transform:uppercase;color:#1B1814;margin-bottom:4px;}
+  .m-tagline{font-family:'Cormorant Garamond',serif;font-size:11px;font-style:italic;color:#8C857B;letter-spacing:.08em;}
+  /* DIVIDERS */
+  .divider-solid{border:none;border-top:1px solid #1B1814;margin:20px 0;}
+  .divider-light{border:none;border-top:1px solid #C8BFB0;margin:16px 0;}
+  .divider-dashed{border:none;border-top:1px dashed #C8BFB0;margin:10px 0;}
+  /* DATE LINE */
+  .date-line{text-align:center;margin-bottom:24px;}
+  .date-text{font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:#8C857B;}
+  /* SECTION */
+  .section{margin-bottom:4px;}
+  .section-label{
+    font-family:'DM Sans',sans-serif;
+    font-size:9px;letter-spacing:.32em;text-transform:uppercase;
+    color:#8C857B;margin-bottom:10px;
+  }
+  /* ITEM ROW */
+  .item{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+  .item-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;color:#1B1814;flex:1;line-height:1.3;}
+  .item-cal{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;color:#1B1814;text-align:right;white-space:nowrap;margin-left:16px;}
+  .item-note{font-family:'Cormorant Garamond',serif;font-size:12px;font-style:italic;color:#8C857B;margin-bottom:8px;line-height:1.5;}
+  /* NOTICE */
+  .notice{font-family:'Cormorant Garamond',serif;font-size:12px;font-style:italic;color:#9A7B3C;margin-top:6px;}
+  /* TOTALS */
+  .totals{margin-top:4px;}
+  .total-label{font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:#8C857B;margin-bottom:12px;}
+  .total-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+  .total-name{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;color:#3C3730;}
+  .total-val{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;color:#3C3730;text-align:right;}
+  /* GRAND TOTAL */
+  .grand{display:flex;justify-content:space-between;align-items:baseline;margin-top:6px;}
+  .grand-label{font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:#7A3A1A;}
+  .grand-val{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:500;color:#7A3A1A;line-height:1;}
+  /* CLOSING */
+  .closing{text-align:center;margin-top:8px;}
+  .closing-text{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:#1B1814;line-height:1.6;}
+  .closing-sub{font-family:'DM Sans',sans-serif;font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:#BEB7AE;margin-top:16px;}
+  @media print{body{padding:0;background:#F5F0E8;}@page{margin:0;size:A5;}}
+</style></head><body>
+<div class="receipt">
+
+  <!-- MASTHEAD -->
+  <div class="masthead">
+    <div class="m-logo">M</div>
+    <div class="m-title">Mission OS · The Re-entry</div>
+    <div class="m-tagline">A personal health journal</div>
+  </div>
+
+  <hr class="divider-solid">
+
+  <!-- DATE -->
+  <div class="date-line">
+    <div class="date-text">${formatDateFull(d).toUpperCase()}${plan.travel ? ' · TRAVEL MODE' : ''}</div>
+  </div>
+
+  <hr class="divider-light">
+
+  <!-- BREAKFAST -->
+  ${plan.breakfast ? `
+  <div class="section">
+    <div class="section-label">Breakfast</div>
+    <div class="item">
+      <span class="item-name">${plan.breakfast.name}</span>
+      <span class="item-cal">${plan.breakfast.cal} kcal</span>
+    </div>
+    <div class="item-note">${plan.breakfast.portion}</div>
+  </div>
+  <hr class="divider-dashed">` : ''}
+
+  <!-- LUNCH -->
+  ${!plan.travel ? `
+  <div class="section">
+    <div class="section-label">Lunch</div>
+    ${[
+      {n:'Rice',    i:plan.lunch_rice},
+      {n:'Fish',    i:plan.lunch_fish},
+      {n:'Thoran',  i:plan.lunch_thoran},
+      {n:'Sprouts', i:plan.lunch_sprouts},
+      {n:'Moru',    i:plan.lunch_moru},
+      {n:'Sweet',   i:plan.lunch_sweet},
+    ].filter(x=>x.i).map(x=>`
+      <div class="item">
+        <span class="item-name">${x.i.name}</span>
+        <span class="item-cal">${x.i.cal} kcal</span>
+      </div>
+      <div class="item-note">${x.i.portion}</div>
+    `).join('<hr class="divider-dashed">')}
+    <div class="notice">Moru is non-negotiable · Fish flesh over gravy</div>
+  </div>
+  <hr class="divider-dashed">
+
+  <!-- DINNER -->
+  <div class="section">
+    <div class="section-label">Dinner</div>
+    ${[
+      {n:'Millet', i:plan.dinner_millet},
+      {n:'Salad',  i:plan.dinner_salad},
+    ].filter(x=>x.i).map(x=>`
+      <div class="item">
+        <span class="item-name">${x.i.name}</span>
+        <span class="item-cal">${x.i.cal} kcal</span>
+      </div>
+      <div class="item-note">${x.i.portion}</div>
+    `).join('<hr class="divider-dashed">')}
+    <div class="notice">Minimum 2 eggs · Salad is non-negotiable</div>
+  </div>
+  <hr class="divider-dashed">` : `
+  <!-- TRAVEL MEALS -->
+  <div class="section">
+    <div class="section-label">Travel Meals</div>
+    ${[
+      {n:'Lunch',  i:plan.lunch_fish},
+      {n:'Dinner', i:plan.dinner_millet},
+    ].filter(x=>x.i).map(x=>`
+      <div class="item">
+        <span class="item-name">${x.i.name}</span>
+        <span class="item-cal">${x.i.cal} kcal</span>
+      </div>
+      <div class="item-note">${x.i.portion}</div>
+    `).join('<hr class="divider-dashed">')}
+  </div>
+  <hr class="divider-dashed">`}
+
+  <!-- SNACK -->
+  ${plan.snack ? `
+  <div class="section">
+    <div class="section-label">Snack</div>
+    <div class="item">
+      <span class="item-name">${plan.snack.name}</span>
+      <span class="item-cal">${plan.snack.cal} kcal</span>
+    </div>
+    <div class="item-note">${plan.snack.portion}</div>
+  </div>` : ''}
+
+  <hr class="divider-solid">
+
+  <!-- TOTALS -->
+  <div class="totals">
+    <div class="total-label">Nutritional Summary</div>
+    <div class="total-row">
+      <span class="total-name">Daily Target</span>
+      <span class="total-val">~${targetCal} kcal</span>
+    </div>
+    <div class="total-row">
+      <span class="total-name">Protein</span>
+      <span class="total-val">${totals.pro} g</span>
+    </div>
+    <div class="total-row">
+      <span class="total-name">Carbohydrates</span>
+      <span class="total-val">${totals.carb} g</span>
+    </div>
+    <div class="total-row">
+      <span class="total-name">Fat</span>
+      <span class="total-val">${totals.fat} g</span>
+    </div>
+  </div>
+
+  <hr class="divider-light">
+
+  <div class="grand">
+    <span class="grand-label">Total Calories</span>
+    <span class="grand-val">~${totals.cal}</span>
+  </div>
+
+  <hr class="divider-solid" style="margin-top:24px;">
+
+  <!-- CLOSING -->
+  <div class="closing">
+    <div class="closing-sub">Mission OS · ${new Date().toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'})}</div>
+  </div>
+
+</div>
+</body></html>`;
+
+  // Use blob URL — works in sandboxed environments where window.open is blocked
+  try {
+    const blob = new Blob([html], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `meal-plan-${key}.html`;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); document.body.removeChild(a); }, 1000);
+  } catch(e) {
+    // Fallback: show in-app print preview
+    showPrintPreview(html);
+  }
+}
+
+function showPrintPreview(html){
+  // Inline preview overlay for environments where blob download is also blocked
+  let prev = document.getElementById('print-preview-overlay');
+  if(!prev){
+    prev = document.createElement('div');
+    prev.id = 'print-preview-overlay';
+    prev.style.cssText = 'position:fixed;inset:0;z-index:200;background:#fff;overflow-y:auto;';
+    const closeBtn = document.createElement('div');
+    closeBtn.style.cssText = 'position:sticky;top:0;background:#fff;padding:16px 20px;border-bottom:1px solid #ECE6DA;display:flex;justify-content:space-between;align-items:center;font-family:sans-serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#8C857B;cursor:pointer;';
+    closeBtn.innerHTML = '<span>MEAL PLAN</span><span onclick="document.getElementById(\'print-preview-overlay\').style.display=\'none\'">✕ Close</span>';
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'width:100%;height:calc(100vh - 52px);border:none;';
+    iframe.id = 'print-preview-frame';
+    prev.appendChild(closeBtn);
+    prev.appendChild(iframe);
+    document.body.appendChild(prev);
+  }
+  prev.style.display = 'block';
+  const frame = document.getElementById('print-preview-frame');
+  frame.srcdoc = html;
+}
+
+// ═══════════════════════════════════════════════
+// RECORD SCREEN
+// ═══════════════════════════════════════════════
+function syncRecordInputs(){
+  const key = keyForOffset(dayOffset);
+  const d = keyToDate(key);
+  const rec = records[key] || {};
+  document.getElementById('dn-date').textContent = formatDate(d);
+  document.getElementById('ph-day').textContent = DOW[d.getDay()];
+  document.getElementById('ph-full').textContent = formatDateFull(d);
+  document.getElementById('dn-prev').classList.toggle('dis', dayOffset <= -90);
+  document.getElementById('dn-next').classList.toggle('dis', dayOffset >= 0);
+  document.getElementById('r-wt').value = rec.weight || '';
+  document.getElementById('r-steps').value = rec.steps || '';
+  document.getElementById('r-notes').value = rec.notes || '';
+
+  // Ensure steps discipline reflects stored steps value
+  if(rec.steps){
+    const stepsDiscIdx = DISCIPLINES.findIndex(d => d.id === 'd3');
+    if(stepsDiscIdx >= 0){
+      if(!records[key].disciplines) records[key].disciplines = [];
+      while(records[key].disciplines.length <= stepsDiscIdx){
+        records[key].disciplines.push({done:false, dur:0});
+      }
+      records[key].disciplines[stepsDiscIdx].done = rec.steps >= 10000;
+    }
+  }
+
+  syncDlList();
+  updateEnergySummary();
+  renderSparkline();
+  updateCompass();
+}
+
+function updateCompass(){
+  const dl = daysLeft();
+  document.getElementById('r-cmp-val').textContent = mission.targetWeight + ' kg';
+  document.getElementById('r-cmp-days').textContent = dl + ' days remaining';
+  document.getElementById('r-dest-whisper').textContent = mission.targetWeight + ' kg by ' + MO_SHORT[keyToDate(mission.targetDate).getMonth()] + ' ' + keyToDate(mission.targetDate).getDate();
+}
+
+function navDay(dir){
+  dayOffset += dir;
+  syncRecordInputs();
+}
+
+function onWtChange(){
+  onRecordChange();
+  updateEnergySummary();
+}
+
+function onRecordChange(){
+  const key = keyForOffset(dayOffset);
+  if(!records[key]) records[key] = {};
+  const wt = parseFloat(document.getElementById('r-wt').value) || null;
+  const steps = parseInt(document.getElementById('r-steps').value) || 0;
+  const notes = document.getElementById('r-notes').value;
+  records[key].weight = wt;
+  records[key].steps = steps;
+  records[key].notes = notes;
+}
+
+function onStepsChange(){
+  onRecordChange();
+  autoCheckStepsDiscipline();
+  updateEnergySummary();
+  if(dayOffset === 0){ updateProgress(); syncDiscList(); }
+}
+
+function autoCheckStepsDiscipline(){
+  const key = keyForOffset(dayOffset);
+  const rec = records[key] || {};
+  const steps = rec.steps || 0;
+  const stepsDiscIdx = DISCIPLINES.findIndex(d => d.id === 'd3');
+  if(stepsDiscIdx < 0) return;
+
+  if(!records[key]) records[key] = {};
+  if(!records[key].disciplines) records[key].disciplines = [];
+  while(records[key].disciplines.length <= stepsDiscIdx){
+    records[key].disciplines.push({done:false, dur:0});
+  }
+
+  const shouldBeChecked = steps >= 10000;
+  records[key].disciplines[stepsDiscIdx].done = shouldBeChecked;
+
+  // Update the checkbox in Record screen if visible
+  const checks = document.querySelectorAll('.dl-check');
+  if(checks[stepsDiscIdx]){
+    checks[stepsDiscIdx].classList.toggle('on', shouldBeChecked);
+    const mark = checks[stepsDiscIdx].querySelector('.dl-check-mark');
+    if(mark) mark.style.opacity = shouldBeChecked ? '1' : '0';
+  }
+
+  // Update the discipline dot in Today screen if on today
+  if(dayOffset === 0) renderDiscList();
+}
+
+function syncDiscList(){
+  // Re-sync after steps auto-check without full re-render
+  syncDlList();
+}
+
+function syncDlList(){
+  const key = keyForOffset(dayOffset);
+  const rec = records[key] || {};
+  const discArr = rec.disciplines || [];
+  const el = document.getElementById('dl-list');
+  el.innerHTML = '';
+  DISCIPLINES.forEach((d, i) => {
+    const checked = discArr[i] && discArr[i].done;
+    const item = document.createElement('div');
+    item.className = 'dl-item';
+    item.innerHTML = `
+      <span class="dl-name">${d.name}</span>
+      <div class="dl-right">
+        <div class="dl-check ${checked ? 'on' : ''}" onclick="toggleRecDisc(${i},this)">
+          <span class="dl-check-mark">✓</span>
+        </div>
+      </div>`;
+    el.appendChild(item);
+  });
+}
+
+function toggleRecDisc(idx, el){
+  const key = keyForOffset(dayOffset);
+  if(!records[key]) records[key] = {};
+  if(!records[key].disciplines) records[key].disciplines = [];
+  while(records[key].disciplines.length <= idx) records[key].disciplines.push({done:false, dur:0});
+  records[key].disciplines[idx].done = !records[key].disciplines[idx].done;
+  el.classList.toggle('on');
+  el.querySelector('.dl-check-mark').style.opacity = records[key].disciplines[idx].done ? '1' : '0';
+  updateEnergySummary();
+  if(dayOffset === 0) { updateProgress(); updateEveningPrompt(); }
+}
+
+function updateEnergySummary(){
+  const key = keyForOffset(dayOffset);
+  const rec = records[key] || {};
+  const wt = parseFloat(rec.weight) || currentWeight();
+  const steps = parseInt(rec.steps) || 0;
+  const { bmr, neat, ex, tef, tdee } = calcTDEE(wt, steps, rec.disciplines);
+  const { target, deficitPerDay } = dailyTargetForRecord(wt, steps, rec.disciplines);
+  const { kgPerWeek, safeKgPerWeek, capped } = calcDynamicDeficit();
+
+  // Get planned meal calories for this day if available
+  const planKey = key;
+  const plan = meals[planKey];
+  const planned = plan ? mealDayTotals(plan).cal : null;
+  const gap = planned ? (planned - target) : null;
+
+  const el = document.getElementById('r-esumm-content');
+  el.innerHTML = `
+    <div class="erow"><span class="erow-lbl">BMR</span><span class="erow-val">${bmr.toLocaleString()} kcal</span></div>
+    <div class="erow"><span class="erow-lbl">NEAT (steps)</span><span class="erow-val">${neat.toLocaleString()} kcal</span></div>
+    <div class="erow"><span class="erow-lbl">Exercise</span><span class="erow-val">${ex.toLocaleString()} kcal</span></div>
+    <div class="erow"><span class="erow-lbl">TEF (~10%)</span><span class="erow-val">${tef.toLocaleString()} kcal</span></div>
+    <div class="ebal"><span class="ebal-lbl">TDEE</span><span class="ebal-val">${tdee.toLocaleString()} kcal</span></div>
+    <div style="height:1px;background:var(--rl);margin:12px 0;"></div>
+    <div class="erow">
+      <span class="erow-lbl">Required Deficit</span>
+      <span class="erow-val" style="font-size:16px;">${deficitPerDay.toLocaleString()} kcal/day</span>
+    </div>
+    <div class="erow">
+      <span class="erow-lbl">Pace</span>
+      <span class="erow-val" style="font-size:16px;${capped ? 'color:var(--risk-at)' : ''}">${safeKgPerWeek} kg/week${capped ? ' (capped)' : ''}</span>
+    </div>
+    <div class="ebal"><span class="ebal-lbl">Meal Target</span><span class="ebal-val" style="color:var(--ac);">${target.toLocaleString()} kcal</span></div>
+    ${planned !== null ? `
+    <div style="height:1px;background:var(--rl);margin:12px 0;"></div>
+    <div class="erow">
+      <span class="erow-lbl">Planned Meals</span>
+      <span class="erow-val" style="font-size:16px;">${planned.toLocaleString()} kcal</span>
+    </div>
+    <div class="erow">
+      <span class="erow-lbl">Gap</span>
+      <span class="erow-val" style="font-size:16px;color:${gap > 150 ? 'var(--risk-at)' : gap < -150 ? 'var(--risk-on)' : 'var(--t1)'};">${gap > 0 ? '+' : ''}${gap.toLocaleString()} kcal</span>
+    </div>` : ''}`;
+}
+
+function saveRecord(){
+  onRecordChange();
+  save();
+  const conf = document.getElementById('save-conf');
+  conf.classList.add('on');
+  setTimeout(() => conf.classList.remove('on'), 2000);
+  if(dayOffset === 0) renderRiskCard();
+}
+
+function renderSparkline(){
+  const svg = document.getElementById('spark-svg');
+  if(!svg) return;
+  const entries = weightEntries().slice(-14);
+  if(entries.length < 2){ svg.innerHTML=''; return; }
+  const W=320,H=32,pL=4,pR=4,pT=4,pB=8;
+  const weights = entries.map(e=>e.w);
+  const minW = Math.min(...weights)-0.5, maxW = Math.max(...weights)+0.5;
+  const minD = entries[0].d, maxD = entries[entries.length-1].d;
+  const DR = maxD-minD || 1;
+  const toX = d => pL+((d-minD)/DR)*(W-pL-pR);
+  const toY = w => pT+((maxW-w)/(maxW-minW))*(H-pT-pB);
+  const pts = entries.map(e=>`${toX(e.d).toFixed(1)},${toY(e.w).toFixed(1)}`).join(' ');
+  svg.innerHTML = `<polyline points="${pts}" fill="none" stroke="${isDark?'#C9A45A':'#9A7B3C'}" stroke-width="1.5" stroke-linejoin="round"/>
+    <circle cx="${toX(entries[entries.length-1].d).toFixed(1)}" cy="${toY(entries[entries.length-1].w).toFixed(1)}" r="3" fill="${isDark?'#C9A45A':'#9A7B3C'}"/>`;
+}
+
+// ═══════════════════════════════════════════════
+// MISSION SCREEN
+// ═══════════════════════════════════════════════
+function renderMission(){
+  const cw = currentWeight();
+  const dl = daysLeft();
+  const weeksLeft = dl / 7;
+  const required = weeksLeft > 0 ? ((cw - mission.targetWeight) / weeksLeft).toFixed(2) : '—';
+  const targetD = keyToDate(mission.targetDate);
+
+  document.getElementById('m-sub').textContent =
+    mission.targetWeight + ' kg by ' + MO[targetD.getMonth()] + ' ' + targetD.getDate() + ', ' + targetD.getFullYear();
+
+  document.getElementById('m-pos-table').innerHTML = `
+    <div class="pos-row"><span class="pos-lbl">Start Weight</span><span class="pos-val">${mission.startWeight} kg</span></div>
+    <div class="pos-row"><span class="pos-lbl">Current Weight</span><span class="pos-val ac">${cw} kg</span></div>
+    <div class="pos-row"><span class="pos-lbl">Target Weight</span><span class="pos-val">${mission.targetWeight} kg</span></div>
+    <div class="pos-row"><span class="pos-lbl">To Lose</span><span class="pos-val">${Math.max(0,cw - mission.targetWeight).toFixed(1)} kg</span></div>
+    <div class="pos-row"><span class="pos-lbl">Days Remaining</span><span class="pos-val">${dl}</span></div>
+    <div class="pos-row"><span class="pos-lbl">Required Rate</span><span class="pos-val${parseFloat(required) > 1 ? '" style="color:var(--risk-at)"' : ' ac"'}>${required} kg/week${parseFloat(required) > 1 ? ' ⚠' : ''}</span></div>
+    <div class="pos-row"><span class="pos-lbl">Daily Deficit</span><span class="pos-val">${calcDynamicDeficit().deficitPerDay.toLocaleString()} kcal</span></div>
+    <div class="pos-row"><span class="pos-lbl">Meal Target (today)</span><span class="pos-val ac">~${dailyTarget(cw).toLocaleString()} kcal</span></div>`;
+
+  // Settings
+  document.getElementById('ms-cw').value = cw;
+  document.getElementById('ms-tw').value = mission.targetWeight;
+  document.getElementById('ms-td').value = mission.targetDate;
+
+  // Roster
+  const roster = document.getElementById('m-roster');
+  roster.innerHTML = '';
+  DISCIPLINES.forEach(d => {
+    const pct = completionRate(d.id);
+    const item = document.createElement('div');
+    item.className = 'roster-item';
+    item.innerHTML = `
+      <div class="ri-l"><div class="ri-dot"></div><div class="ri-name">${d.name}</div></div>
+      <div class="ri-r">
+        <span class="ri-pct ${pct>=80?'hi':''}">${pct}%</span>
+        <span class="ri-cat">${d.category}</span>
+      </div>`;
+    roster.appendChild(item);
+  });
+}
+
+function applyMissionSettings(){
+  const cw = parseFloat(document.getElementById('ms-cw').value);
+  const tw = parseFloat(document.getElementById('ms-tw').value);
+  const td = document.getElementById('ms-td').value;
+  if(!cw||!tw||!td){ alert('Please fill all fields.'); return; }
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = keyToDate(td);
+  const weeks = Math.round((target-today)/86400000) / 7;
+  const rateNeeded = (cw-tw) / weeks;
+
+  const warn = document.getElementById('ms-warning');
+  warn.classList.toggle('on', rateNeeded > 1);
+
+  mission.startWeight = cw;
+  mission.targetWeight = tw;
+  mission.targetDate = td;
+  save();
+  renderMission();
+  renderRiskCard();
+  renderTomorrowCard();
+}
+
+function completionRate(discId){
+  const recs = Object.values(records);
+  if(!recs.length) return 0;
+  const withDisc = recs.filter(r => r.disciplines && r.disciplines.length);
+  if(!withDisc.length) return 0;
+  const idx = DISCIPLINES.findIndex(d => d.id === discId);
+  if(idx < 0) return 0;
+  const done = withDisc.filter(r => r.disciplines[idx] && r.disciplines[idx].done).length;
+  return Math.round((done/withDisc.length)*100);
+}
+
+// ═══════════════════════════════════════════════
+// PATTERNS SCREEN
+// ═══════════════════════════════════════════════
+function renderPatterns(){
+  renderWeightChart();
+  renderEnergyBreakdown();
+  renderPatternInsights();
+}
+
+function setRange(r, btn){
+  chartRange = r;
+  document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderWeightChart();
+}
+
+function renderWeightChart(){
+  const wrap = document.getElementById('chart-wrap');
+  let entries = weightEntries();
+  if(chartRange > 0){
+    const cutoff = Date.now() - chartRange*86400000;
+    entries = entries.filter(e => e.d >= cutoff);
+  }
+  if(entries.length < 2){ wrap.innerHTML='<div class="chart-empty">Not enough data yet.</div>'; return; }
+  const W=330,H=100,pL=8,pR=28,pT=8,pB=16;
+  const weights = entries.map(e=>e.w);
+  const targetWt = mission.targetWeight;
+  const minW = Math.min(...weights, targetWt)-0.5;
+  const maxW = Math.max(...weights)+0.5;
+  const minD = entries[0].d, maxD = entries[entries.length-1].d;
+  const DR = maxD-minD||1;
+  const toX = d => pL+((d-minD)/DR)*(W-pL-pR);
+  const toY = w => pT+((maxW-w)/(maxW-minW))*(H-pT-pB);
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  svg.setAttribute('preserveAspectRatio','none');
+  svg.style.width='100%'; svg.style.height='100%';
+  // Target line
+  const ty = toY(targetWt);
+  const tl = document.createElementNS('http://www.w3.org/2000/svg','line');
+  tl.setAttribute('x1',pL); tl.setAttribute('y1',ty); tl.setAttribute('x2',W-pR); tl.setAttribute('y2',ty);
+  tl.setAttribute('stroke',isDark?'rgba(212,168,83,.18)':'rgba(139,105,20,.13)');
+  tl.setAttribute('stroke-width','1'); tl.setAttribute('stroke-dasharray','3,4');
+  svg.appendChild(tl);
+  const tLabel = document.createElementNS('http://www.w3.org/2000/svg','text');
+  tLabel.setAttribute('x',W-pR+2); tLabel.setAttribute('y',ty+3);
+  tLabel.setAttribute('font-size','8'); tLabel.setAttribute('fill',isDark?'rgba(212,168,83,.45)':'rgba(139,105,20,.5)');
+  tLabel.textContent = targetWt;
+  svg.appendChild(tLabel);
+  // Main line
+  const pl = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+  pl.setAttribute('points', entries.map(e=>`${toX(e.d).toFixed(1)},${toY(e.w).toFixed(1)}`).join(' '));
+  pl.setAttribute('fill','none'); pl.setAttribute('stroke',isDark?'#D4A853':'#8B6914');
+  pl.setAttribute('stroke-width','1.8'); pl.setAttribute('stroke-linejoin','round');
+  svg.appendChild(pl);
+  // Dots
+  entries.forEach((e,i) => {
+    const isLast = i===entries.length-1;
+    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',toX(e.d).toFixed(1)); c.setAttribute('cy',toY(e.w).toFixed(1));
+    c.setAttribute('r',isLast?3.5:1.8); c.setAttribute('fill',isDark?'#D4A853':'#8B6914');
+    svg.appendChild(c);
+  });
+  wrap.innerHTML=''; wrap.appendChild(svg);
+}
+
+function renderEnergyBreakdown(){
+  const el = document.getElementById('pat-energy');
+  const recs = Object.values(records).filter(r => r.weight);
+  if(recs.length < 3){ el.innerHTML='<div class="chart-empty" style="padding:8px 0;">Energy breakdown appears after 3 days of weight entries.</div>'; return; }
+  const cw = currentWeight();
+  const target = dailyTarget(cw);
+  const { deficitPerDay, safeKgPerWeek, kgPerWeek, capped } = calcDynamicDeficit();
+  const fullTDEE = calcTDEE(cw, 10000, Array(5).fill({done:true})).tdee;
+
+  el.innerHTML = `<div class="bk-card" style="margin:0;">
+    <div class="bk-title">${recs.length}-Day Data · Current Weight ${cw} kg</div>
+    <div class="bk-row"><span class="bk-lbl">BMR</span><span class="bk-val">${calcBMR(cw).toLocaleString()} kcal</span></div>
+    <div class="bk-row"><span class="bk-lbl">TDEE (full disciplines)</span><span class="bk-val">${fullTDEE.toLocaleString()} kcal</span></div>
+    <div class="bk-row"><span class="bk-lbl">Required Deficit</span><span class="bk-val">${deficitPerDay.toLocaleString()} kcal/day</span></div>
+    <div class="bk-row"><span class="bk-lbl">Meal Target (today)</span><span class="bk-val ac">~${target.toLocaleString()} kcal</span></div>
+    <div class="bk-row">
+      <span class="bk-lbl">Target Pace</span>
+      <span class="bk-val${capped ? ' style="color:var(--risk-at)"' : ' ac'}">${safeKgPerWeek} kg/week${capped ? ' (capped at 1 kg)' : ''}</span>
+    </div>
+    ${capped ? `<div style="font-family:var(--serif);font-size:13px;font-style:italic;color:var(--risk-at);padding:8px 0 4px;">Required pace is ${kgPerWeek} kg/week — capped at 1 kg/week for safety. Adjust target date or weight.</div>` : ''}
+  </div>`;
+}
+
+function renderPatternInsights(){
+  const el = document.getElementById('pat-insights');
+  const recs = Object.entries(records);
+  if(recs.length < 5){ el.innerHTML='<div class="chart-empty" style="padding:8px 0;">Patterns appear after 5 days of records.</div>'; return; }
+  const insights = [];
+  // Weight trend
+  const entries = weightEntries();
+  if(entries.length >= 4){
+    const risk = calcMissionRisk();
+    if(risk.state !== 'insufficient'){
+      const dir = risk.rateSign < -0.1 ? 'downward' : risk.rateSign > 0.1 ? 'upward' : 'flat';
+      insights.push(`Weight is trending <strong>${dir}</strong> at ${risk.currentRate} kg/week. Required: ${risk.requiredRate} kg/week.`);
+    }
+  }
+  // Best discipline day
+  const byDow = {};
+  recs.forEach(([k,v]) => {
+    const dow = keyToDate(k).getDay();
+    const discs = v.disciplines || [];
+    const total = discs.length, done = discs.filter(d=>d&&d.done).length;
+    if(total > 0){
+      if(!byDow[dow]) byDow[dow] = {sum:0, count:0};
+      byDow[dow].sum += done/total; byDow[dow].count++;
+    }
+  });
+  const dowEntries = Object.entries(byDow).filter(([,v])=>v.count>=2);
+  if(dowEntries.length >= 3){
+    const best = [...dowEntries].sort((a,b)=>(b[1].sum/b[1].count)-(a[1].sum/a[1].count))[0];
+    const worst = [...dowEntries].sort((a,b)=>(a[1].sum/a[1].count)-(b[1].sum/b[1].count))[0];
+    insights.push(`${DOW[parseInt(best[0])]}s show highest discipline completion. ${DOW[parseInt(worst[0])]}s are the lowest.`);
+  }
+  if(!insights.length){ el.innerHTML='<div class="chart-empty" style="padding:8px 0;">Keep logging — patterns will surface soon.</div>'; return; }
+  el.innerHTML = insights.map(text=>`
+    <div class="pat-item">
+      <div class="pat-from">From your record</div>
+      <div class="pat-text">${text}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+const TAB_ORDER = ['today','record','mission','patterns'];
+
+function switchTab(tab, direction){
+  if(tab === activeTab) return;
+  const prev = document.getElementById('s-' + activeTab);
+  const next = document.getElementById('s-' + tab);
+  if(!direction){
+    const ci = TAB_ORDER.indexOf(activeTab), ni = TAB_ORDER.indexOf(tab);
+    direction = ni > ci ? 'forward' : 'back';
+  }
+  const outClass = direction === 'forward' ? 'slide-out-left' : 'slide-out-right';
+  const inClass  = direction === 'forward' ? 'slide-in-right' : 'slide-in-left';
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('on','slide-in-right','slide-in-left','slide-out-left','slide-out-right');
+    s.style.display = 'none';
+  });
+  if(prev){ prev.style.display='block'; prev.classList.add(outClass); prev.addEventListener('animationend',()=>{prev.style.display='none';prev.classList.remove(outClass);},{once:true}); }
+  next.style.display='block'; next.classList.add(inClass);
+  next.addEventListener('animationend',()=>{next.classList.remove(inClass);next.classList.add('on');},{once:true});
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
+  document.querySelector('[data-tab="'+tab+'"]').classList.add('on');
+  activeTab = tab;
+  next.scrollTop = 0;
+  if(tab==='record'){ syncRecordInputs(); }
+  if(tab==='mission'){ renderMission(); }
+  if(tab==='patterns'){ renderPatterns(); }
+}
+
+// ═══════════════════════════════════════════════
+// DARK MODE
+// ═══════════════════════════════════════════════
+function toggleDark(){
+  isDark = !isDark;
+  document.getElementById('phone').classList.toggle('dk', isDark);
+  document.getElementById('dkt-lbl').textContent = isDark ? 'Dark' : 'Light';
+  save();
+  if(activeTab === 'patterns') renderPatterns();
+  renderSparkline();
+}
+
+// ═══════════════════════════════════════════════
+// SWIPE
+// ═══════════════════════════════════════════════
+function initSwipe(){
+  const phone = document.getElementById('phone');
+  let startX=0, startY=0, startTime=0;
+  phone.addEventListener('touchstart', e => { startX=e.touches[0].clientX; startY=e.touches[0].clientY; startTime=Date.now(); }, {passive:true});
+  phone.addEventListener('touchend', e => {
+    const dx=e.changedTouches[0].clientX-startX, dy=e.changedTouches[0].clientY-startY, dt=Date.now()-startTime;
+    if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.5 && dt<400){
+      const cur=TAB_ORDER.indexOf(activeTab);
+      if(dx<0 && cur<TAB_ORDER.length-1) switchTab(TAB_ORDER[cur+1],'forward');
+      else if(dx>0 && cur>0) switchTab(TAB_ORDER[cur-1],'back');
+    }
+  }, {passive:true});
+}
+
+// ═══════════════════════════════════════════════
+// CLOCK
+// ═══════════════════════════════════════════════
+function updateClock(){
+  document.getElementById('tod-day').textContent = missionDay();
+  updateEveningPrompt();
+}
+function startClock(){
+  updateClock();
+  const now=new Date();
+  const msToNext=(60-now.getSeconds())*1000-now.getMilliseconds();
+  setTimeout(()=>{updateClock();setInterval(updateClock,60000);},msToNext);
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+function init(){
+  load();
+  if(isDark){
+    document.getElementById('phone').classList.add('dk');
+    document.getElementById('dkt-lbl').textContent = 'Dark';
+  }
+  renderToday();
+  syncRecordInputs();
+  startClock();
+  initSwipe();
+  setTimeout(updateProgress, 400);
+}
+
+init();
+</script>
+
+<script>
+// ═══════════════════════════════════════════════
+// PWA — Service Worker (HTTPS only)
+// ═══════════════════════════════════════════════
+const isHTTPS = location.protocol === 'https:';
+const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+// Install prompt listener — works independently of SW
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  window._installPrompt = e;
+  if(!window.matchMedia('(display-mode: standalone)').matches){
+    showInstallHint();
+  }
+});
+
+if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
+  const swCode = `
+const CACHE = 'mission-os-v11';
+const FONTS = [
+  'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
+];
+
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE).then(cache => cache.addAll(FONTS).catch(() => {}))
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    )
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', e => {
+  if(e.request.mode === 'navigate'){
+    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+  } else {
+    e.respondWith(
+      caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
+        if(res && res.status === 200 && res.type !== 'opaque'){
+          caches.open(CACHE).then(c => c.put(e.request, res.clone()));
+        }
+        return res;
+      }))
+    );
+  }
+});
+`;
+
+  try {
+    const blob = new Blob([swCode], {type:'application/javascript'});
+    const swUrl = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swUrl, {scope:'/'})
+      .then(() => console.log('Mission OS: SW registered'))
+      .catch(() => {}); // silent fail
+  } catch(e) {}
+}
+
+function showInstallHint(){
+  // Only show once per session
+  if(sessionStorage.getItem('install-hint-shown')) return;
+  sessionStorage.setItem('install-hint-shown', '1');
+
+  const hint = document.createElement('div');
+  hint.id = 'install-hint';
+  hint.style.cssText = `
+    position:fixed;bottom:calc(var(--nav-h) + 12px);left:28px;right:28px;
+    background:var(--t1);color:var(--bg);
+    padding:14px 18px;
+    display:flex;justify-content:space-between;align-items:center;
+    z-index:50;
+    font-family:var(--sans);
+    animation:slideUp .3s cubic-bezier(.16,1,.3,1) both;
+  `;
+  hint.innerHTML = `
+    <div>
+      <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:3px;opacity:.7;">Install App</div>
+      <div style="font-size:14px;font-weight:300;">Add Mission OS to Home Screen</div>
+    </div>
+    <div style="display:flex;gap:14px;align-items:center;">
+      <span style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;opacity:.5;cursor:pointer;" onclick="document.getElementById('install-hint').remove()">Later</span>
+      <span style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;border-bottom:1px solid var(--bg);padding-bottom:1px;" onclick="triggerInstall()">Install →</span>
+    </div>
+  `;
+
+  // Add slide up keyframe if not present
+  if(!document.getElementById('install-hint-style')){
+    const s = document.createElement('style');
+    s.id = 'install-hint-style';
+    s.textContent = '@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}';
+    document.head.appendChild(s);
+  }
+
+  document.body.appendChild(hint);
+  setTimeout(() => { if(hint.parentNode) hint.remove(); }, 8000);
+}
+
+function triggerInstall(){
+  const hint = document.getElementById('install-hint');
+  if(hint) hint.remove();
+  if(window._installPrompt){
+    window._installPrompt.prompt();
+    window._installPrompt.userChoice.then(result => {
+      if(result.outcome === 'accepted') console.log('Mission OS installed');
+      window._installPrompt = null;
+    });
+  }
+}
+</script>
+</body>
+</html>
