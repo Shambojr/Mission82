@@ -318,63 +318,42 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 .cal-dot{width:3px;height:3px;border-radius:50%;background:var(--ac);margin:3px auto 0;opacity:0;}
 .cal-day.has-plan .cal-dot{opacity:1;}
 
-/* ═══ RECORD ═══ */
-.compass{padding:58px 28px 16px;display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--rl);}
-.cmp-lbl{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ac);}
-.cmp-val{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--t3);}
-.cmp-days{font-size:11px;color:var(--t4);letter-spacing:.06em;}
-.daynav{display:flex;align-items:center;justify-content:space-between;padding:20px 28px 0;}
-.dn-arr{font-family:var(--serif);font-size:28px;font-weight:300;color:var(--t3);cursor:pointer;padding:8px;margin:-8px;-webkit-tap-highlight-color:transparent;transition:color .18s;user-select:none;}
-.dn-arr:active{color:var(--ac);}
-.dn-arr.dis{opacity:.14;pointer-events:none;}
-.dn-date{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--t3);text-align:center;letter-spacing:.04em;}
-.page-head{padding:18px 28px 0;}
-.ph-day{font-family:var(--serif);font-size:48px;font-weight:300;color:var(--t1);line-height:1;}
-.ph-full{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);margin-top:6px;}
-.page-rule{margin:18px 28px 0;height:1px;background:var(--rl);}
-.je{padding:22px 28px;border-bottom:1px solid var(--rl);}
-.je:last-child{border-bottom:none;}
-.je-cat{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--t2);font-weight:500;margin-bottom:14px;display:flex;align-items:center;}
-.w-row{display:flex;align-items:baseline;gap:10px;}
-.w-inp{background:none;border:none;border-bottom:1px solid var(--rls);outline:none;font-family:var(--serif);font-size:52px;font-weight:300;color:var(--t1);caret-color:var(--ac);width:170px;padding-bottom:4px;transition:border-color .2s;}
-.w-inp:focus{border-bottom-color:var(--ac);}
-.w-inp::placeholder{color:var(--t4);}
-.w-unit{font-family:var(--serif);font-size:24px;font-weight:300;color:var(--t3);}
-.w-whisper{font-size:12px;color:var(--t4);margin-top:10px;letter-spacing:.06em;}
-.w-whisper em{color:var(--ac);font-style:normal;}
-.spark-svg{width:100%;height:36px;margin-top:16px;opacity:.7;}
+/* ═══ RECORD — REBUILT ═══ */
+.rec-head{padding:52px 28px 24px;border-bottom:1px solid var(--rl);}
+.rec-date-nav{display:flex;align-items:center;justify-content:space-between;}
+.rec-arr{font-family:var(--serif);font-size:26px;font-weight:300;color:var(--t3);cursor:pointer;padding:8px;margin:-8px;-webkit-tap-highlight-color:transparent;user-select:none;transition:color .18s;}
+.rec-arr:active{color:var(--ac);}
+.rec-arr.dis{opacity:.15;pointer-events:none;}
+.rec-dayname{font-family:var(--serif);font-size:36px;font-weight:300;color:var(--t1);text-align:center;line-height:1;}
+.rec-fulldate{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);text-align:center;margin-top:4px;}
+
+/* DEFICIT HERO */
+.rec-deficit{padding:32px 28px 28px;text-align:center;}
+.rd-label{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--t3);margin-bottom:12px;}
+.rd-number{font-family:var(--serif);font-size:72px;font-weight:300;color:var(--t1);line-height:1;letter-spacing:-.02em;}
+.rd-number.ahead{color:var(--risk-on);}
+.rd-number.behind{color:var(--risk-at);}
+.rd-status{font-family:var(--serif);font-size:16px;font-weight:300;font-style:italic;color:var(--t3);margin-top:8px;}
+.rd-status.ahead{color:var(--risk-on);}
+.rd-status.behind{color:var(--risk-at);}
+
+/* RECORD SECTIONS */
+.rec-section{padding:22px 28px;}
+.rec-section-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;}
+.rec-section-label{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--t2);font-weight:500;}
+.rec-section-action{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t4);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.rec-section-action:active{color:var(--ac);}
+
+/* Shared — still used by Patterns/Mission */
 .notes-ta{background:none;border:none;outline:none;font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t2);width:100%;resize:none;line-height:1.65;caret-color:var(--ac);}
 .notes-ta::placeholder{color:var(--t4);}
-
-/* Steps in record */
-.steps-row{display:flex;align-items:baseline;gap:10px;}
-.steps-inp{background:none;border:none;border-bottom:1px solid var(--rls);outline:none;font-family:var(--serif);font-size:36px;font-weight:300;color:var(--t1);caret-color:var(--ac);width:160px;padding-bottom:4px;transition:border-color .2s;}
-.steps-inp:focus{border-bottom-color:var(--ac);}
-.steps-inp::placeholder{color:var(--t4);}
-.steps-unit{font-family:var(--serif);font-size:17px;color:var(--t3);}
-
-/* Discipline log in record */
-.dl-item{display:flex;align-items:center;justify-content:space-between;padding:15px 0;border-bottom:1px solid var(--rl);}
-.dl-item:last-child{border-bottom:none;}
-.dl-name{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t2);}
-.dl-right{display:flex;align-items:center;gap:12px;}
-.dl-check{width:20px;height:20px;border:1px solid var(--rls);cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:all .2s;flex-shrink:0;}
-.dl-check.on{background:var(--t1);border-color:var(--t1);}
-.dl-check-mark{font-size:10px;color:var(--bg);opacity:0;transition:opacity .2s;}
-.dl-check.on .dl-check-mark{opacity:1;}
-
-/* Energy summary */
-.esumm{margin:22px 28px 0;padding:16px 0;border-top:1px solid var(--rl);}
-.esumm-title{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--t2);font-weight:500;margin-bottom:12px;}
 .erow{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--rl);}
 .erow:last-of-type{border-bottom:none;}
 .erow-lbl{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);}
 .erow-val{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t1);}
-.erow-val.dim{color:var(--t3);}
 .ebal{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px;padding-top:12px;border-top:1px solid var(--rls);}
 .ebal-lbl{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);}
 .ebal-val{font-family:var(--serif);font-size:30px;font-weight:300;color:var(--t1);}
-.save-row{margin:24px 28px 0;display:flex;flex-direction:column;gap:10px;}
 .save-conf{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--ac);opacity:0;transition:opacity .3s;text-align:center;}
 .save-conf.on{opacity:1;}
 
@@ -543,75 +522,73 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 
 <!-- RECORD -->
 <div class="screen" id="s-record">
-  <div class="compass">
-    <span class="cmp-lbl">The Re-entry</span>
-    <span class="cmp-val" id="r-cmp-val">92 kg</span>
-    <span class="cmp-days" id="r-cmp-days">— days</span>
-  </div>
-  <div class="daynav">
-    <div class="dn-arr" id="dn-prev" onclick="navDay(-1)">←</div>
-    <div class="dn-date" id="dn-date">—</div>
-    <div class="dn-arr dis" id="dn-next" onclick="navDay(1)">→</div>
-  </div>
-  <div class="page-head">
-    <div class="ph-day" id="ph-day">—</div>
-    <div class="ph-full" id="ph-full">—</div>
-  </div>
-  <div class="page-rule"></div>
 
-  <!-- Weight -->
-  <div class="je">
-    <div class="je-cat">Weight</div>
-    <div class="w-row">
-      <input class="w-inp" id="r-wt" type="number" step="0.1" placeholder="—" inputmode="decimal" oninput="onWtChange()">
-      <span class="w-unit">kg</span>
-    </div>
-    <div class="w-whisper">Target <em id="r-dest-whisper">92 kg by Sep 1</em></div>
-    <svg class="spark-svg" id="spark-svg" viewBox="0 0 320 32" preserveAspectRatio="none"></svg>
-  </div>
-
-  <!-- Steps -->
-  <div class="je">
-    <div class="je-cat">Steps</div>
-    <div class="steps-row">
-      <input class="steps-inp" id="r-steps" type="number" placeholder="—" inputmode="numeric" oninput="onStepsChange()">
-      <span class="steps-unit">steps</span>
+  <!-- Date header — simple, no nav arrows -->
+  <div class="rec-head">
+    <div class="rec-date-nav">
+      <span class="rec-arr" id="dn-prev" onclick="navDay(-1)">←</span>
+      <div>
+        <div class="rec-dayname" id="ph-day">—</div>
+        <div class="rec-fulldate" id="ph-full">—</div>
+      </div>
+      <span class="rec-arr dis" id="dn-next" onclick="navDay(1)">→</span>
     </div>
   </div>
 
-  <!-- Disciplines -->
-  <div class="je">
-    <div class="je-cat">Disciplines</div>
-    <div id="dl-list"></div>
+  <!-- TODAY'S DEFICIT — the star -->
+  <div class="rec-deficit" id="rec-deficit">
+    <div class="rd-label">Today's Deficit</div>
+    <div class="rd-number" id="rd-number">—</div>
+    <div class="rd-status" id="rd-status">Log meals to calculate</div>
   </div>
 
-  <!-- Actual Meals -->
-  <div class="je" id="r-actual-meals">
-    <div class="je-cat" style="justify-content:space-between;">
-      <span>Actual Meals</span>
-      <span style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t4);font-weight:400;cursor:pointer;" onclick="resetActualMeals()">Reset to Plan</span>
+  <!-- Rule -->
+  <div style="margin:0 28px;height:1px;background:var(--rl);"></div>
+
+  <!-- What you ate today -->
+  <div class="rec-section">
+    <div class="rec-section-head">
+      <span class="rec-section-label">What you ate</span>
+      <span class="rec-section-action" onclick="resetActualMeals()">Reset to plan</span>
     </div>
     <div id="r-actual-slots"></div>
-    <div id="r-actual-summary" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--rl);"></div>
+    <div id="r-actual-summary"></div>
   </div>
+
+  <!-- Rule -->
+  <div style="margin:0 28px;height:1px;background:var(--rl);"></div>
 
   <!-- Notes -->
-  <div class="je">
-    <div class="je-cat">Notes</div>
-    <textarea class="notes-ta" id="r-notes" placeholder="What shaped today?" rows="3"></textarea>
+  <div class="rec-section">
+    <div class="rec-section-head">
+      <span class="rec-section-label">Notes</span>
+    </div>
+    <textarea class="notes-ta" id="r-notes"
+      placeholder="What shaped today?" rows="4"
+      oninput="onRecordChange()"></textarea>
   </div>
 
-  <!-- Energy summary -->
-  <div class="esumm" id="r-esumm">
-    <div class="esumm-title">Energy Summary</div>
-    <div id="r-esumm-content"><div class="chart-empty">Log weight and steps to see energy calculations.</div></div>
+  <!-- Hidden inputs — kept for JS compatibility, invisible -->
+  <div style="display:none;">
+    <input id="r-wt" type="number" step="0.1" oninput="onWtChange()">
+    <input id="r-steps" type="number" oninput="onStepsChange()">
+    <svg id="spark-svg" viewBox="0 0 320 32"></svg>
+    <div id="dl-list"></div>
+    <div id="r-esumm"></div>
+    <div id="r-esumm-content"></div>
+    <span id="r-cmp-val"></span>
+    <span id="r-cmp-days"></span>
+    <span id="r-dest-whisper"></span>
+    <div id="dn-date"></div>
   </div>
 
   <!-- Save -->
-  <div class="save-row">
-    <button class="btn-ghost" onclick="saveRecord()" style="flex:1;">Save Record</button>
-    <span class="save-conf" id="save-conf">Saved.</span>
+  <div style="padding:24px 28px 0;">
+    <button class="btn-primary" onclick="saveRecord()" style="margin-top:0;">Save →</button>
+    <div class="save-conf" id="save-conf" style="text-align:center;margin-top:10px;">Saved.</div>
   </div>
+
+  <div style="height:40px;"></div>
 </div>
 
 <!-- MISSION -->
@@ -732,10 +709,10 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
     <span class="ov-action" id="db-overlay-slot" style="color:var(--t4);font-size:8px;letter-spacing:.14em;text-transform:uppercase;"></span>
   </div>
 
-  <!-- Combination tray — shows selected items before confirming -->
+  <!-- Combination tray — shows selected items with quantity controls -->
   <div id="db-tray" style="display:none;padding:12px 28px;background:var(--bg-r);border-bottom:1px solid var(--rls);">
-    <div style="font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;">Building combination</div>
-    <div id="db-tray-items" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;"></div>
+    <div style="font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;">Selected items</div>
+    <div id="db-tray-items" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;">
       <div id="db-tray-total" style="font-family:var(--serif);font-size:13px;font-weight:300;color:var(--t3);"></div>
       <div style="display:flex;gap:12px;">
@@ -1876,92 +1853,71 @@ function renderDbTray(){
   const tray = document.getElementById('db-tray');
   const itemsEl = document.getElementById('db-tray-items');
   const totalEl = document.getElementById('db-tray-total');
-
-  if(!dbTrayItems.length){
-    tray.style.display = 'none';
-    return;
-  }
-
+  if(!dbTrayItems.length){ tray.style.display='none'; return; }
   tray.style.display = 'block';
   itemsEl.innerHTML = '';
-
   dbTrayItems.forEach((item, idx) => {
+    const qty = item.qty || 1;
+    const itemCal = item.calories * qty;
     const row = document.createElement('div');
-    row.style.cssText = 'display:flex;justify-content:space-between;align-items:baseline;';
+    row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;';
     row.innerHTML = `
-      <span style="font-family:var(--serif);font-size:15px;font-weight:300;color:var(--t1);flex:1;">${item.name}</span>
-      <span style="font-size:9px;color:var(--t3);margin:0 10px;">${item.calories} kcal</span>
-      <span style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--risk-at);cursor:pointer;" onclick="removeDbTrayItem(${idx})">✕</span>`;
+      <span style="font-family:var(--serif);font-size:15px;font-weight:300;color:var(--t1);flex:1;line-height:1.2;">${item.name}</span>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:8px;">
+        <span style="font-size:9px;color:var(--t3);min-width:52px;text-align:right;">${itemCal} kcal</span>
+        <div style="display:flex;align-items:center;border:1px solid var(--rls);">
+          <span style="font-size:16px;color:var(--t2);padding:2px 10px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;" onclick="changeQty(${idx},-1)">−</span>
+          <span style="font-family:var(--serif);font-size:15px;font-weight:300;color:var(--t1);padding:2px 8px;min-width:22px;text-align:center;">${qty}</span>
+          <span style="font-size:16px;color:var(--t2);padding:2px 10px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;" onclick="changeQty(${idx},1)">+</span>
+        </div>
+        <span style="font-size:10px;color:var(--risk-at);cursor:pointer;padding:4px;" onclick="removeDbTrayItem(${idx})">✕</span>
+      </div>`;
     itemsEl.appendChild(row);
   });
-
-  const totalCal = dbTrayItems.reduce((s,i) => s + i.calories, 0);
-  const totalPro = dbTrayItems.reduce((s,i) => s + i.protein, 0);
-  const totalCarb = dbTrayItems.reduce((s,i) => s + i.carbs, 0);
-  const totalFat = dbTrayItems.reduce((s,i) => s + i.fat, 0);
+  const totalCal  = dbTrayItems.reduce((s,i) => s + i.calories*(i.qty||1), 0);
+  const totalPro  = dbTrayItems.reduce((s,i) => s + i.protein *(i.qty||1), 0);
+  const totalCarb = dbTrayItems.reduce((s,i) => s + i.carbs   *(i.qty||1), 0);
+  const totalFat  = dbTrayItems.reduce((s,i) => s + i.fat     *(i.qty||1), 0);
   totalEl.textContent = `${totalCal} kcal · P:${totalPro}g C:${totalCarb}g F:${totalFat}g`;
 }
 
-function removeDbTrayItem(idx){
-  dbTrayItems.splice(idx, 1);
+function changeQty(idx, delta){
+  if(!dbTrayItems[idx]) return;
+  dbTrayItems[idx].qty = Math.max(1, (dbTrayItems[idx].qty||1) + delta);
   renderDbTray();
-  renderDbBrowser(); // re-render to uncheck removed item
-}
-
-function clearDbTray(){
-  dbTrayItems = [];
-  renderDbTray();
-  renderDbBrowser();
-}
-
-function confirmDbTray(){
-  if(!dbTrayItems.length) return;
-  const combined = buildCombinedItem(dbTrayItems);
-
-  // Check if this is an actual meal edit
-  if(currentReplaceSlot && currentReplaceSlot.startsWith('__actual__')){
-    const slotKey = currentReplaceSlot.replace('__actual__', '');
-    saveActualMeal(currentReplaceDate, slotKey, combined);
-    closeDbBrowser();
-    return;
-  }
-
-  saveToSlot(combined);
-  closeDbBrowser();
-  renderMealDetail();
-  renderTomorrowCard();
 }
 
 function buildCombinedItem(items){
   if(items.length === 1){
     const item = items[0];
+    const qty = item.qty || 1;
     return {
       id: item.id,
-      name: item.name,
+      name: qty > 1 ? `${item.name} ×${qty}` : item.name,
       ml: '',
-      cal: item.calories,
-      pro: item.protein,
-      carb: item.carbs,
-      fat: item.fat,
-      cat: item.category,
-      portion: item.servingSize,
+      cal:  item.calories * qty,
+      pro:  item.protein  * qty,
+      carb: item.carbs    * qty,
+      fat:  item.fat      * qty,
+      cat:  item.category,
+      portion: qty > 1 ? `${qty} × ${item.servingSize}` : item.servingSize,
       tgFriendly: item.tgFriendly,
     };
   }
-  // Multiple items — combine
   return {
     id: items.map(i => i.id).join('+'),
-    name: items.map(i => i.name).join(' + '),
+    name: items.map(i => { const q=i.qty||1; return q>1?`${i.name} ×${q}`:i.name; }).join(' + '),
     ml: '',
-    cal: items.reduce((s,i) => s + i.calories, 0),
-    pro: items.reduce((s,i) => s + i.protein, 0),
-    carb: items.reduce((s,i) => s + i.carbs, 0),
-    fat: items.reduce((s,i) => s + i.fat, 0),
-    cat: items[0].category,
-    portion: items.map(i => i.servingSize).join(' + '),
+    cal:  items.reduce((s,i) => s + i.calories*(i.qty||1), 0),
+    pro:  items.reduce((s,i) => s + i.protein *(i.qty||1), 0),
+    carb: items.reduce((s,i) => s + i.carbs   *(i.qty||1), 0),
+    fat:  items.reduce((s,i) => s + i.fat     *(i.qty||1), 0),
+    cat:  items[0].category,
+    portion: items.map(i => { const q=i.qty||1; return q>1?`${q} × ${i.servingSize}`:i.servingSize; }).join(' + '),
     tgFriendly: items.every(i => i.tgFriendly),
   };
 }
+
 
 function saveToSlot(item){
   if(!meals[currentReplaceDate]) meals[currentReplaceDate] = {};
@@ -2446,40 +2402,78 @@ function syncRecordInputs(){
   const key = keyForOffset(dayOffset);
   const d = keyToDate(key);
   const rec = records[key] || {};
-  document.getElementById('dn-date').textContent = formatDate(d);
+
   document.getElementById('ph-day').textContent = DOW[d.getDay()];
   document.getElementById('ph-full').textContent = formatDateFull(d);
   document.getElementById('dn-prev').classList.toggle('dis', dayOffset <= -90);
   document.getElementById('dn-next').classList.toggle('dis', dayOffset >= 0);
-  document.getElementById('r-wt').value = rec.weight || '';
-  document.getElementById('r-steps').value = rec.steps || '';
+
+  const wtInp = document.getElementById('r-wt');
+  const stepsInp = document.getElementById('r-steps');
+  if(wtInp) wtInp.value = rec.weight || '';
+  if(stepsInp) stepsInp.value = rec.steps || '';
   document.getElementById('r-notes').value = rec.notes || '';
 
-  // Ensure steps discipline reflects stored steps value
   if(rec.steps){
-    const stepsDiscIdx = DISCIPLINES.findIndex(d => d.id === 'd3');
-    if(stepsDiscIdx >= 0){
+    const si = DISCIPLINES.findIndex(d => d.id === 'd3');
+    if(si >= 0){
       if(!records[key].disciplines) records[key].disciplines = [];
-      while(records[key].disciplines.length <= stepsDiscIdx){
-        records[key].disciplines.push({done:false, dur:0});
-      }
-      records[key].disciplines[stepsDiscIdx].done = rec.steps >= 10000;
+      while(records[key].disciplines.length <= si) records[key].disciplines.push({done:false,dur:0});
+      records[key].disciplines[si].done = rec.steps >= 10000;
     }
   }
 
-  syncDlList();
-  updateEnergySummary();
-  renderSparkline();
-  updateCompass();
+  renderDeficitHero();
   renderActualMeals();
+  renderSparkline();
 }
 
-function updateCompass(){
-  const dl = daysLeft();
-  document.getElementById('r-cmp-val').textContent = mission.targetWeight + ' kg';
-  document.getElementById('r-cmp-days').textContent = dl + ' days remaining';
-  document.getElementById('r-dest-whisper').textContent = mission.targetWeight + ' kg by ' + MO_SHORT[keyToDate(mission.targetDate).getMonth()] + ' ' + keyToDate(mission.targetDate).getDate();
+function renderDeficitHero(){
+  const key = keyForOffset(dayOffset);
+  const rec = records[key] || {};
+  const wt = parseFloat(rec.weight) || currentWeight();
+  const steps = parseInt(rec.steps) || 0;
+  const { tdee } = calcTDEE(wt, steps, rec.disciplines);
+  const { deficitPerDay } = calcDynamicDeficit();
+  const numEl = document.getElementById('rd-number');
+  const statusEl = document.getElementById('rd-status');
+  if(!numEl || !statusEl) return;
+
+  const actualMeals = rec.actualMeals;
+  const plan = meals[key];
+  let foodCal = null;
+  if(actualMeals && Object.keys(actualMeals).length > 0){
+    foodCal = Object.values(actualMeals).reduce((s,m) => s+(m.cal||0), 0);
+  } else if(plan){
+    foodCal = mealDayTotals(plan).cal;
+  }
+
+  if(foodCal === null){
+    numEl.textContent = '—';
+    numEl.className = 'rd-number';
+    statusEl.textContent = 'Log meals to calculate';
+    statusEl.className = 'rd-status';
+    return;
+  }
+  const actualDeficit = tdee - foodCal;
+  const diff = actualDeficit - deficitPerDay;
+  numEl.textContent = actualDeficit.toLocaleString();
+  if(diff > 200){
+    numEl.className = 'rd-number ahead';
+    statusEl.textContent = 'Ahead of pace · required ' + deficitPerDay.toLocaleString();
+    statusEl.className = 'rd-status ahead';
+  } else if(diff < -200){
+    numEl.className = 'rd-number behind';
+    statusEl.textContent = 'Behind pace · required ' + deficitPerDay.toLocaleString();
+    statusEl.className = 'rd-status behind';
+  } else {
+    numEl.className = 'rd-number';
+    statusEl.textContent = 'On pace · required ' + deficitPerDay.toLocaleString();
+    statusEl.className = 'rd-status';
+  }
 }
+
+function updateCompass(){} // stub — no longer needed
 
 function navDay(dir){
   dayOffset += dir;
