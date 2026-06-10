@@ -142,97 +142,125 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 .btn-ghost{background:none;border:1px solid var(--rls);padding:16px 0;width:100%;font-family:var(--sans);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--t2);cursor:pointer;transition:all .2s;}
 .btn-ghost:active{border-color:var(--ac);color:var(--ac);}
 
-/* ═══ TODAY ═══ */
-.tod-top{padding:28px 28px 0;display:flex;justify-content:space-between;align-items:center;}
-.tod-meta{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);}
-.tod-meta span{color:var(--ac);}
+/* ═══ TODAY — REBUILT ═══ */
+.tod-top{padding:52px 28px 0;display:flex;justify-content:space-between;align-items:center;}
+.tod-meta{font-family:var(--serif);font-size:18px;font-weight:300;color:var(--t2);}
 .dk-toggle{display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.dkt-lbl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);}
 .dkt-pill{width:28px;height:2px;background:var(--rls);position:relative;top:0;}
 .dkt-knob{width:8px;height:8px;border-radius:50%;background:var(--ac);position:absolute;top:-3px;left:0;transition:left .28s ease;}
 .dk .dkt-knob{left:20px;}
 
-/* Travel mode banner */
-.travel-banner{margin:18px 28px 0;padding:13px 16px;background:var(--bg-r);border-left:2px solid var(--ac);display:none;justify-content:space-between;align-items:center;}
+/* Travel mode */
+.travel-toggle-dot{width:8px;height:8px;border-radius:50%;border:1px solid var(--t4);cursor:pointer;transition:all .2s;}
+.travel-toggle-dot.on{background:var(--ac);border-color:var(--ac);}
+.travel-banner{margin:16px 28px 0;padding:11px 16px;background:var(--bg-r);border-left:2px solid var(--ac);display:none;justify-content:space-between;align-items:center;}
 .travel-banner.on{display:flex;}
 .tb-lbl{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ac);}
 .tb-off{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);cursor:pointer;-webkit-tap-highlight-color:transparent;}
 
-/* Weight quick entry */
-.wt-quick{padding:32px 28px 0;}
-.wq-label{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--t2);font-weight:500;margin-bottom:14px;display:flex;align-items:center;gap:14px;}
-.wq-label::after{content:'';flex:1;height:1px;background:var(--rl);}
-.wq-row{display:flex;align-items:baseline;gap:12px;}
-.wq-inp{background:none;border:none;border-bottom:1px solid var(--rls);outline:none;font-family:var(--serif);font-size:52px;font-weight:300;color:var(--t1);caret-color:var(--ac);width:140px;padding-bottom:4px;transition:border-color .2s;}
-.wq-inp:focus{border-bottom-color:var(--ac);}
-.wq-inp::placeholder{color:var(--t4);}
-.wq-unit{font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t3);}
-.wq-save{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ac);cursor:pointer;margin-left:auto;-webkit-tap-highlight-color:transparent;padding:6px 0;}
-.wq-saved{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--ac);opacity:0;transition:opacity .3s;margin-left:8px;}
-.wq-saved.on{opacity:1;}
-
-/* ═══ MISSION RISK CARD ═══ */
-.risk-card{margin:24px 28px 0;padding:18px 0;border-top:1px solid var(--rl);border-bottom:1px solid var(--rl);}
-.rc-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
-.rc-eyebrow{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--t2);font-weight:500;}
-.rc-status{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);font-weight:500;}
-.rc-status.on-track{color:var(--risk-on);}
-.rc-status.at-risk{color:var(--risk-at);}
-.rc-row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--rl);}
-.rc-row:last-child{border-bottom:none;}
-.rc-lbl{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);}
-.rc-val{font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t1);}
-.rc-val.projected{font-size:24px;}
-.rc-val.muted{color:var(--t3);}
-.rc-insufficient{font-family:var(--serif);font-size:18px;font-weight:300;font-style:italic;color:var(--t3);padding:4px 0;}
-.rc-entries{font-size:11px;letter-spacing:.12em;color:var(--t4);margin-top:8px;}
-
-/* Tomorrow meal card */
-.meal-card{
-  margin:24px 28px 0;
-  padding:18px 20px;
-  border:1px solid var(--rls);
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-  transition:background .18s;
+/* HERO WEIGHT */
+.hero-weight{
+  padding:40px 28px 0;
+  position:relative;
+  cursor:text;
 }
-.meal-card:active{background:var(--bg-r);}
-.mc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
-.mc-eyebrow{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--t2);font-weight:500;}
-.mc-arrow{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t4);}
-.mc-row{display:flex;align-items:baseline;gap:14px;padding:6px 0;}
-.mc-slot{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--t4);width:76px;flex-shrink:0;}
-.mc-dish{font-family:var(--serif);font-size:18px;font-weight:300;color:var(--t2);}
-.mc-kcal{font-size:11px;color:var(--t4);margin-left:auto;}
-.mc-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;padding-top:14px;border-top:1px solid var(--rl);}
-.mc-total-lbl{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);}
-.mc-total-val{font-family:var(--serif);font-size:18px;font-weight:300;color:var(--ac);}
-.mc-empty{font-family:var(--serif);font-size:17px;font-weight:300;font-style:italic;color:var(--t3);}
+.hw-display{display:flex;align-items:baseline;gap:10px;}
+.hw-current{
+  font-family:var(--serif);
+  font-size:96px;
+  font-weight:300;
+  color:var(--t1);
+  line-height:1;
+  letter-spacing:-.02em;
+  transition:color .2s;
+}
+.hw-unit{
+  font-family:var(--serif);
+  font-size:28px;
+  font-weight:300;
+  color:var(--t3);
+  padding-bottom:8px;
+}
+.hw-input{
+  position:absolute;
+  top:0;left:0;width:100%;height:100%;
+  opacity:0;
+  font-size:96px;
+  background:none;border:none;outline:none;
+  cursor:text;
+}
 
-/* Progress */
-.prog{padding:24px 28px 0;}
-.prog-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;}
-.prog-label{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);}
-.prog-count{font-family:var(--serif);font-size:16px;font-weight:300;color:var(--t2);}
-.prog-track{height:1px;background:var(--rl);}
-.prog-fill{height:1px;background:var(--ac);width:0%;transition:width 1.3s cubic-bezier(.16,1,.3,1);}
+/* GAP LINE */
+.gap-line{
+  padding:12px 28px 0;
+  display:flex;align-items:baseline;gap:8px;
+}
+.gl-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--t4);}
+.gl-target-val{font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t3);}
+.gl-sep{font-size:14px;color:var(--t4);margin:0 2px;}
+.gl-rem-val{font-family:var(--serif);font-size:28px;font-weight:300;color:var(--t1);}
 
-/* Discipline list */
-.disc-list{padding:10px 28px 0;}
-.di{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 0;border-bottom:1px solid var(--rl);cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.di:first-child{border-top:1px solid var(--rl);}
-.di-l{display:flex;align-items:flex-start;gap:20px;}
-.di-dot{width:18px;height:1px;background:var(--t4);flex-shrink:0;transition:background .28s;margin-top:11px;}
-.di.done .di-dot{background:var(--ac);}
-.di-name{font-family:var(--serif);font-size:24px;font-weight:300;color:var(--t1);transition:all .28s;letter-spacing:.01em;line-height:1.15;}
-.di.done .di-name{color:var(--t3);font-style:italic;}
-.di-sub{font-size:12px;color:var(--t3);margin-top:4px;letter-spacing:.04em;}
-.di-tag{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--t4);margin-top:3px;}
+/* PACE LINE */
+.pace-line{
+  padding:14px 28px 0;
+  font-family:var(--serif);
+  font-size:17px;
+  font-weight:300;
+  font-style:italic;
+  color:var(--t3);
+  line-height:1.5;
+}
+.pace-line.on-track{color:var(--risk-on);}
+.pace-line.at-risk{color:var(--risk-at);}
 
-/* Evening prompt */
-.ev-prompt{margin:22px 28px 0;padding:18px 0;border-top:1px solid var(--rl);}
-.ev-lbl{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;}
-.ev-text{font-family:var(--serif);font-size:18px;font-weight:300;font-style:italic;color:var(--t2);line-height:1.6;}
+/* DISCIPLINE DOTS */
+.disc-dots-wrap{padding:28px 28px 24px;}
+.disc-dots{display:flex;gap:0;justify-content:space-between;}
+.dd-item{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  flex:1;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  padding:4px 0;
+}
+.dd-dot{
+  width:10px;height:10px;border-radius:50%;
+  border:1px solid var(--t4);
+  transition:all .25s cubic-bezier(.16,1,.3,1);
+  flex-shrink:0;
+}
+.dd-item.done .dd-dot{
+  background:var(--ac);
+  border-color:var(--ac);
+  transform:scale(1.15);
+}
+.dd-name{
+  font-size:8px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--t4);text-align:center;line-height:1.3;
+  transition:color .2s;
+  max-width:52px;
+}
+.dd-item.done .dd-name{color:var(--t3);}
+
+/* MEAL ONE-LINER */
+.meal-oneliner{
+  padding:20px 28px;
+  display:flex;align-items:flex-start;gap:14px;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:opacity .15s;
+}
+.meal-oneliner:active{opacity:.7;}
+.mol-label{
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--t4);flex-shrink:0;padding-top:5px;
+  min-width:64px;
+}
+.mol-meals{
+  font-family:var(--serif);font-size:18px;font-weight:300;
+  color:var(--t2);flex:1;line-height:1.4;
+}
+.mol-arrow{
+  font-family:var(--serif);font-size:18px;
+  color:var(--t4);flex-shrink:0;padding-top:2px;
+}
 
 /* ═══ MEAL DETAIL OVERLAY ═══ */
 .md-date-strip{padding:0 28px 18px;display:flex;align-items:center;justify-content:space-between;}
@@ -451,11 +479,15 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 
 <!-- TODAY -->
 <div class="screen on" id="s-today">
+
+  <!-- Top bar — minimal -->
   <div class="tod-top">
-    <div class="tod-meta" id="tod-meta">Mission Day <span id="tod-day">1</span></div>
-    <div class="dk-toggle" onclick="toggleDark()">
-      <span class="dkt-lbl" id="dkt-lbl">Light</span>
-      <div class="dkt-pill"><div class="dkt-knob"></div></div>
+    <div class="tod-meta" id="tod-meta">The Re-<em style="font-style:italic;color:var(--ac);">entry</em></div>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <div class="travel-toggle-dot" id="travel-dot" onclick="toggleTravelFromTop()"></div>
+      <div class="dk-toggle" onclick="toggleDark()">
+        <div class="dkt-pill"><div class="dkt-knob"></div></div>
+      </div>
     </div>
   </div>
 
@@ -465,54 +497,48 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
     <span class="tb-off" onclick="setTravelMode(false)">Exit →</span>
   </div>
 
-  <!-- Weight quick entry -->
-  <div class="wt-quick">
-    <div class="wq-label">Today's Weight</div>
-    <div class="wq-row">
-      <input class="wq-inp" id="wq-inp" type="number" step="0.1" inputmode="decimal" placeholder="—">
-      <span class="wq-unit">kg</span>
-      <span class="wq-save" onclick="saveQuickWeight()">Save</span>
-      <span class="wq-saved" id="wq-saved">Saved.</span>
+  <!-- HERO WEIGHT — dominant, tappable -->
+  <div class="hero-weight" onclick="focusWeightInput()">
+    <div class="hw-display">
+      <span class="hw-current" id="hw-current">—</span>
+      <span class="hw-unit">kg</span>
     </div>
+    <input class="hw-input" id="hw-input" type="number" step="0.1"
+      inputmode="decimal"
+      oninput="onHeroWeightInput()" onblur="onHeroWeightBlur()">
   </div>
 
-  <!-- Mission Risk Card -->
-  <div class="risk-card" id="risk-card">
-    <div class="rc-header">
-      <span class="rc-eyebrow">Mission Status</span>
-      <span class="rc-status" id="rc-status">—</span>
-    </div>
-    <div id="rc-body"></div>
+  <!-- Gap row — target · remaining -->
+  <div class="gap-line">
+    <span class="gl-label">Target</span>
+    <span class="gl-target-val" id="gl-target-val">—</span>
+    <span class="gl-sep">·</span>
+    <span class="gl-rem-val" id="gl-rem-val">—</span>
+    <span class="gl-label">remaining</span>
   </div>
 
-  <!-- Tomorrow's Meal Card -->
-  <div class="meal-card" id="meal-card" onclick="openMealDetail(getTomorrowOffset())">
-    <div class="mc-header">
-      <span class="mc-eyebrow">Tomorrow's Meal</span>
-      <span class="mc-arrow">→</span>
-    </div>
-    <div id="mc-body"><div class="mc-empty">Generating plan…</div></div>
+  <!-- Pace line — one sentence -->
+  <div class="pace-line" id="pace-line">—</div>
+
+  <!-- Thin rule -->
+  <div style="margin:28px 28px 0;height:1px;background:var(--rl);"></div>
+
+  <!-- Discipline dots -->
+  <div class="disc-dots-wrap">
+    <div class="disc-dots" id="disc-dots"></div>
   </div>
 
-  <!-- Progress -->
-  <div class="prog">
-    <div class="prog-row">
-      <div class="prog-label">Today's Disciplines</div>
-      <div class="prog-count" id="prog-count">0 of 5</div>
-    </div>
-    <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+  <!-- Thin rule -->
+  <div style="margin:0 28px;height:1px;background:var(--rl);"></div>
+
+  <!-- Tomorrow — one line -->
+  <div class="meal-oneliner" onclick="openMealDetail(getTomorrowOffset())">
+    <span class="mol-label">Tomorrow</span>
+    <div class="mol-meals" id="mol-meals">—</div>
+    <span class="mol-arrow">→</span>
   </div>
 
-  <!-- Discipline list -->
-  <div class="disc-list" id="disc-list"></div>
-
-  <!-- Evening prompt -->
-  <div class="ev-prompt" id="ev-prompt" style="display:none;">
-    <div class="ev-lbl">This Evening</div>
-    <div class="ev-text" id="ev-text">Complete your remaining disciplines before sleep.</div>
-  </div>
-
-  <div style="height:8px;"></div>
+  <div style="height:32px;"></div>
 </div>
 
 <!-- RECORD -->
@@ -1280,30 +1306,160 @@ function mealDayTotals(plan){
 // TODAY SCREEN
 // ═══════════════════════════════════════════════
 function renderToday(){
-  // Mission day
-  document.getElementById('tod-day').textContent = missionDay();
+  const cw = currentWeight();
+  const tw = mission.targetWeight;
+  const remaining = Math.max(0, cw - tw);
+
+  // Hero weight
+  const hwEl = document.getElementById('hw-current');
+  if(hwEl) hwEl.textContent = cw !== mission.startWeight || Object.keys(records).length > 0 ? cw : '—';
+
+  // Target and remaining
+  const glTarget = document.getElementById('gl-target-val');
+  const glRem = document.getElementById('gl-rem-val');
+  if(glTarget) glTarget.textContent = tw + ' kg';
+  if(glRem) glRem.textContent = remaining.toFixed(1) + ' kg';
+
+  // Travel dot
+  const tDot = document.getElementById('travel-dot');
+  if(tDot) tDot.classList.toggle('on', travelMode);
 
   // Travel banner
   document.getElementById('travel-banner').classList.toggle('on', travelMode);
 
-  // Pre-fill weight input if today already logged
+  // Pace line — the honest sentence
+  renderPaceLine();
+
+  // Discipline dots
+  renderDiscDots();
+
+  // Tomorrow meal oneliner
+  renderMealOneliner();
+}
+
+function renderPaceLine(){
+  const el = document.getElementById('pace-line');
+  if(!el) return;
+  const risk = calcMissionRisk();
+  if(risk.state === 'insufficient'){
+    el.textContent = 'Log weight for 4 days to see your pace.';
+    el.className = 'pace-line';
+    return;
+  }
+  const targetD = keyToDate(mission.targetDate);
+  const dateStr = MO_SHORT[targetD.getMonth()] + ' ' + targetD.getDate();
+  if(risk.state === 'on-track'){
+    el.textContent = `At this pace, you arrive ${dateStr}.`;
+    el.className = 'pace-line on-track';
+  } else {
+    const projD = new Date();
+    const daysNeeded = risk.projected > mission.targetWeight
+      ? Math.round((risk.projected - mission.targetWeight) / (risk.currentRate / 7))
+      : 0;
+    el.textContent = `At this pace, you arrive after ${dateStr}.`;
+    el.className = 'pace-line at-risk';
+  }
+}
+
+function renderDiscDots(){
+  const el = document.getElementById('disc-dots');
+  if(!el) return;
   const todayRec = records[todayKey()] || {};
-  const wqInp = document.getElementById('wq-inp');
-  if(todayRec.weight) wqInp.value = todayRec.weight;
-  else wqInp.value = '';
+  const todayDiscs = todayRec.disciplines || [];
+  el.innerHTML = '';
+  DISCIPLINES.forEach((disc, i) => {
+    const done = todayDiscs[i] && todayDiscs[i].done;
+    const displayName = travelMode ? disc.travelName : disc.name;
+    // Shorten for dot label
+    const short = displayName.replace('Wake at 4:30 am','Wake').replace('Angamardana','Angamar.').replace('10,000 Steps','Steps').replace('Dumbbell Training','Dumbbell').replace('Bodyweight Training','Bodyweight').replace('Room Stretching','Stretch');
+    const div = document.createElement('div');
+    div.className = 'dd-item' + (done ? ' done' : '');
+    div.innerHTML = `<div class="dd-dot"></div><div class="dd-name">${short}</div>`;
+    div.addEventListener('click', () => toggleTodayDiscDot(i, div));
+    el.appendChild(div);
+  });
+}
 
-  // Risk card
+function toggleTodayDiscDot(idx, el){
+  const key = todayKey();
+  if(!records[key]) records[key] = {};
+  if(!records[key].disciplines) records[key].disciplines = [];
+  while(records[key].disciplines.length <= idx) records[key].disciplines.push({done:false, dur:0});
+  records[key].disciplines[idx].done = !records[key].disciplines[idx].done;
+  save();
+  el.classList.toggle('done');
+  // Auto-check steps if steps disc
+  if(DISCIPLINES[idx].id === 'd3'){
+    const steps = parseInt((records[key] || {}).steps) || 0;
+    records[key].disciplines[idx].done = steps >= 10000;
+    el.classList.toggle('done', records[key].disciplines[idx].done);
+    save();
+  }
+  if(activeTab === 'record') syncDlList();
+}
+
+function renderMealOneliner(){
+  const el = document.getElementById('mol-meals');
+  if(!el) return;
+  const key = keyForOffset(1);
+  const plan = getMealPlan(key);
+  if(!plan){ el.textContent = 'Generating plan…'; return; }
+  const parts = [];
+  if(plan.breakfast) parts.push(plan.breakfast.name.split(' ')[0] + (plan.breakfast.name.includes('+') ? ' + ' + plan.breakfast.name.split('+')[1].trim().split(' ')[0] : ''));
+  if(plan.lunch_fish) parts.push(plan.lunch_fish.name.split('(')[0].trim());
+  if(plan.dinner_millet) parts.push(plan.dinner_millet.name.split('+')[0].trim());
+  el.textContent = parts.join('  ·  ');
+}
+
+// Hero weight input handlers
+function focusWeightInput(){
+  const inp = document.getElementById('hw-input');
+  if(inp){
+    const todayRec = records[todayKey()] || {};
+    if(todayRec.weight) inp.value = todayRec.weight;
+    inp.style.opacity = '1';
+    inp.style.zIndex = '10';
+    inp.focus();
+    // Briefly show caret color on display
+    const hw = document.getElementById('hw-current');
+    if(hw) hw.style.color = 'var(--ac)';
+  }
+}
+
+function onHeroWeightInput(){
+  const val = document.getElementById('hw-input').value;
+  const hw = document.getElementById('hw-current');
+  if(hw) hw.textContent = val || '—';
+}
+
+function onHeroWeightBlur(){
+  const inp = document.getElementById('hw-input');
+  const val = parseFloat(inp.value);
+  inp.style.opacity = '0';
+  // Restore color
+  const hw = document.getElementById('hw-current');
+  if(hw) hw.style.color = '';
+  if(!val) return;
+  // Save
+  const key = todayKey();
+  if(!records[key]) records[key] = {};
+  records[key].weight = val;
+  save();
+  renderToday();
   renderRiskCard();
+  renderSparkline();
+  if(activeTab === 'record') syncRecordInputs();
+}
 
-  // Tomorrow meal card
-  renderTomorrowCard();
+function toggleTravelFromTop(){
+  setTravelMode(!travelMode);
+  const tDot = document.getElementById('travel-dot');
+  if(tDot) tDot.classList.toggle('on', travelMode);
+}
 
-  // Disciplines
-  renderDiscList();
-  updateProgress();
-
-  // Evening prompt
-  updateEveningPrompt();
+// Keep saveQuickWeight as alias for compatibility
+function saveQuickWeight(){
+  onHeroWeightBlur();
 }
 
 function saveQuickWeight(){
@@ -1660,20 +1816,36 @@ const MASTER_DB = [{"id":"b001","name":"Puttu","mealSlot":"breakfast","category"
 {"id":"bry05","name":"Ghee Rice — Neychoru (half)","mealSlot":"lunch","category":"biriyani","servingSize":"Half serving (~200g) jeerakasala rice, ghee, fried onions, cashew, raisins","calories":190,"protein":3,"carbs":30,"fat":8,"fiber":2,"satietyScore":6,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":1,"tags":["Lunch","Kerala","Kannur","Vegetarian","Weekend","TreatMeal"]},
 {"id":"plt01","name":"Ripe Nendran — Raw","mealSlot":"snack","category":"plantain","servingSize":"1 medium ripe nendran (~150g peeled)","calories":160,"protein":2,"carbs":38,"fat":0,"fiber":3,"satietyScore":6,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Breakfast","Kerala","Kannur","Fruit","Fiber","TGFriendly","Nendran","Plantain","Banana","Pazham","Ethapazham"]},
 {"id":"plt02","name":"Steamed Nendran (Puzhungiyathu)","mealSlot":"snack","category":"plantain","servingSize":"1 medium steamed nendran with skin — plain, no sugar","calories":155,"protein":1,"carbs":40,"fat":0,"fiber":3,"satietyScore":7,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Snack","Breakfast","Kerala","Kannur","Vegetarian","Fiber","TGFriendly","Nendran","Plantain","Pazham","Ethapazham","Steamed","Puzhungiyathu"]},
-{"id":"plt03","name":"Ghee Roasted Nendran (Nei Roast)","mealSlot":"snack","category":"plantain","servingSize":"1 medium nendran caramelized in 1 tsp ghee","calories":220,"protein":2,"carbs":44,"fat":5,"fiber":3,"satietyScore":7,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Snack","Breakfast","Kerala","Kannur","Vegetarian","Fiber","TGFriendly","Weekend","Nendran","Plantain","Pazham","Ethapazham","Ghee","Roasted","NeiRoast"]}];
+{"id":"plt03","name":"Ghee Roasted Nendran (Nei Roast)","mealSlot":"snack","category":"plantain","servingSize":"1 medium nendran caramelized in 1 tsp ghee","calories":220,"protein":2,"carbs":44,"fat":5,"fiber":3,"satietyScore":7,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Snack","Breakfast","Kerala","Kannur","Vegetarian","Fiber","TGFriendly","Weekend","Nendran","Plantain","Pazham","Ethapazham","Ghee","Roasted","NeiRoast"]},
+
+{"id":"ff001","name":"Sardine Fry (Mathi Fry)","mealSlot":"lunch","category":"fish_fry","servingSize":"3 sardines shallow fried (~120g) — Kerala masala","calories":240,"protein":21,"carbs":4,"fat":16,"fiber":0,"satietyScore":8,"proteinScore":9,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Fish","Omega3","TGFriendly","HighProtein","Protein"]},
+{"id":"ff002","name":"Mackerel Fry (Ayala Fry)","mealSlot":"lunch","category":"fish_fry","servingSize":"1 whole mackerel shallow fried (~150g)","calories":271,"protein":21,"carbs":2,"fat":20,"fiber":1,"satietyScore":8,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Fish","Omega3","TGFriendly","Protein"]},
+{"id":"ff003","name":"King Fish Fry (Neymeen Fry)","mealSlot":"lunch","category":"fish_fry","servingSize":"1 piece king fish shallow fried (~120g)","calories":230,"protein":25,"carbs":3,"fat":13,"fiber":0,"satietyScore":9,"proteinScore":9,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Lunch","Kerala","Kannur","Fish","HighProtein","Protein","TGFriendly"]},
+{"id":"ff004","name":"Mussel Fry (Kallumakkaya)","mealSlot":"lunch","category":"fish_fry","servingSize":"1 serving roasted mussels with coconut masala (~100g)","calories":190,"protein":16,"carbs":8,"fat":11,"fiber":1,"satietyScore":7,"proteinScore":7,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Fish","Protein","Malabar"]},
+{"id":"ff005","name":"Prawn Fry (Chemmeen Fry)","mealSlot":"lunch","category":"fish_fry","servingSize":"1 serving shallow fried prawns (~120g)","calories":200,"protein":20,"carbs":5,"fat":12,"fiber":0,"satietyScore":8,"proteinScore":8,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Fish","Protein","TGFriendly"]},
+
+{"id":"vc013","name":"Koottucurry (Black Chickpea)","mealSlot":"lunch","category":"vegetable_curry","servingSize":"1 serving (~150g) black chickpea + raw banana + roasted coconut","calories":180,"protein":6,"carbs":22,"fat":8,"fiber":6,"satietyScore":7,"proteinScore":4,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Vegetarian","Protein","Fiber","TGFriendly","Sadya"]},
+{"id":"vc014","name":"Erissery (Pumpkin & Cowpea)","mealSlot":"lunch","category":"vegetable_curry","servingSize":"1 bowl (~150g) pumpkin, red cowpea, roasted coconut","calories":160,"protein":5,"carbs":20,"fat":8,"fiber":4,"satietyScore":6,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Vegetarian","Fiber","TGFriendly","Sadya"]},
+
+{"id":"cnd001","name":"Pickle (Quarter tsp)","mealSlot":"any","category":"condiment","servingSize":"Quarter teaspoon (~2g) — any Kerala pickle","calories":5,"protein":0,"carbs":1,"fat":0,"fiber":0,"satietyScore":1,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Breakfast","Lunch","Dinner","Kerala","Vegetarian","Condiment"]},
+
+{"id":"bev001","name":"Coffee with Milk & Sugar","mealSlot":"snack","category":"beverage","servingSize":"1 cup (~200ml) — 2 tsp sugar, 30ml milk","calories":80,"protein":3,"carbs":10,"fat":3,"fiber":0,"satietyScore":3,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Kannur","Vegetarian","Coffee","Beverage"]},
+{"id":"bev002","name":"Lemon Juice with Sugar","mealSlot":"snack","category":"beverage","servingSize":"1 glass (~200ml) — fresh lemon, 2 tsp sugar","calories":60,"protein":0,"carbs":15,"fat":0,"fiber":0,"satietyScore":3,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Vegetarian","Lemon","Beverage","TGFriendly"]},
+{"id":"bev003","name":"Lemon Tea with Sugar","mealSlot":"snack","category":"beverage","servingSize":"1 cup (~200ml) — black tea, fresh lemon, 1 tsp sugar","calories":45,"protein":0,"carbs":11,"fat":0,"fiber":0,"satietyScore":2,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Vegetarian","Lemon","Tea","Beverage","TGFriendly","WeightLoss"]}];
 
 // Category display labels
 const CAT_LABELS = {
   'breakfast_main':'Breakfast', 'breakfast_side':'Bfast Sides',
-  'fish':'Fish & Seafood', 'chicken':'Chicken', 'egg':'Eggs',
+  'fish':'Fish Curry', 'fish_fry':'Fish Fry', 'chicken':'Chicken', 'egg':'Eggs',
   'vegetable_curry':'Veg Curry', 'thoran':'Thoran',
   'sprouts':'Sprouts', 'lunch_staple':'Rice',
   'lunch_sweet':'Post-Lunch', 'dinner_millet':'Dinner Base',
   'dinner_salad':'Salad', 'soup':'Soup',
   'fruit':'Fruits', 'beverage':'Drinks', 'travel_arabic':'Travel / Arabic',
-  'biriyani':'Biriyani & Special', 'plantain':'Plantain / Ethapazham'
+  'biriyani':'Biriyani & Special', 'plantain':'Plantain',
+  'condiment':'Condiments'
 };
-const CAT_ORDER = ['breakfast_main','breakfast_side','fish','chicken','egg','vegetable_curry','thoran','sprouts','lunch_staple','biriyani','plantain','lunch_sweet','dinner_millet','dinner_salad','soup','fruit','beverage','travel_arabic'];
+const CAT_ORDER = ['breakfast_main','breakfast_side','fish','fish_fry','chicken','egg','vegetable_curry','thoran','sprouts','lunch_staple','biriyani','plantain','lunch_sweet','dinner_millet','dinner_salad','soup','fruit','beverage','condiment','travel_arabic'];
 
 // DB browser state
 let dbActiveCat = 'all';
@@ -2434,6 +2606,26 @@ function updateEnergySummary(){
   const gapColor = gap === null ? 'var(--t3)' : gap > 150 ? 'var(--risk-at)' : gap < -150 ? 'var(--risk-on)' : 'var(--t1)';
   const gapLabel = displayCal !== null ? (actualCal !== null ? 'Actual Meals' : 'Planned Meals') : null;
 
+  // Actual deficit = TDEE − what you actually ate
+  const actualDeficit = displayCal !== null ? tdee - displayCal : null;
+  const deficitDiff = actualDeficit !== null ? actualDeficit - deficitPerDay : null;
+
+  // Deficit status
+  let deficitStatus = '';
+  let deficitStatusColor = 'var(--t3)';
+  if(deficitDiff !== null){
+    if(deficitDiff > 200){
+      deficitStatus = 'Ahead of pace';
+      deficitStatusColor = 'var(--risk-on)';
+    } else if(deficitDiff < -200){
+      deficitStatus = 'Behind pace';
+      deficitStatusColor = 'var(--risk-at)';
+    } else {
+      deficitStatus = 'On pace';
+      deficitStatusColor = 'var(--t2)';
+    }
+  }
+
   const el = document.getElementById('r-esumm-content');
   el.innerHTML = `
     <div class="erow"><span class="erow-lbl">BMR</span><span class="erow-val">${bmr.toLocaleString()} kcal</span></div>
@@ -2441,6 +2633,28 @@ function updateEnergySummary(){
     <div class="erow"><span class="erow-lbl">Exercise</span><span class="erow-val">${ex.toLocaleString()} kcal</span></div>
     <div class="erow"><span class="erow-lbl">TEF (~10%)</span><span class="erow-val">${tef.toLocaleString()} kcal</span></div>
     <div class="ebal"><span class="ebal-lbl">TDEE</span><span class="ebal-val">${tdee.toLocaleString()} kcal</span></div>
+
+    ${displayCal !== null ? `
+    <div style="height:1px;background:var(--rl);margin:12px 0;"></div>
+    <div class="erow">
+      <span class="erow-lbl">${gapLabel}</span>
+      <span class="erow-val" style="font-size:18px;">${displayCal.toLocaleString()} kcal</span>
+    </div>
+
+    <!-- ACTUAL DEFICIT — the star -->
+    <div style="margin:14px 0 4px;padding:14px 0 10px;border-top:1px solid var(--rls);border-bottom:1px solid var(--rls);">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
+        <span style="font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--t2);font-weight:500;">Today's Deficit</span>
+        <span style="font-family:var(--serif);font-size:32px;font-weight:300;color:var(--t1);">${actualDeficit.toLocaleString()} kcal</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;">
+        <span style="font-family:var(--serif);font-size:14px;font-weight:300;font-style:italic;color:${deficitStatusColor};">${deficitStatus}</span>
+        <span style="font-size:11px;letter-spacing:.1em;color:var(--t3);">Required: ${deficitPerDay.toLocaleString()}</span>
+      </div>
+    </div>` : `
+    <div style="height:1px;background:var(--rl);margin:12px 0;"></div>
+    <div style="font-family:var(--serif);font-size:14px;font-style:italic;color:var(--t3);padding:4px 0;">Log meals to see today's actual deficit.</div>`}
+
     <div style="height:1px;background:var(--rl);margin:12px 0;"></div>
     <div class="erow">
       <span class="erow-lbl">Required Deficit</span>
@@ -2450,21 +2664,17 @@ function updateEnergySummary(){
       <span class="erow-lbl">Pace</span>
       <span class="erow-val" style="font-size:16px;${capped ? 'color:var(--risk-at)' : ''}">${safeKgPerWeek} kg/week${capped ? ' (capped)' : ''}</span>
     </div>
-    <div class="ebal"><span class="ebal-lbl">Meal Target</span><span class="ebal-val" style="color:var(--ac);">${target.toLocaleString()} kcal</span></div>
-    ${displayCal !== null ? `
-    <div style="height:1px;background:var(--rl);margin:12px 0;"></div>
-    <div class="erow">
-      <span class="erow-lbl">${gapLabel}</span>
-      <span class="erow-val" style="font-size:16px;">${displayCal.toLocaleString()} kcal</span>
-    </div>
-    <div class="erow">
-      <span class="erow-lbl">Gap</span>
-      <span class="erow-val" style="font-size:16px;color:${gapColor};">${gap > 0 ? '+' : ''}${gap.toLocaleString()} kcal</span>
-    </div>` : ''}`;
+    <div class="ebal"><span class="ebal-lbl">Meal Target</span><span class="ebal-val" style="color:var(--ac);">${target.toLocaleString()} kcal</span></div>`;
 }
 
+// Compatibility stubs for old function names
+function renderRiskCard(){ renderPaceLine(); }
+function renderTomorrowCard(){ renderMealOneliner(); }
+function renderDiscList(){ renderDiscDots(); }
+function updateProgress(){ renderDiscDots(); }
+function updateEveningPrompt(){}
+
 function saveRecord(){
-  onRecordChange();
   save();
   const conf = document.getElementById('save-conf');
   conf.classList.add('on');
@@ -3102,8 +3312,8 @@ function initSwipe(){
 // CLOCK
 // ═══════════════════════════════════════════════
 function updateClock(){
-  document.getElementById('tod-day').textContent = missionDay();
-  updateEveningPrompt();
+  renderPaceLine();
+  if(activeTab === 'today') renderDiscDots();
 }
 function startClock(){
   updateClock();
