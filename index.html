@@ -624,6 +624,9 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 
   <div class="sh"><span class="sl">Discipline Roster</span><div class="sr"></div></div>
   <div style="padding:0 28px 20px;" id="m-roster"></div>
+
+  <div class="sh"><span class="sl">Discipline Ascent</span><div class="sr"></div></div>
+  <div id="m-ascent" style="padding:0 28px 32px;"></div>
 </div>
 
 <!-- PATTERNS -->
@@ -2676,6 +2679,216 @@ function renderMission(){
       </div>`;
     roster.appendChild(item);
   });
+
+  // Discipline Ascent
+  renderDisciplineAscent();
+}
+
+// ═══════════════════════════════════════════════
+// DISCIPLINE ASCENT — SVG mountain visualization
+// ═══════════════════════════════════════════════
+function renderDisciplineAscent(){
+  const container = document.getElementById('m-ascent');
+  if(!container) return;
+
+  const totalDays = missionTotalDays();
+  const dark = isDark;
+
+  const C = {
+    bg:       dark ? '#161412' : '#F4EFE5',
+    terrain:  dark ? 'rgba(237,231,219,.06)' : 'rgba(28,25,20,.06)',
+    ridge:    dark ? 'rgba(237,231,219,.18)' : 'rgba(28,25,20,.18)',
+    path:     dark ? '#C9A45A' : '#9A7B3C',
+    pathMute: dark ? 'rgba(201,164,90,.22)' : 'rgba(154,123,60,.18)',
+    marker:   dark ? '#C9A45A' : '#9A7B3C',
+    flag:     dark ? '#4A8C4A' : '#2E5C2E',
+    text1:    dark ? '#EDE7DB' : '#1B1814',
+    text2:    dark ? '#6A6460' : '#8C857B',
+    text3:    dark ? 'rgba(237,231,219,.18)' : 'rgba(28,25,20,.14)',
+    snow:     dark ? 'rgba(237,231,219,.08)' : 'rgba(255,255,255,.55)',
+  };
+
+  const W = container.offsetWidth || 320;
+  const CARD_H = 148;
+  const GAP = 28;
+  const TOTAL_H = DISCIPLINES.length * (CARD_H + GAP);
+
+  // Mountain path generator — unique profile per discipline
+  function mountainPath(seed, w, h, peaks){
+    // Generate a convincing mountain silhouette
+    // Main peak at ~60-70% from left, secondary peaks
+    const pad = 12;
+    const baseY = h - 16;
+    const summitX = w * (0.58 + (seed % 7) * 0.02);
+    const summitY = pad + 8 + (seed % 4) * 6;
+
+    // Left shoulder
+    const ls1x = summitX * 0.28;
+    const ls1y = baseY - (baseY - summitY) * 0.22;
+    const ls2x = summitX * 0.62;
+    const ls2y = baseY - (baseY - summitY) * 0.72;
+
+    // Right descent
+    const rs1x = summitX + (w - summitX) * 0.32;
+    const rs1y = baseY - (baseY - summitY) * 0.58;
+    const rs2x = summitX + (w - summitX) * 0.68;
+    const rs2y = baseY - (baseY - summitY) * 0.18;
+
+    // Secondary peak left
+    const sp1x = summitX * 0.44;
+    const sp1y = baseY - (baseY - summitY) * 0.38 - (seed % 3) * 8;
+
+    return {
+      outline: `M ${pad},${baseY} L ${ls1x},${ls1y} Q ${sp1x},${sp1y - 12} ${ls2x},${ls2y} Q ${summitX - 8},${summitY + 4} ${summitX},${summitY} Q ${summitX + 6},${summitY + 3} ${rs1x},${rs1y} Q ${rs2x},${rs2y + 4} ${w - pad},${baseY} Z`,
+      ridgeline: `M ${pad},${baseY} L ${ls1x},${ls1y} Q ${sp1x},${sp1y - 12} ${ls2x},${ls2y} Q ${summitX - 8},${summitY + 4} ${summitX},${summitY} Q ${summitX + 6},${summitY + 3} ${rs1x},${rs1y} Q ${rs2x},${rs2y + 4} ${w - pad},${baseY}`,
+      summitX,
+      summitY,
+      baseX: pad,
+      baseY,
+      // Snow cap: small arc near summit
+      snowCap: `M ${summitX - 11},${summitY + 10} Q ${summitX - 6},${summitY + 2} ${summitX},${summitY} Q ${summitX + 5},${summitY + 2} ${summitX + 9},${summitY + 8} Q ${summitX},${summitY + 14} ${summitX - 11},${summitY + 10} Z`,
+      // Ascent path along left face
+      ascentPath(pct){
+        // Interpolate from base along left ridge to summit
+        const t = Math.min(1, Math.max(0, pct));
+        if(t === 0) return null;
+        // Points along the ascent route
+        const pts = [
+          [pad, baseY],
+          [ls1x, ls1y],
+          [sp1x, sp1y - 8],
+          [ls2x, ls2y],
+          [summitX, summitY],
+        ];
+        const totalSegs = pts.length - 1;
+        const prog = t * totalSegs;
+        const seg = Math.min(Math.floor(prog), totalSegs - 1);
+        const frac = prog - seg;
+
+        // Build path up to current segment
+        let d = `M ${pts[0][0]},${pts[0][1]}`;
+        for(let i = 1; i <= seg; i++) d += ` L ${pts[i][0]},${pts[i][1]}`;
+        // Partial last segment
+        if(seg < totalSegs){
+          const px = pts[seg][0] + (pts[seg+1][0] - pts[seg][0]) * frac;
+          const py = pts[seg][1] + (pts[seg+1][1] - pts[seg][1]) * frac;
+          d += ` L ${px},${py}`;
+        }
+
+        // Current marker position
+        let mx, my;
+        if(t >= 1){
+          mx = summitX; my = summitY;
+        } else {
+          const px = pts[seg][0] + (pts[seg+1][0] - pts[seg][0]) * frac;
+          const py = pts[seg][1] + (pts[seg+1][1] - pts[seg][1]) * frac;
+          mx = px; my = py;
+        }
+        return { d, mx, my };
+      }
+    };
+  }
+
+  let html = '';
+
+  DISCIPLINES.forEach((disc, idx) => {
+    const pct = completionRate(disc.id) / 100;
+    const completed = completionDays(disc.id);
+    const isComplete = pct >= 1.0;
+    const mtn = mountainPath(idx * 7 + 3, W, CARD_H - 28, 1);
+    const ascent = mtn.ascentPath(pct);
+    const uid = `ascent-${idx}`;
+
+    html += `<div style="margin-bottom:${GAP}px;">`;
+
+    // Label row
+    html += `<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+      <span style="font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:${C.text2};">${disc.name}</span>
+      <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;font-weight:300;color:${isComplete ? C.flag : C.path};">${isComplete ? 'Summit' : Math.round(pct * 100) + '%'}</span>
+    </div>`;
+
+    // SVG mountain
+    html += `<svg id="${uid}" xmlns="http://www.w3.org/2000/svg" width="${W}" height="${CARD_H - 28}" viewBox="0 0 ${W} ${CARD_H - 28}" style="display:block;overflow:visible;">
+      <defs>
+        <linearGradient id="mtnGrad${idx}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${C.terrain}" stop-opacity="1"/>
+          <stop offset="100%" stop-color="${C.terrain}" stop-opacity="0.3"/>
+        </linearGradient>
+        <linearGradient id="pathGrad${idx}" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="${C.path}" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="${C.path}" stop-opacity="1"/>
+        </linearGradient>
+        <filter id="glow${idx}" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- Mountain fill -->
+      <path d="${mtn.outline}" fill="url(#mtnGrad${idx})"/>
+
+      <!-- Mountain ridgeline -->
+      <path d="${mtn.ridgeline}" fill="none" stroke="${C.ridge}" stroke-width="1" stroke-linejoin="round"/>
+
+      <!-- Snow cap -->
+      <path d="${mtn.snowCap}" fill="${C.snow}" stroke="none"/>
+
+      <!-- Dotted full ascent route (ghost path) -->
+      ${ascent ? `<path d="${mtn.ascentPath(1).d}" fill="none" stroke="${C.pathMute}" stroke-width="1.2" stroke-dasharray="2,3" stroke-linecap="round"/>` : ''}
+
+      <!-- Completed ascent path -->
+      ${ascent && pct > 0 ? `<path d="${ascent.d}" fill="none" stroke="url(#pathGrad${idx})" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
+
+      <!-- Base camp marker -->
+      <circle cx="${mtn.baseX}" cy="${mtn.baseY}" r="4" fill="none" stroke="${C.ridge}" stroke-width="1.2"/>
+      <circle cx="${mtn.baseX}" cy="${mtn.baseY}" r="1.5" fill="${C.ridge}"/>
+      <text x="${mtn.baseX + 7}" y="${mtn.baseY + 4}" font-family="'DM Sans',sans-serif" font-size="8" fill="${C.text2}" letter-spacing="0.5">BASE</text>
+
+      <!-- Summit marker -->
+      ${isComplete ? `
+        <!-- Summit flag when complete -->
+        <line x1="${mtn.summitX}" y1="${mtn.summitY - 14}" x2="${mtn.summitX}" y2="${mtn.summitY + 2}" stroke="${C.flag}" stroke-width="1.2"/>
+        <polygon points="${mtn.summitX},${mtn.summitY - 14} ${mtn.summitX + 10},${mtn.summitY - 10} ${mtn.summitX},${mtn.summitY - 6}" fill="${C.flag}" opacity="0.9"/>
+        <circle cx="${mtn.summitX}" cy="${mtn.summitY}" r="3" fill="${C.flag}"/>
+      ` : `
+        <!-- Summit △ not yet reached -->
+        <polygon points="${mtn.summitX},${mtn.summitY - 8} ${mtn.summitX - 5},${mtn.summitY + 2} ${mtn.summitX + 5},${mtn.summitY + 2}" fill="none" stroke="${C.ridge}" stroke-width="1" stroke-linejoin="round"/>
+      `}
+
+      <!-- Current position marker (if in progress) -->
+      ${ascent && pct > 0 && pct < 1 ? `
+        <circle cx="${ascent.mx}" cy="${ascent.my}" r="8" fill="${C.marker}" opacity="0.12"/>
+        <circle cx="${ascent.mx}" cy="${ascent.my}" r="4.5" fill="${C.marker}" filter="url(#glow${idx})"/>
+        <circle cx="${ascent.mx}" cy="${ascent.my}" r="1.8" fill="${dark ? '#161412' : '#F4EFE5'}"/>
+      ` : ''}
+
+      <!-- Day counter -->
+      <text x="${W - 12}" y="${mtn.baseY + 4}" font-family="'DM Sans',sans-serif" font-size="8" fill="${C.text2}" text-anchor="end" letter-spacing="0.3">${completed} / ${totalDays} days</text>
+    </svg>`;
+
+    // Thin separator
+    if(idx < DISCIPLINES.length - 1){
+      html += `<div style="height:1px;background:${C.text3};margin-top:${GAP - 4}px;"></div>`;
+    }
+
+    html += `</div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function missionTotalDays(){
+  const start = keyToDate(mission.startDate);
+  const end = keyToDate(mission.targetDate);
+  return Math.max(1, Math.round((end - start) / 86400000));
+}
+
+function completionDays(discId){
+  const idx = DISCIPLINES.findIndex(d => d.id === discId);
+  if(idx < 0) return 0;
+  return Object.values(records).filter(r =>
+    r.disciplines && r.disciplines[idx] && r.disciplines[idx].done
+  ).length;
 }
 
 function applyMissionSettings(){
@@ -2880,6 +3093,7 @@ function toggleDark(){
   document.getElementById('dkt-lbl').textContent = isDark ? 'Dark' : 'Light';
   save();
   if(activeTab === 'patterns') renderPatterns();
+  if(activeTab === 'mission') renderDisciplineAscent();
   renderSparkline();
 }
 
