@@ -1545,7 +1545,7 @@ const DEFAULT_MISSION = {
 };
 
 const DISCIPLINES = [
-  {id:'d1', name:'Wake at 4:30 am',    category:'Discipline', kcalPerMin:0,   defaultDur:0,  travelName:'Wake at 4:30 am'},
+  {id:'d1', name:'Wake Early',    category:'Discipline', kcalPerMin:0,   defaultDur:0,  travelName:'Wake Early'},
   {id:'d2', name:'Angamardana',         category:'Sadhana',    kcalPerMin:6.9, defaultDur:45, travelName:'Room Stretching'},
   {id:'d3', name:'10,000 Steps',        category:'Fitness',    kcalPerMin:0,   defaultDur:0,  travelName:'10,000 Steps'},
   {id:'d4', name:'Kriya',               category:'Sadhana',    kcalPerMin:2.7, defaultDur:30, travelName:'Kriya'},
@@ -2134,9 +2134,17 @@ function renderDiscDots(){
   el.innerHTML = '';
   DISCIPLINES.forEach((disc, i) => {
     const done = todayDiscs[i] && todayDiscs[i].done;
-    const displayName = travelMode ? disc.travelName : disc.name;
-    // Shorten for dot label
-    const short = displayName.replace('Wake at 4:30 am','Wake').replace('Angamardana','Angamar.').replace('10,000 Steps','Steps').replace('Dumbbell Training','Dumbbell').replace('Bodyweight Training','Bodyweight').replace('Room Stretching','Stretch');
+    let displayName = travelMode ? disc.travelName : disc.name;
+    // Dynamic wake target for d1
+    if(disc.id === 'd1') displayName = getWakeDisplayName();
+    const short = displayName
+      .replace(/Wake at \d+:\d+ [ap]m/i, 'Wake')
+      .replace('Angamardana','Angamar.')
+      .replace('10,000 Steps','Steps')
+      .replace('Dumbbell Training','Dumbbell')
+      .replace('Bodyweight Training','Bodyweight')
+      .replace('Room Stretching','Stretch')
+      .replace('Wake Early','Wake');
     const div = document.createElement('div');
     div.className = 'dd-item' + (done ? ' done' : '');
     div.innerHTML = `<div class="dd-dot"></div><div class="dd-name">${short}</div>`;
@@ -3620,7 +3628,36 @@ function saveRecord(){
 }
 
 // ═══════════════════════════════════════════════
-// GOOGLE FIT INTEGRATION
+// GRADUAL WAKE TARGET
+// 6:45am → 4:30am over 45 days, 15 min per 5 days
+// ═══════════════════════════════════════════════
+function getWakeTarget(){
+  const day = missionDay(); // 1-indexed
+  // Schedule: every 5 days shift 15 minutes earlier
+  // Day 1–5: 6:45, Day 6–10: 6:30 ... Day 46+: 4:30
+  const START_MINS = 6 * 60 + 45; // 6:45am in minutes
+  const TARGET_MINS = 4 * 60 + 30; // 4:30am in minutes
+  const STEP = 15; // minutes per shift
+  const DAYS_PER_STEP = 5;
+
+  const shiftsCompleted = Math.floor((day - 1) / DAYS_PER_STEP);
+  const currentMins = Math.max(TARGET_MINS, START_MINS - shiftsCompleted * STEP);
+
+  const hours = Math.floor(currentMins / 60);
+  const mins = currentMins % 60;
+  const ampm = hours < 12 ? 'am' : 'pm';
+  const h12 = hours > 12 ? hours - 12 : hours;
+  return {
+    label: `${h12}:${String(mins).padStart(2,'0')} ${ampm}`,
+    reached: currentMins === TARGET_MINS,
+    minutes: currentMins,
+  };
+}
+
+function getWakeDisplayName(){
+  const { label, reached } = getWakeTarget();
+  return reached ? 'Wake at 4:30 am' : `Wake at ${label}`;
+}
 // ═══════════════════════════════════════════════
 const GFIT_CLIENT_ID = '825016103270-3nqqek01ct3dgbmaakfs8bceoskfbqoq.apps.googleusercontent.com';
 const GFIT_SCOPE = 'https://www.googleapis.com/auth/fitness.activity.read';
@@ -4230,7 +4267,9 @@ function renderDisciplineAscent(){
   ${routes.map((r,i) => {
     const lx = Math.max(28, Math.min(W - 28, parseFloat(r.basePos.x)));
     const ly = baseY + 14;
-    const shortName = r.disc.name.replace('10,000 Steps','10,000').replace('Dumbbell Training','Dumbbell').replace('Wake at 4:30 am','Wake').replace('Angamardana','Angamar.').replace('Kriya','Kriya');
+    const shortName = r.disc.name === 'Wake Early'
+      ? getWakeDisplayName().replace(/Wake at /i,'').replace(' am','').replace(' pm','')
+      : r.disc.name.replace('10,000 Steps','10,000').replace('Dumbbell Training','Dumbbell').replace('Wake at 4:30 am','Wake').replace('Angamardana','Angamar.').replace('Kriya','Kriya');
     return `
       <line x1="${r.basePos.x.toFixed(1)}" y1="${baseY}" x2="${r.basePos.x.toFixed(1)}" y2="${baseY + 6}" stroke="${r.color}" stroke-width="1" opacity="0.5"/>
       <text x="${lx}" y="${ly}" font-family="'DM Sans',sans-serif" font-size="8.5" fill="${r.color}" text-anchor="middle" opacity="0.9">${shortName}</text>
