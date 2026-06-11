@@ -311,7 +311,7 @@ html,body{
 .pace-line.at-risk{color:var(--risk-at);}
 
 /* Discipline dots */
-.disc-dots-wrap{padding:var(--s4) var(--pad) var(--s3);}
+.disc-dots-wrap{padding:var(--s4) var(--pad) var(--s2);}
 .disc-dots{display:flex;gap:0;justify-content:space-between;}
 .dd-item{
   display:flex;flex-direction:column;align-items:center;gap:var(--s1);
@@ -336,6 +336,11 @@ html,body{
   transition:color .2s;
 }
 .dd-item.done .dd-name{color:var(--t3);}
+.wake-target-line{
+  text-align:center;
+  font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;
+  color:var(--t3);padding:0 var(--pad) var(--s3);
+}
 
 /* Meal one-liner */
 .meal-oneliner{
@@ -1267,6 +1272,8 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
   <div class="disc-dots-wrap">
     <div class="disc-dots" id="disc-dots"></div>
   </div>
+  <!-- Wake target line -->
+  <div class="wake-target-line" id="wake-target-line"></div>
 
   <!-- Thin rule -->
   <div style="margin:0 28px;height:1px;background:var(--rl);"></div>
@@ -1328,7 +1335,7 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
         <div class="gfit-status" id="gfit-status">Tap to sync from Google Fit</div>
       </div>
       <button class="gfit-btn" id="gfit-btn" onclick="syncGoogleFit()">Sync →</button>
-      <button id="gfit-disconnect" onclick="disconnectGoogleFit()" style="display:none;background:none;border:none;font-family:var(--sans);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t4);cursor:pointer;padding:8px 4px;margin-left:8px;-webkit-tap-highlight-color:transparent;">Disconnect</button>
+      <button id="gfit-disconnect" onclick="disconnectGoogleFit()" style="display:none;background:none;border:none;font-family:var(--sans);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t4);cursor:pointer;padding:8px 8px;margin-left:4px;-webkit-tap-highlight-color:transparent;border-bottom:1px solid var(--rl);">Disconnect</button>
     </div>
   </div>
 
@@ -2132,26 +2139,44 @@ function renderDiscDots(){
   if(!el) return;
   const todayRec = records[todayKey()] || {};
   const todayDiscs = todayRec.disciplines || [];
+  const { label: wakeLabel, reached } = getWakeTarget();
   el.innerHTML = '';
+
   DISCIPLINES.forEach((disc, i) => {
     const done = todayDiscs[i] && todayDiscs[i].done;
     let displayName = travelMode ? disc.travelName : disc.name;
-    // Dynamic wake target for d1
     if(disc.id === 'd1') displayName = getWakeDisplayName();
-    const short = displayName
-      .replace(/Wake at \d+:\d+ [ap]m/i, 'Wake')
-      .replace('Angamardana','Angamar.')
-      .replace('10,000 Steps','Steps')
-      .replace('Dumbbell Training','Dumbbell')
-      .replace('Bodyweight Training','Bodyweight')
-      .replace('Room Stretching','Stretch')
-      .replace('Wake Early','Wake');
+
+    // Dot label — short version
+    let short;
+    if(disc.id === 'd1'){
+      short = wakeLabel; // show the actual time e.g. "6:45 am"
+    } else {
+      short = displayName
+        .replace('Angamardana','Angamar.')
+        .replace('10,000 Steps','Steps')
+        .replace('Dumbbell Training','Dumbbell')
+        .replace('Bodyweight Training','Bodyweight')
+        .replace('Room Stretching','Stretch')
+        .replace('Wake Early','Wake');
+    }
+
     const div = document.createElement('div');
     div.className = 'dd-item' + (done ? ' done' : '');
     div.innerHTML = `<div class="dd-dot"></div><div class="dd-name">${short}</div>`;
     div.addEventListener('click', () => toggleTodayDiscDot(i, div));
     el.appendChild(div);
   });
+
+  // Wake target line
+  const wakeLine = document.getElementById('wake-target-line');
+  if(wakeLine){
+    if(reached){
+      wakeLine.textContent = 'Wake target reached — 4:30 am';
+    } else {
+      wakeLine.textContent = `Today's wake target: ${wakeLabel}`;
+    }
+  }
 }
 
 function toggleTodayDiscDot(idx, el){
@@ -3670,8 +3695,9 @@ function initGoogleFit(){
   const expiry = localStorage.getItem('gfit_token_expiry');
   if(saved && expiry && Date.now() < parseInt(expiry)){
     gfitToken = saved;
-    updateGfitUI(true);
   }
+  // Always update UI on load — will show disconnect if connected
+  setTimeout(() => updateGfitUI(!!gfitToken), 300);
 }
 
 function syncGoogleFit(){
