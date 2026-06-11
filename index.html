@@ -3865,7 +3865,10 @@ function getActualMeals(dateKey){
 
 function getActualSlotItem(dateKey, slotKey){
   const actual = getActualMeals(dateKey);
-  if(actual[slotKey]) return { item: actual[slotKey], deviated: true };
+  if(slotKey in actual){
+    if(actual[slotKey] === null) return null; // explicitly skipped
+    return { item: actual[slotKey], deviated: true };
+  }
 
   // Fall back to plan
   const plan = meals[dateKey];
@@ -3917,32 +3920,55 @@ function renderActualMeals(){
 
   ACTUAL_SLOTS.forEach(slot => {
     const result = getActualSlotItem(key, slot.key);
+    const actual = getActualMeals(key);
+    const isSkipped = actual[slot.key] === null; // explicitly skipped
     const item = result ? result.item : null;
     const deviated = result ? result.deviated : false;
-    if(item){ anyData = true; totalCal += item.cal||0; totalPro += item.pro||0; totalCarb += item.carb||0; totalFat += item.fat||0; }
+
+    if(item && !isSkipped){
+      anyData = true;
+      totalCal  += item.cal||0;
+      totalPro  += item.pro||0;
+      totalCarb += item.carb||0;
+      totalFat  += item.fat||0;
+    }
 
     const div = document.createElement('div');
     div.className = 'am-slot';
-    div.innerHTML = `
-      <div class="am-slot-left">
-        <div class="am-slot-label">${slot.label}</div>
-        <div class="am-slot-dish ${deviated ? 'deviated' : 'from-plan'}">${item ? item.name : '—'}</div>
-        ${deviated ? '<div class="am-slot-tag">Edited</div>' : (item ? '<div style="font-size:9px;letter-spacing:.1em;color:var(--t4);margin-top:2px;">From plan · tap to edit</div>' : '')}
-      </div>
-      <div class="am-slot-right">
-        <div class="am-slot-cal">${item ? item.cal : '—'}</div>
-        <div class="am-slot-edit">kcal</div>
-      </div>`;
-    div.addEventListener('click', () => openActualMealEdit(key, slot.key));
+
+    if(isSkipped){
+      // Skipped state
+      div.innerHTML = `
+        <div class="am-slot-left">
+          <div class="am-slot-label">${slot.label}</div>
+          <div class="am-slot-dish" style="color:var(--t4);font-style:italic;">Skipped</div>
+        </div>
+        <div class="am-slot-right" style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+          <span style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t4);cursor:pointer;" onclick="restoreActualSlot('${key}','${slot.key}')">Restore</span>
+        </div>`;
+      div.addEventListener('click', () => openActualMealEdit(key, slot.key));
+    } else {
+      div.innerHTML = `
+        <div class="am-slot-left" style="cursor:pointer;" onclick="openActualMealEdit('${key}','${slot.key}')">
+          <div class="am-slot-label">${slot.label}</div>
+          <div class="am-slot-dish ${deviated ? 'deviated' : 'from-plan'}">${item ? item.name : '—'}</div>
+          ${deviated ? '<div class="am-slot-tag">Edited</div>' : (item ? '<div style="font-size:9px;letter-spacing:.1em;color:var(--t4);margin-top:2px;">From plan · tap to edit</div>' : '')}
+        </div>
+        <div class="am-slot-right" style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+          <div class="am-slot-cal">${item ? item.cal : '—'}</div>
+          <div class="am-slot-edit">kcal</div>
+          ${item ? `<span style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t4);cursor:pointer;margin-top:2px;" onclick="event.stopPropagation();skipActualSlot('${key}','${slot.key}')">Skip</span>` : ''}
+        </div>`;
+    }
+
     slotsEl.appendChild(div);
   });
 
   if(!anyData){
-    summEl.innerHTML = `<div style="font-family:var(--serif);font-size:14px;font-weight:300;font-style:italic;color:var(--t4);">Pre-filled from meal plan. Tap any slot to edit.</div>`;
+    summEl.innerHTML = `<div style="font-family:var(--serif);font-size:14px;font-weight:300;font-style:italic;color:var(--t4);">Pre-filled from meal plan. Tap any slot to edit, or skip if not eaten.</div>`;
     return;
   }
 
-  // Compare with planned
   const plan = meals[key];
   const planned = plan ? mealDayTotals(plan).cal : null;
   const gap = planned ? (totalCal - planned) : null;
@@ -3959,6 +3985,24 @@ function renderActualMeals(){
       <span style="font-family:var(--serif);font-size:15px;font-weight:300;color:var(--t2);">${totalPro}g / ${totalCarb}g / ${totalFat}g</span>
     </div>
     ${gap !== null ? `<div style="font-family:var(--serif);font-size:14px;font-weight:300;font-style:italic;color:${gapColor};margin-top:4px;">${gapText}</div>` : ''}`;
+}
+
+function skipActualSlot(dateKey, slotKey){
+  if(!records[dateKey]) records[dateKey] = {};
+  if(!records[dateKey].actualMeals) records[dateKey].actualMeals = {};
+  records[dateKey].actualMeals[slotKey] = null; // null = explicitly skipped
+  save();
+  renderActualMeals();
+  renderDeficitHero();
+}
+
+function restoreActualSlot(dateKey, slotKey){
+  if(records[dateKey] && records[dateKey].actualMeals){
+    delete records[dateKey].actualMeals[slotKey];
+  }
+  save();
+  renderActualMeals();
+  renderDeficitHero();
 }
 
 function openActualMealEdit(dateKey, slotKey){
