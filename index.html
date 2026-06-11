@@ -95,6 +95,7 @@ html,body{
   position:relative;
   transition:background .35s,color .35s;
   overflow:hidden;
+  touch-action:pan-y;
 }
 
 /* ── SCREENS ── */
@@ -4589,10 +4590,9 @@ function toggleDark(){
 // SWIPE
 // ═══════════════════════════════════════════════
 function initSwipe(){
-  const phone = document.getElementById('phone');
   let startX=0, startY=0, startTime=0;
-  phone.addEventListener('touchstart', e => { startX=e.touches[0].clientX; startY=e.touches[0].clientY; startTime=Date.now(); }, {passive:true});
-  phone.addEventListener('touchend', e => {
+  document.addEventListener('touchstart', e => { startX=e.touches[0].clientX; startY=e.touches[0].clientY; startTime=Date.now(); }, {passive:true});
+  document.addEventListener('touchend', e => {
     const dx=e.changedTouches[0].clientX-startX, dy=e.changedTouches[0].clientY-startY, dt=Date.now()-startTime;
     if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.5 && dt<400){
       const cur=TAB_ORDER.indexOf(activeTab);
@@ -4653,7 +4653,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v11';
+const CACHE = 'mission-os-v12';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
@@ -4693,7 +4693,7 @@ self.addEventListener('fetch', e => {
   try {
     const blob = new Blob([swCode], {type:'application/javascript'});
     const swUrl = URL.createObjectURL(blob);
-    navigator.serviceWorker.register(swUrl, {scope:'/'})
+    navigator.serviceWorker.register(swUrl, {scope: location.pathname.replace(/[^/]*$/, '') || '/'})
       .then(() => console.log('Mission OS: SW registered'))
       .catch(() => {}); // silent fail
   } catch(e) {}
