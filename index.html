@@ -4579,7 +4579,6 @@ function switchTab(tab, direction){
 function toggleDark(){
   isDark = !isDark;
   document.getElementById('phone').classList.toggle('dk', isDark);
-  document.getElementById('dkt-lbl').textContent = isDark ? 'Dark' : 'Light';
   save();
   if(activeTab === 'patterns') renderPatterns();
   if(activeTab === 'mission') renderDisciplineAscent();
@@ -4624,7 +4623,6 @@ function init(){
   load();
   if(isDark){
     document.getElementById('phone').classList.add('dk');
-    document.getElementById('dkt-lbl').textContent = 'Dark';
   }
   renderToday();
   syncRecordInputs();
