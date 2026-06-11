@@ -1328,6 +1328,7 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
         <div class="gfit-status" id="gfit-status">Tap to sync from Google Fit</div>
       </div>
       <button class="gfit-btn" id="gfit-btn" onclick="syncGoogleFit()">Sync →</button>
+      <button id="gfit-disconnect" onclick="disconnectGoogleFit()" style="display:none;background:none;border:none;font-family:var(--sans);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t4);cursor:pointer;padding:8px 4px;margin-left:8px;-webkit-tap-highlight-color:transparent;">Disconnect</button>
     </div>
   </div>
 
@@ -3825,16 +3826,27 @@ async function fetchStepsFromFit(){
   }
 }
 
+function disconnectGoogleFit(){
+  gfitToken = null;
+  localStorage.removeItem('gfit_token');
+  localStorage.removeItem('gfit_token_expiry');
+  updateGfitUI(false);
+  const status = document.getElementById('gfit-status');
+  if(status) status.textContent = 'Disconnected · tap Sync to connect a new account';
+}
+
 function updateGfitUI(connected){
   const btn = document.getElementById('gfit-btn');
   const status = document.getElementById('gfit-status');
   const display = document.getElementById('gfit-steps-display');
+  const disconnectBtn = document.getElementById('gfit-disconnect');
   if(!btn) return;
+
+  if(disconnectBtn) disconnectBtn.style.display = connected ? 'block' : 'none';
 
   if(connected){
     btn.textContent = 'Sync →';
     btn.className = 'gfit-btn connected';
-    // Show last known steps if available
     const key = keyForOffset(dayOffset);
     const rec = records[key] || {};
     if(rec.steps && display){
@@ -3847,6 +3859,7 @@ function updateGfitUI(connected){
   } else {
     btn.textContent = 'Sync →';
     btn.className = 'gfit-btn';
+    if(display) display.className = 'gfit-steps unsynced';
     if(status) status.textContent = 'Tap to sync from Google Fit';
   }
 }
