@@ -560,7 +560,26 @@ html,body{
   text-transform:uppercase;color:var(--t4);
 }
 
-/* Notes textarea */
+/* Google Fit sync */
+.gfit-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:var(--s2) 0;border-bottom:1px solid var(--rl);
+}
+.gfit-left{flex:1;}
+.gfit-label{font-family:var(--sans);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--t4);margin-bottom:3px;}
+.gfit-steps{font-family:var(--serif);font-size:28px;font-weight:300;color:var(--t1);}
+.gfit-steps.unsynced{color:var(--t4);}
+.gfit-btn{
+  font-family:var(--sans);font-size:9px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--t3);
+  border:1px solid var(--rl);padding:8px 12px;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:all .15s;white-space:nowrap;flex-shrink:0;
+  background:none;
+}
+.gfit-btn:active{color:var(--ac);border-color:var(--ac);}
+.gfit-btn.connected{color:var(--risk-on);border-color:var(--risk-on);}
+.gfit-status{font-family:var(--serif);font-size:12px;font-weight:300;font-style:italic;color:var(--t4);margin-top:2px;}
 .notes-ta{
   background:none;border:none;
   border-bottom:1px solid var(--rl);
@@ -1297,8 +1316,23 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
     <div id="r-actual-summary"></div>
   </div>
 
+  <!-- Google Fit Steps -->
+  <div class="rec-section" style="padding-bottom:0;">
+    <div class="rec-section-head">
+      <span class="rec-section-label">Steps</span>
+    </div>
+    <div class="gfit-row">
+      <div class="gfit-left">
+        <div class="gfit-label">Today's Steps</div>
+        <div class="gfit-steps unsynced" id="gfit-steps-display">—</div>
+        <div class="gfit-status" id="gfit-status">Tap to sync from Google Fit</div>
+      </div>
+      <button class="gfit-btn" id="gfit-btn" onclick="syncGoogleFit()">Sync →</button>
+    </div>
+  </div>
+
   <!-- Rule -->
-  <div style="margin:0 28px;height:1px;background:var(--rl);"></div>
+  <div style="margin:0 var(--pad);height:1px;background:var(--rl);"></div>
 
   <!-- Notes -->
   <div class="rec-section">
@@ -2562,7 +2596,32 @@ const MASTER_DB = [{"id":"b001","name":"Puttu","mealSlot":"breakfast","category"
 
 {"id":"bev001","name":"Coffee with Milk & Sugar","mealSlot":"snack","category":"beverage","servingSize":"1 cup (~200ml) — 2 tsp sugar, 30ml milk","calories":80,"protein":3,"carbs":10,"fat":3,"fiber":0,"satietyScore":3,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Kannur","Vegetarian","Coffee","Beverage"]},
 {"id":"bev002","name":"Lemon Juice with Sugar","mealSlot":"snack","category":"beverage","servingSize":"1 glass (~200ml) — fresh lemon, 2 tsp sugar","calories":60,"protein":0,"carbs":15,"fat":0,"fiber":0,"satietyScore":3,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Vegetarian","Lemon","Beverage","TGFriendly"]},
-{"id":"bev003","name":"Lemon Tea with Sugar","mealSlot":"snack","category":"beverage","servingSize":"1 cup (~200ml) — black tea, fresh lemon, 1 tsp sugar","calories":45,"protein":0,"carbs":11,"fat":0,"fiber":0,"satietyScore":2,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Vegetarian","Lemon","Tea","Beverage","TGFriendly","WeightLoss"]}];
+{"id":"bev003","name":"Lemon Tea with Sugar","mealSlot":"snack","category":"beverage","servingSize":"1 cup (~200ml) — black tea, fresh lemon, 1 tsp sugar","calories":45,"protein":0,"carbs":11,"fat":0,"fiber":0,"satietyScore":2,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Vegetarian","Lemon","Tea","Beverage","TGFriendly","WeightLoss"]},
+
+{"id":"vk001","name":"Vazhakoombu Thoran (Banana Flower)","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g) banana flower stir-fried with coconut & spices","calories":100,"protein":4,"carbs":15,"fat":3,"fiber":4,"satietyScore":5,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Vegetarian","Fiber","TGFriendly","WeightLoss","Vazhakoombu","BananaFlower"]},
+{"id":"vk002","name":"Vazhakaambu Mezhukkupuratti (Banana Stem)","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g) banana stem stir-fried with shallots & spices","calories":65,"protein":2,"carbs":10,"fat":3,"fiber":5,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Vegetarian","Fiber","TGFriendly","WeightLoss","VazhaKaambu","BananaStem"]},
+
+{"id":"mzk001","name":"Vazhakka Mezhukkupuratti (Raw Banana)","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g) raw banana stir-fried with coconut oil & spices","calories":110,"protein":2,"carbs":20,"fat":4,"fiber":3,"satietyScore":6,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Vegetarian","Fiber","Mezhukkupuratti"]},
+{"id":"mzk002","name":"Chena Mezhukkupuratti (Elephant Yam)","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g) elephant yam stir-fried with shallots & spices","calories":95,"protein":2,"carbs":16,"fat":4,"fiber":3,"satietyScore":6,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Vegetarian","Fiber","Mezhukkupuratti","Chena"]},
+{"id":"mzk003","name":"Pavakka Mezhukkupuratti (Bitter Gourd)","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g) bitter gourd stir-fried with shallots","calories":70,"protein":2,"carbs":8,"fat":4,"fiber":3,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","Fiber","TGFriendly","WeightLoss","Mezhukkupuratti","Pavakka"]},
+{"id":"mzk004","name":"Kovakka Mezhukkupuratti (Ivy Gourd)","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g) ivy gourd stir-fried","calories":75,"protein":2,"carbs":10,"fat":4,"fiber":3,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","Fiber","TGFriendly","Mezhukkupuratti","Kovakka"]},
+{"id":"mzk005","name":"Koorkka Mezhukkupuratti (Chinese Potato)","mealSlot":"lunch","category":"thoran","servingSize":"1 serving (~80g) koorkka stir-fried with shallots","calories":90,"protein":2,"carbs":15,"fat":4,"fiber":2,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Kannur","Vegetarian","Mezhukkupuratti","Koorkka"]},
+
+{"id":"cnd002","name":"Coconut Chammanthi (1 spoon)","mealSlot":"any","category":"condiment","servingSize":"1 tablespoon (~15g) fresh coconut chutney with green chilli & shallots","calories":40,"protein":1,"carbs":2,"fat":4,"fiber":1,"satietyScore":2,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Lunch","Kerala","Kannur","Vegetarian","Condiment","Chammanthi"]},
+{"id":"cnd003","name":"Red Chammanthi (1 spoon)","mealSlot":"any","category":"condiment","servingSize":"1 tablespoon (~15g) dried chilli, shallot & coconut chammanthi","calories":35,"protein":1,"carbs":3,"fat":3,"fiber":1,"satietyScore":2,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Breakfast","Lunch","Kerala","Kannur","Vegetarian","Condiment","Chammanthi"]},
+
+{"id":"knj001","name":"Kanji + Puzhukku + Chammanthi","mealSlot":"dinner","category":"dinner_millet","servingSize":"1 bowl kanji (~250ml) + puzhukku (~80g) + 1 tbsp chammanthi","calories":280,"protein":5,"carbs":48,"fat":7,"fiber":6,"satietyScore":8,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Dinner","Kerala","Kannur","Vegetarian","Fiber","TGFriendly","WeightLoss","Kanji","Traditional"]},
+
+{"id":"fr010","name":"Chakka (Ripe Jackfruit) — 3 pods","mealSlot":"snack","category":"fruit","servingSize":"3 ripe jackfruit pods (~120g)","calories":95,"protein":2,"carbs":23,"fat":0,"fiber":2,"satietyScore":5,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Kannur","Fruit","TGFriendly","Chakka","Jackfruit"]},
+{"id":"fr011","name":"Seethapazham (Custard Apple)","mealSlot":"snack","category":"fruit","servingSize":"1 medium (~150g flesh)","calories":120,"protein":2,"carbs":28,"fat":1,"fiber":3,"satietyScore":6,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Fruit","TGFriendly","CustardApple","Seethapazham"]},
+{"id":"fr012","name":"Njaval (Black Plum / Jamun)","mealSlot":"snack","category":"fruit","servingSize":"10–12 fruits (~100g)","calories":62,"protein":1,"carbs":14,"fat":0,"fiber":1,"satietyScore":4,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Fruit","TGFriendly","WeightLoss","Jamun","Njaval"]},
+{"id":"fr013","name":"Nelli (Indian Gooseberry / Amla)","mealSlot":"snack","category":"fruit","servingSize":"3–4 fruits (~60g)","calories":26,"protein":0,"carbs":6,"fat":0,"fiber":2,"satietyScore":3,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Kannur","Fruit","TGFriendly","WeightLoss","Amla","Nelli"]},
+{"id":"fr014","name":"Rambutan","mealSlot":"snack","category":"fruit","servingSize":"5–6 fruits (~100g flesh)","calories":75,"protein":1,"carbs":18,"fat":0,"fiber":1,"satietyScore":4,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Kannur","Fruit","TGFriendly"]},
+{"id":"fr015","name":"Mangosteen","mealSlot":"snack","category":"fruit","servingSize":"2–3 segments (~80g flesh)","calories":50,"protein":0,"carbs":12,"fat":0,"fiber":2,"satietyScore":4,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Fruit","TGFriendly","WeightLoss"]},
+{"id":"fr016","name":"Star Fruit (Carambola)","mealSlot":"snack","category":"fruit","servingSize":"1 medium (~124g)","calories":38,"protein":1,"carbs":7,"fat":0,"fiber":3,"satietyScore":3,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Fruit","TGFriendly","WeightLoss","StarFruit"]},
+{"id":"fr017","name":"Breadfruit (Seema Chakka) — cooked","mealSlot":"snack","category":"fruit","servingSize":"1 cup cooked (~220g)","calories":170,"protein":2,"carbs":40,"fat":0,"fiber":7,"satietyScore":7,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Snack","Lunch","Kerala","Fruit","Fiber","TGFriendly"]},
+{"id":"fr018","name":"Sapodilla (Chikku / Sapota)","mealSlot":"snack","category":"fruit","servingSize":"1 medium (~100g)","calories":83,"protein":0,"carbs":20,"fat":1,"fiber":5,"satietyScore":6,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Fruit","Fiber","TGFriendly","Sapota","Chikku"]},
+{"id":"fr019","name":"Passion Fruit","mealSlot":"snack","category":"fruit","servingSize":"3–4 fruits (~60g flesh)","calories":35,"protein":1,"carbs":8,"fat":0,"fiber":5,"satietyScore":4,"proteinScore":1,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Fruit","Fiber","TGFriendly","WeightLoss"]}];
 
 // Category display labels
 const CAT_LABELS = {
@@ -3180,6 +3239,7 @@ function syncRecordInputs(){
   renderDeficitHero();
   renderActualMeals();
   renderSparkline();
+  updateGfitUI(!!gfitToken);
 }
 
 function renderDeficitHero(){
@@ -3431,7 +3491,200 @@ function saveRecord(){
 }
 
 // ═══════════════════════════════════════════════
-// ACTUAL MEALS — Record screen
+// GOOGLE FIT INTEGRATION
+// ═══════════════════════════════════════════════
+const GFIT_CLIENT_ID = '825016103270-3nqqek01ct3dgbmaakfs8bceoskfbqoq.apps.googleusercontent.com';
+const GFIT_SCOPE = 'https://www.googleapis.com/auth/fitness.activity.read';
+let gfitToken = null;
+
+// Load saved token on init
+function initGoogleFit(){
+  const saved = localStorage.getItem('gfit_token');
+  const expiry = localStorage.getItem('gfit_token_expiry');
+  if(saved && expiry && Date.now() < parseInt(expiry)){
+    gfitToken = saved;
+    updateGfitUI(true);
+  }
+}
+
+function syncGoogleFit(){
+  if(gfitToken){
+    // Already have token — just fetch steps
+    fetchStepsFromFit();
+  } else {
+    // Need to auth first
+    authGoogleFit();
+  }
+}
+
+function authGoogleFit(){
+  const btn = document.getElementById('gfit-btn');
+  const status = document.getElementById('gfit-status');
+  if(btn) btn.textContent = 'Connecting…';
+  if(status) status.textContent = 'Opening Google sign-in…';
+
+  const redirectUri = encodeURIComponent('https://shambojr.github.io/Mission82');
+  const scope = encodeURIComponent(GFIT_SCOPE);
+  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+    `client_id=${GFIT_CLIENT_ID}` +
+    `&redirect_uri=${redirectUri}` +
+    `&response_type=token` +
+    `&scope=${scope}` +
+    `&prompt=consent`;
+
+  // Open in popup
+  const popup = window.open(authUrl, 'gfit_auth', 'width=500,height=600,left=100,top=100');
+
+  // Poll for token in URL hash
+  const poll = setInterval(() => {
+    try {
+      if(popup.closed){
+        clearInterval(poll);
+        if(btn) btn.textContent = 'Sync →';
+        if(status) status.textContent = 'Tap to sync from Google Fit';
+        return;
+      }
+      const hash = popup.location.hash;
+      if(hash && hash.includes('access_token')){
+        clearInterval(poll);
+        popup.close();
+        const params = new URLSearchParams(hash.substring(1));
+        const token = params.get('access_token');
+        const expiresIn = parseInt(params.get('expires_in') || '3600');
+        if(token){
+          gfitToken = token;
+          localStorage.setItem('gfit_token', token);
+          localStorage.setItem('gfit_token_expiry', Date.now() + expiresIn * 1000);
+          updateGfitUI(true);
+          fetchStepsFromFit();
+        }
+      }
+    } catch(e){
+      // Cross-origin — popup not yet redirected back
+    }
+  }, 500);
+}
+
+async function fetchStepsFromFit(){
+  const btn = document.getElementById('gfit-btn');
+  const status = document.getElementById('gfit-status');
+  const display = document.getElementById('gfit-steps-display');
+
+  if(btn) btn.textContent = 'Syncing…';
+  if(status) status.textContent = 'Fetching today\'s steps…';
+
+  // Get today's start and end in milliseconds
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const endOfDay = startOfDay + 86400000;
+
+  try {
+    const res = await fetch(
+      'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${gfitToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          aggregateBy: [{
+            dataTypeName: 'com.google.step_count.delta',
+            dataSourceId: 'derived:com.google.step_count.delta:com.google.android.gms:estimated_steps'
+          }],
+          bucketByTime: { durationMillis: 86400000 },
+          startTimeMillis: startOfDay,
+          endTimeMillis: endOfDay,
+        })
+      }
+    );
+
+    if(res.status === 401){
+      // Token expired
+      gfitToken = null;
+      localStorage.removeItem('gfit_token');
+      localStorage.removeItem('gfit_token_expiry');
+      updateGfitUI(false);
+      if(status) status.textContent = 'Session expired. Tap to reconnect.';
+      if(btn) btn.textContent = 'Reconnect →';
+      return;
+    }
+
+    const data = await res.json();
+    let steps = 0;
+    if(data.bucket && data.bucket.length > 0){
+      data.bucket.forEach(bucket => {
+        if(bucket.dataset){
+          bucket.dataset.forEach(ds => {
+            if(ds.point){
+              ds.point.forEach(pt => {
+                if(pt.value) pt.value.forEach(v => { steps += v.intVal || 0; });
+              });
+            }
+          });
+        }
+      });
+    }
+
+    // Update display
+    if(display){
+      display.textContent = steps.toLocaleString();
+      display.className = 'gfit-steps';
+    }
+
+    // Save to record
+    const key = keyForOffset(dayOffset);
+    if(!records[key]) records[key] = {};
+    records[key].steps = steps;
+
+    // Update hidden input for compatibility
+    const stepsInp = document.getElementById('r-steps');
+    if(stepsInp) stepsInp.value = steps;
+
+    // Trigger discipline auto-check and energy update
+    autoCheckStepsDiscipline();
+    renderDeficitHero();
+    renderDiscDots();
+
+    const now2 = new Date();
+    const timeStr = now2.getHours() + ':' + String(now2.getMinutes()).padStart(2,'0');
+    if(status) status.textContent = `Synced at ${timeStr} · ${steps.toLocaleString()} steps`;
+    if(btn){ btn.textContent = 'Sync ✓'; btn.className = 'gfit-btn connected'; }
+
+    save();
+
+  } catch(err) {
+    if(status) status.textContent = 'Sync failed. Check connection.';
+    if(btn) btn.textContent = 'Retry →';
+    console.error('Google Fit sync error:', err);
+  }
+}
+
+function updateGfitUI(connected){
+  const btn = document.getElementById('gfit-btn');
+  const status = document.getElementById('gfit-status');
+  const display = document.getElementById('gfit-steps-display');
+  if(!btn) return;
+
+  if(connected){
+    btn.textContent = 'Sync →';
+    btn.className = 'gfit-btn connected';
+    // Show last known steps if available
+    const key = keyForOffset(dayOffset);
+    const rec = records[key] || {};
+    if(rec.steps && display){
+      display.textContent = rec.steps.toLocaleString();
+      display.className = 'gfit-steps';
+      if(status) status.textContent = 'Connected to Google Fit · tap to refresh';
+    } else {
+      if(status) status.textContent = 'Connected · tap to fetch today\'s steps';
+    }
+  } else {
+    btn.textContent = 'Sync →';
+    btn.className = 'gfit-btn';
+    if(status) status.textContent = 'Tap to sync from Google Fit';
+  }
+}
 // ═══════════════════════════════════════════════
 const ACTUAL_SLOTS = [
   {key:'breakfast', label:'Breakfast'},
@@ -4126,6 +4379,7 @@ function init(){
   renderToday();
   syncRecordInputs();
   startClock();
+  initGoogleFit();
   initSwipe();
   setTimeout(updateProgress, 400);
 }
