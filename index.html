@@ -2700,6 +2700,36 @@ function changeQty(idx, delta){
   renderDbTray();
 }
 
+function removeDbTrayItem(idx){
+  dbTrayItems.splice(idx, 1);
+  renderDbTray();
+  renderDbBrowser();
+}
+
+function clearDbTray(){
+  dbTrayItems = [];
+  renderDbTray();
+  renderDbBrowser();
+}
+
+function confirmDbTray(){
+  if(!dbTrayItems.length) return;
+  const combined = buildCombinedItem(dbTrayItems);
+
+  // Check if this is an actual meal edit (Record screen)
+  if(currentReplaceSlot && currentReplaceSlot.startsWith('__actual__')){
+    const slotKey = currentReplaceSlot.replace('__actual__', '');
+    saveActualMeal(currentReplaceDate, slotKey, combined);
+    closeDbBrowser();
+    return;
+  }
+
+  saveToSlot(combined);
+  closeDbBrowser();
+  renderMealDetail();
+  renderTomorrowCard();
+}
+
 function buildCombinedItem(items){
   if(items.length === 1){
     const item = items[0];
@@ -3589,8 +3619,7 @@ async function fetchStepsFromFit(){
         },
         body: JSON.stringify({
           aggregateBy: [{
-            dataTypeName: 'com.google.step_count.delta',
-            dataSourceId: 'derived:com.google.step_count.delta:com.google.android.gms:estimated_steps'
+            dataTypeName: 'com.google.step_count.delta'
           }],
           bucketByTime: { durationMillis: 86400000 },
           startTimeMillis: startOfDay,
