@@ -3801,9 +3801,11 @@ async function fetchStepsFromFit(){
     }
 
     const data = await res.json();
+    console.log('Google Fit raw response:', JSON.stringify(data));
     let steps = 0;
     if(data.bucket && data.bucket.length > 0){
       data.bucket.forEach(bucket => {
+        console.log('Bucket:', JSON.stringify(bucket));
         if(bucket.dataset){
           bucket.dataset.forEach(ds => {
             if(ds.point){
