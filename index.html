@@ -1940,42 +1940,7 @@ function calcMissionRisk(){
     targetWeight: mission.targetWeight,
   };
 }
-function renderRiskCard(){
-  const data = calcMissionRisk();
-  const statusEl = document.getElementById('rc-status');
-  const bodyEl = document.getElementById('rc-body');
-
-  if(data.state === 'insufficient'){
-    statusEl.textContent = '—';
-    statusEl.className = 'rc-status';
-    bodyEl.innerHTML = `
-      <div class="rc-insufficient">Projection requires 4 weight entries.</div>
-      <div class="rc-entries">${data.count} of 4 entries logged</div>`;
-    return;
-  }
-
-  const targetD = keyToDate(data.targetDate);
-  const targetStr = MO_SHORT[targetD.getMonth()] + ' ' + targetD.getDate();
-
-  statusEl.textContent = data.state === 'on-track' ? 'On Track' : 'At Risk';
-  statusEl.className = 'rc-status ' + data.state;
-
-  const rateColor = data.rateSign < 0 ? '' : 'style="color:var(--risk-at)"';
-
-  bodyEl.innerHTML = `
-    <div class="rc-row">
-      <span class="rc-lbl">Projected</span>
-      <span class="rc-val projected">${data.projected} kg by ${targetStr}</span>
-    </div>
-    <div class="rc-row">
-      <span class="rc-lbl">Current Rate</span>
-      <span class="rc-val" ${rateColor}>${data.rateSign < 0 ? '' : '+'}${data.rateSign >= 0 ? data.currentRate : -data.currentRate} kg / week</span>
-    </div>
-    <div class="rc-row">
-      <span class="rc-lbl">Required Rate</span>
-      <span class="rc-val muted">${data.requiredRate} kg / week</span>
-    </div>`;
-}
+function renderRiskCard(){ renderPaceLine(); }
 
 // ═══════════════════════════════════════════════
 // MEAL ENGINE — RULE-BASED
@@ -2261,114 +2226,18 @@ function saveQuickWeight(){
   onHeroWeightBlur();
 }
 
-function saveQuickWeight(){
-  const val = parseFloat(document.getElementById('wq-inp').value);
-  if(!val) return;
-  const key = todayKey();
-  if(!records[key]) records[key] = {};
-  records[key].weight = val;
-  save();
-  const conf = document.getElementById('wq-saved');
-  conf.classList.add('on');
-  setTimeout(() => conf.classList.remove('on'), 2000);
-  renderRiskCard();
-  renderSparkline();
-  if(activeTab === 'record') syncRecordInputs();
-}
+function renderTomorrowCard(){ renderMealOneliner(); }
 
-function renderTomorrowCard(){
-  const key = keyForOffset(1);
-  const plan = getMealPlan(key);
-  const totals = mealDayTotals(plan);
-  const el = document.getElementById('mc-body');
-
-  const lunchDish = plan.travel ? (plan.lunch_fish ? plan.lunch_fish.name : '—') : `Rice + ${plan.lunch_fish ? plan.lunch_fish.name : '—'}`;
-
-  el.innerHTML = `
-    <div class="mc-row">
-      <span class="mc-slot">Breakfast</span>
-      <span class="mc-dish">${plan.breakfast ? plan.breakfast.name : '—'}</span>
-      <span class="mc-kcal">${plan.breakfast ? plan.breakfast.cal : '—'}</span>
-    </div>
-    <div class="mc-row">
-      <span class="mc-slot">Lunch</span>
-      <span class="mc-dish">${lunchDish}</span>
-      <span class="mc-kcal">${plan.lunch_fish ? (plan.lunch_fish.cal + (plan.lunch_rice ? plan.lunch_rice.cal : 0)) : '—'}</span>
-    </div>
-    <div class="mc-row">
-      <span class="mc-slot">Dinner</span>
-      <span class="mc-dish">${plan.dinner_millet ? plan.dinner_millet.name : '—'}</span>
-      <span class="mc-kcal">${plan.dinner_millet ? plan.dinner_millet.cal : '—'}</span>
-    </div>
-    <div class="mc-total">
-      <span class="mc-total-lbl">Day Total</span>
-      <span class="mc-total-val">~${totals.cal} kcal</span>
-    </div>`;
-}
-
-function renderDiscList(){
-  const list = document.getElementById('disc-list');
-  const todayRec = records[todayKey()] || {};
-  const todayDiscs = todayRec.disciplines || [];
-  list.innerHTML = '';
-  DISCIPLINES.forEach((disc, i) => {
-    const done = todayDiscs[i] && todayDiscs[i].done;
-    const displayName = travelMode ? disc.travelName : disc.name;
-    const div = document.createElement('div');
-    div.className = 'di' + (done ? ' done' : '');
-    div.innerHTML = `
-      <div class="di-l">
-        <div class="di-dot"></div>
-        <div>
-          <div class="di-name">${displayName}</div>
-          ${disc.kcalPerMin ? `<div class="di-sub">~${Math.round(disc.kcalPerMin * disc.defaultDur)} kcal · ${disc.defaultDur} min</div>` : ''}
-        </div>
-      </div>
-      <div class="di-tag">${disc.category}</div>`;
-    div.addEventListener('click', () => toggleTodayDisc(i, div));
-    list.appendChild(div);
-  });
-}
+function renderDiscList(){ renderDiscDots(); }
 
 function toggleTodayDisc(idx, el){
-  const key = todayKey();
-  if(!records[key]) records[key] = {};
-  if(!records[key].disciplines) records[key].disciplines = [];
-  while(records[key].disciplines.length <= idx) records[key].disciplines.push({done:false, dur:0});
-  records[key].disciplines[idx].done = !records[key].disciplines[idx].done;
-  save();
-  el.classList.toggle('done');
-  updateProgress();
-  updateEveningPrompt();
-  if(activeTab === 'record') syncDlList();
+  // Legacy — calls new toggleTodayDiscDot
+  toggleTodayDiscDot(idx, el);
 }
 
-function updateProgress(){
-  const todayRec = records[todayKey()] || {};
-  const todayDiscs = todayRec.disciplines || [];
-  const total = DISCIPLINES.length;
-  const done = todayDiscs.filter(d => d && d.done).length;
-  document.getElementById('prog-count').textContent = `${done} of ${total}`;
-  setTimeout(() => {
-    const pct = total ? Math.round((done/total)*100) : 0;
-    document.getElementById('prog-fill').style.width = pct + '%';
-  }, 50);
-}
+function updateProgress(){ renderDiscDots(); }
 
-function updateEveningPrompt(){
-  const h = new Date().getHours();
-  const ep = document.getElementById('ev-prompt');
-  if(!ep) return;
-  ep.style.display = h >= 17 ? 'block' : 'none';
-  if(h >= 17){
-    const todayRec = records[todayKey()] || {};
-    const done = (todayRec.disciplines || []).filter(d => d && d.done).length;
-    const left = DISCIPLINES.length - done;
-    document.getElementById('ev-text').textContent = left > 0
-      ? `${left} discipline${left > 1 ? 's' : ''} still open.`
-      : 'All disciplines complete. Record your day.';
-  }
-}
+function updateEveningPrompt(){}
 
 // ═══════════════════════════════════════════════
 // TRAVEL MODE
@@ -3508,31 +3377,9 @@ function autoCheckStepsDiscipline(){
   if(dayOffset === 0) renderDiscList();
 }
 
-function syncDiscList(){
-  // Re-sync after steps auto-check without full re-render
-  syncDlList();
-}
+function syncDiscList(){ renderDiscDots(); }
 
-function syncDlList(){
-  const key = keyForOffset(dayOffset);
-  const rec = records[key] || {};
-  const discArr = rec.disciplines || [];
-  const el = document.getElementById('dl-list');
-  el.innerHTML = '';
-  DISCIPLINES.forEach((d, i) => {
-    const checked = discArr[i] && discArr[i].done;
-    const item = document.createElement('div');
-    item.className = 'dl-item';
-    item.innerHTML = `
-      <span class="dl-name">${d.name}</span>
-      <div class="dl-right">
-        <div class="dl-check ${checked ? 'on' : ''}" onclick="toggleRecDisc(${i},this)">
-          <span class="dl-check-mark">✓</span>
-        </div>
-      </div>`;
-    el.appendChild(item);
-  });
-}
+function syncDlList(){ /* dl-list removed — disciplines now on Today screen dots */ }
 
 function toggleRecDisc(idx, el){
   const key = keyForOffset(dayOffset);
@@ -3640,10 +3487,12 @@ function updateEnergySummary(){
 
 // Compatibility stubs for old function names
 function renderRiskCard(){ renderPaceLine(); }
-function renderTomorrowCard(){ renderMealOneliner(); }
-function renderDiscList(){ renderDiscDots(); }
-function updateProgress(){ renderDiscDots(); }
-function updateEveningPrompt(){}
+function updateEnergySummary(){ renderDeficitHero(); }
+
+// Safe getElementById wrapper
+function safeGet(id){ return document.getElementById(id); }
+function safeSet(id, val){ const el = safeGet(id); if(el) el.textContent = val; }
+function safeToggle(id, cls, val){ const el = safeGet(id); if(el) el.classList.toggle(cls, val); }
 
 function saveRecord(){
   save();
