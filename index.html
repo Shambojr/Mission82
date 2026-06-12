@@ -1449,7 +1449,15 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
   <div id="pat-energy" style="padding:0 28px;"></div>
   <div class="sh"><span class="sl">Patterns</span><div class="sr"></div></div>
   <div id="pat-insights" style="padding:0 28px;display:flex;flex-direction:column;gap:8px;"></div>
-  <div style="height:20px;"></div>
+
+  <!-- Data Diagnostic -->
+  <div style="padding:var(--s4) var(--pad) 0;">
+    <div style="font-family:var(--sans);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--t4);margin-bottom:var(--s2);">Data Diagnostic</div>
+    <button onclick="showDataDiagnostic()" style="background:none;border:1px solid var(--rl);padding:10px 16px;font-family:var(--sans);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);cursor:pointer;width:100%;">Check Stored Data</button>
+    <div id="diagnostic-result" style="font-family:var(--serif);font-size:13px;font-weight:300;color:var(--t2);margin-top:var(--s2);line-height:1.8;"></div>
+  </div>
+
+  <div style="height:40px;"></div>
 </div>
 
 <!-- NAV -->
@@ -3534,6 +3542,34 @@ function getWakeDisplayName(){
   return reached ? 'Wake at 4:30 am' : `Wake at ${label}`;
 }
 // ═══════════════════════════════════════════════
+function showDataDiagnostic(){
+  const el = document.getElementById('diagnostic-result');
+  if(!el) return;
+  const recordsRaw = localStorage.getItem('mos_records');
+  const mealsRaw = localStorage.getItem('mos_meals');
+  const missionRaw = localStorage.getItem('mos_mission');
+  let out = '';
+  if(recordsRaw){
+    const rec = JSON.parse(recordsRaw);
+    const keys = Object.keys(rec).sort();
+    out += `Records: ${keys.length} days\n`;
+    keys.forEach(k => {
+      const r = rec[k];
+      out += `  ${k}: wt=${r.weight||'—'} steps=${r.steps||'—'}\n`;
+    });
+  } else { out += 'Records: NONE\n'; }
+  if(mealsRaw){
+    const ml = JSON.parse(mealsRaw);
+    out += `\nMeals: ${Object.keys(ml).sort().join(', ')}\n`;
+  } else { out += '\nMeals: NONE\n'; }
+  if(missionRaw){
+    const ms = JSON.parse(missionRaw);
+    out += `\nMission: ${ms.startWeight}→${ms.targetWeight}kg`;
+  }
+  el.style.whiteSpace = 'pre';
+  el.textContent = out || 'No data found';
+}
+
 const GFIT_CLIENT_ID = '825016103270-3nqqek01ct3dgbmaakfs8bceoskfbqoq.apps.googleusercontent.com';
 const GFIT_SCOPE = 'https://www.googleapis.com/auth/fitness.activity.read';
 let gfitToken = null;
