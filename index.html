@@ -2693,7 +2693,11 @@ function openReplace(dateKey, slot){
 }
 
 function closeDbBrowser(){
-  document.getElementById('db-overlay').classList.remove('on');
+  const dbOverlay = document.getElementById('db-overlay');
+  if(dbOverlay){
+    dbOverlay.classList.remove('on');
+    dbOverlay.style.zIndex = '';
+  }
   dbTrayItems = [];
 }
 
@@ -2912,6 +2916,10 @@ const SLOT_LABELS = {
   breakfast:'Breakfast', lunch_fish:'Fish', lunch_thoran:'Thoran',
   lunch_sprouts:'Sprouts', lunch_sweet:'Post-Lunch Sweet',
   dinner_millet:'Dinner Base', dinner_salad:'Salad', snack:'Snack',
+  '__mp__breakfast':'Breakfast', '__mp__lunch':'Lunch',
+  '__mp__dinner':'Dinner', '__mp__snack':'Snack',
+  '__actual__breakfast':'Breakfast', '__actual__lunch':'Lunch',
+  '__actual__dinner':'Dinner', '__actual__snack':'Snack',
 };
 
 // ═══════════════════════════════════════════════
@@ -3660,7 +3668,9 @@ function openMpSlotEdit(slotKey){
   const key = keyForOffset(1);
   currentReplaceDate = key;
   currentReplaceSlot = '__mp__' + slotKey;
-  openDbBrowser();
+  const dbOverlay = document.getElementById('db-overlay');
+  if(dbOverlay) dbOverlay.style.zIndex = '90';
+  openReplace(key, '__mp__' + slotKey);
 }
 
 function saveMpSlotItem(slotKey, item){
