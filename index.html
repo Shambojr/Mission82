@@ -891,125 +891,74 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 .btn-ghost{background:none;border:1px solid var(--rls);padding:16px 0;width:100%;font-family:var(--sans);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--t2);cursor:pointer;transition:all .2s;}
 .btn-ghost:active{border-color:var(--ac);color:var(--ac);}
 
-/* ═══ TODAY — REBUILT ═══ */
-.tod-top{padding:52px 28px 0;display:flex;justify-content:space-between;align-items:center;}
-.tod-meta{font-family:var(--serif);font-size:18px;font-weight:300;color:var(--t2);}
+/* ═══ TODAY ═══ */
+.tod-top{padding:52px var(--pad) 0;display:flex;justify-content:space-between;align-items:flex-start;}
+.tod-meta{font-family:var(--serif);font-size:17px;font-weight:300;color:var(--t3);}
+.tod-meta em{font-style:italic;color:var(--t2);}
+.tod-mission-day{font-family:var(--sans);font-size:9px;letter-spacing:.26em;text-transform:uppercase;color:var(--t4);margin-top:4px;}
+.tod-settings-btn{background:none;border:none;color:var(--t3);cursor:pointer;padding:4px;-webkit-tap-highlight-color:transparent;transition:color .15s;margin-top:2px;}
+.tod-settings-btn:active{color:var(--ac);}
+
+/* Dark mode toggle — used in settings sheet */
 .dk-toggle{display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.dkt-pill{width:28px;height:2px;background:var(--rls);position:relative;top:0;}
-.dkt-knob{width:8px;height:8px;border-radius:50%;background:var(--ac);position:absolute;top:-3px;left:0;transition:left .28s ease;}
+.dkt-pill{width:28px;height:2px;background:var(--rls);position:relative;}
+.dkt-knob{width:8px;height:8px;border-radius:50%;background:var(--ac);position:absolute;top:-3px;left:0;transition:left .25s ease;}
 .dk .dkt-knob{left:20px;}
 
 /* Travel mode */
 .travel-toggle-dot{width:8px;height:8px;border-radius:50%;border:1px solid var(--t4);cursor:pointer;transition:all .2s;}
 .travel-toggle-dot.on{background:var(--ac);border-color:var(--ac);}
-.travel-banner{margin:16px 28px 0;padding:11px 16px;background:var(--bg-r);border-left:2px solid var(--ac);display:none;justify-content:space-between;align-items:center;}
+.travel-banner{margin:16px var(--pad) 0;padding:11px 16px;background:var(--bg-r);border-left:2px solid var(--ac);display:none;justify-content:space-between;align-items:center;}
 .travel-banner.on{display:flex;}
 .tb-lbl{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ac);}
 .tb-off{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);cursor:pointer;-webkit-tap-highlight-color:transparent;}
 
-/* HERO WEIGHT */
-.hero-weight{
-  padding:40px 28px 0;
-  position:relative;
-  cursor:text;
-}
+/* Hero weight */
+.hero-weight{padding:var(--s5) var(--pad) 0;position:relative;cursor:text;}
 .hw-display{display:flex;align-items:baseline;gap:10px;}
-.hw-current{
-  font-family:var(--serif);
-  font-size:96px;
-  font-weight:300;
-  color:var(--t1);
-  line-height:1;
-  letter-spacing:-.02em;
-  transition:color .2s;
-}
-.hw-unit{
-  font-family:var(--serif);
-  font-size:28px;
-  font-weight:300;
-  color:var(--t3);
-  padding-bottom:8px;
-}
-.hw-input{
-  position:absolute;
-  top:0;left:0;width:100%;height:100%;
-  opacity:0;
-  font-size:96px;
-  background:none;border:none;outline:none;
-  cursor:text;
-}
+.hw-current{font-family:var(--serif);font-size:96px;font-weight:300;color:var(--t1);line-height:1;letter-spacing:-.02em;transition:color .2s;}
+.hw-unit{font-family:var(--serif);font-size:28px;font-weight:300;color:var(--t3);padding-bottom:8px;}
+.hw-input{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;font-size:96px;background:none;border:none;outline:none;cursor:text;}
 
-/* GAP LINE */
-.gap-line{
-  padding:12px 28px 0;
-  display:flex;align-items:baseline;gap:8px;
-}
-.gl-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--t4);}
-.gl-target-val{font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t3);}
-.gl-sep{font-size:14px;color:var(--t4);margin:0 2px;}
+/* Gap line */
+.gap-line{padding:var(--s2) var(--pad) 0;display:flex;align-items:baseline;gap:var(--s1);}
+.gl-label{font-family:var(--sans);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--t4);}
+.gl-target-val{font-family:var(--serif);font-size:18px;font-weight:300;color:var(--t3);}
+.gl-sep{font-family:var(--sans);font-size:12px;color:var(--t4);margin:0 4px;}
 .gl-rem-val{font-family:var(--serif);font-size:28px;font-weight:300;color:var(--t1);}
 
-/* PACE LINE */
-.pace-line{
-  padding:14px 28px 0;
-  font-family:var(--serif);
-  font-size:17px;
-  font-weight:300;
-  font-style:italic;
-  color:var(--t3);
-  line-height:1.5;
-}
+/* Pace line */
+.pace-line{padding:var(--s2) var(--pad) 0;font-family:var(--serif);font-size:19px;font-weight:300;font-style:italic;color:var(--t3);line-height:1.5;}
 .pace-line.on-track{color:var(--risk-on);}
 .pace-line.at-risk{color:var(--risk-at);}
 
-/* DISCIPLINE DOTS */
-.disc-dots-wrap{padding:28px 28px 24px;}
+/* Discipline dots */
+.disc-dots-wrap{padding:var(--s4) var(--pad) var(--s2);}
 .disc-dots{display:flex;gap:0;justify-content:space-between;}
-.dd-item{
-  display:flex;flex-direction:column;align-items:center;gap:10px;
-  flex:1;cursor:pointer;-webkit-tap-highlight-color:transparent;
-  padding:4px 0;
-}
-.dd-dot{
-  width:10px;height:10px;border-radius:50%;
-  border:1px solid var(--t4);
-  transition:all .25s cubic-bezier(.16,1,.3,1);
-  flex-shrink:0;
-}
-.dd-item.done .dd-dot{
-  background:var(--ac);
-  border-color:var(--ac);
-  transform:scale(1.15);
-}
-.dd-name{
-  font-size:8px;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--t4);text-align:center;line-height:1.3;
-  transition:color .2s;
-  max-width:52px;
-}
+.dd-item{display:flex;flex-direction:column;align-items:center;gap:var(--s1);flex:1;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:var(--s1) 0;transition:opacity .15s;}
+.dd-item:active{opacity:.6;}
+.dd-dot{width:10px;height:10px;border-radius:50%;border:1px solid var(--t4);transition:background .25s,border-color .25s,transform .25s cubic-bezier(.16,1,.3,1);}
+.dd-item.done .dd-dot{background:var(--ac);border-color:var(--ac);transform:scale(1.2);}
+.dd-name{font-family:var(--sans);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--t4);text-align:center;line-height:1.3;max-width:52px;transition:color .2s;}
 .dd-item.done .dd-name{color:var(--t3);}
+.wake-target-line{text-align:center;font-family:var(--serif);font-size:13px;font-weight:300;font-style:italic;color:var(--t4);padding:4px var(--pad) var(--s3);}
 
-/* MEAL ONE-LINER */
-.meal-oneliner{
-  padding:20px 28px;
-  display:flex;align-items:flex-start;gap:14px;
-  cursor:pointer;-webkit-tap-highlight-color:transparent;
-  transition:opacity .15s;
-}
-.meal-oneliner:active{opacity:.7;}
-.mol-label{
-  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--t4);flex-shrink:0;padding-top:5px;
-  min-width:64px;
-}
-.mol-meals{
-  font-family:var(--serif);font-size:18px;font-weight:300;
-  color:var(--t2);flex:1;line-height:1.4;
-}
-.mol-arrow{
-  font-family:var(--serif);font-size:18px;
-  color:var(--t4);flex-shrink:0;padding-top:2px;
-}
+/* FAB */
+.fab{position:fixed;bottom:calc(var(--nav-h) + 16px);right:var(--pad);width:52px;height:52px;border-radius:50%;background:var(--t1);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:35;-webkit-tap-highlight-color:transparent;transition:opacity .15s,transform .15s;}
+.fab:active{opacity:.8;transform:scale(.95);}
+.dk .fab{box-shadow:0 4px 20px rgba(0,0,0,.5);}
+
+/* Meal planner slots */
+.mp-slot{padding:var(--s3) 0;border-bottom:1px solid var(--rl);display:flex;align-items:flex-start;justify-content:space-between;}
+.mp-slot:last-child{border-bottom:none;}
+.mp-slot-left{flex:1;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.mp-slot-label{font-family:var(--sans);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--t4);margin-bottom:4px;}
+.mp-slot-dish{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t1);line-height:1.2;margin-bottom:4px;}
+.mp-slot-dish.empty{color:var(--t4);font-style:italic;}
+.mp-slot-add{font-family:var(--sans);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ac);}
+.mp-slot-right{text-align:right;flex-shrink:0;padding-left:var(--s2);}
+.mp-slot-cal{font-family:var(--serif);font-size:18px;font-weight:300;color:var(--t2);}
+.mp-slot-clear{font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t4);cursor:pointer;display:block;margin-top:4px;}
 
 /* ═══ MEAL DETAIL OVERLAY ═══ */
 .md-date-strip{padding:0 28px 18px;display:flex;align-items:center;justify-content:space-between;}
@@ -1225,15 +1174,18 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 <!-- TODAY -->
 <div class="screen on" id="s-today">
 
-  <!-- Top bar — minimal -->
+  <!-- Top bar -->
   <div class="tod-top">
-    <div class="tod-meta" id="tod-meta">The Re-<em style="font-style:italic;color:var(--ac);">entry</em></div>
-    <div style="display:flex;align-items:center;gap:16px;">
-      <div class="travel-toggle-dot" id="travel-dot" onclick="toggleTravelFromTop()"></div>
-      <div class="dk-toggle" onclick="toggleDark()">
-        <div class="dkt-pill"><div class="dkt-knob"></div></div>
-      </div>
+    <div>
+      <div class="tod-meta">The Re-<em>entry</em></div>
+      <div class="tod-mission-day" id="tod-mission-day">Mission Day —</div>
     </div>
+    <button class="tod-settings-btn" onclick="openSettingsSheet()" aria-label="Settings">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="9" cy="9" r="2.5" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M9 1v2M9 15v2M1 9h2M15 9h2M3.22 3.22l1.41 1.41M13.37 13.37l1.41 1.41M3.22 14.78l1.41-1.41M13.37 4.63l1.41-1.41" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+    </button>
   </div>
 
   <!-- Travel banner -->
@@ -1242,7 +1194,7 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
     <span class="tb-off" onclick="setTravelMode(false)">Exit →</span>
   </div>
 
-  <!-- HERO WEIGHT — dominant, tappable -->
+  <!-- HERO WEIGHT -->
   <div class="hero-weight" onclick="focusWeightInput()">
     <div class="hw-display">
       <span class="hw-current" id="hw-current">—</span>
@@ -1253,7 +1205,7 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
       oninput="onHeroWeightInput()" onblur="onHeroWeightBlur()">
   </div>
 
-  <!-- Gap row — target · remaining -->
+  <!-- Gap row -->
   <div class="gap-line">
     <span class="gl-label">Target</span>
     <span class="gl-target-val" id="gl-target-val">—</span>
@@ -1262,30 +1214,84 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
     <span class="gl-label">remaining</span>
   </div>
 
-  <!-- Pace line — one sentence -->
+  <!-- Pace line -->
   <div class="pace-line" id="pace-line">—</div>
 
-  <!-- Thin rule -->
+  <!-- Rule -->
   <div style="margin:28px 28px 0;height:1px;background:var(--rl);"></div>
 
   <!-- Discipline dots -->
   <div class="disc-dots-wrap">
     <div class="disc-dots" id="disc-dots"></div>
   </div>
-  <!-- Wake target line -->
   <div class="wake-target-line" id="wake-target-line"></div>
 
-  <!-- Thin rule -->
+  <!-- Rule -->
   <div style="margin:0 28px;height:1px;background:var(--rl);"></div>
 
-  <!-- Tomorrow — one line -->
-  <div class="meal-oneliner" onclick="openMealDetail(getTomorrowOffset())">
-    <span class="mol-label">Tomorrow</span>
-    <div class="mol-meals" id="mol-meals">—</div>
-    <span class="mol-arrow">→</span>
+  <div style="height:80px;"></div>
+</div>
+
+<!-- SETTINGS SHEET -->
+<div class="bottom-sheet" id="settings-sheet" onclick="closeSettingsSheet(event)">
+  <div class="bs-inner">
+    <div class="bs-handle"></div>
+    <div class="bs-title">Settings</div>
+    <div style="margin-top:var(--s3);display:flex;flex-direction:column;gap:var(--s3);">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:var(--s2) 0;border-bottom:1px solid var(--rl);">
+        <span style="font-family:var(--sans);font-size:13px;letter-spacing:.1em;color:var(--t2);">Dark Mode</span>
+        <div class="dk-toggle" onclick="toggleDark()">
+          <div class="dkt-pill"><div class="dkt-knob"></div></div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:var(--s2) 0;border-bottom:1px solid var(--rl);">
+        <span style="font-family:var(--sans);font-size:13px;letter-spacing:.1em;color:var(--t2);">Travel Mode</span>
+        <div class="travel-toggle-dot" id="travel-dot" onclick="toggleTravelFromTop()"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MEAL PLANNER OVERLAY -->
+<div class="overlay" id="meal-planner-overlay">
+  <div class="ov-top">
+    <span class="ov-back" onclick="closeMealPlanner()">←</span>
+    <span class="ov-title">Meal Planner</span>
+    <span class="ov-action" onclick="shareMealPlanPdf()">PDF</span>
   </div>
 
-  <div style="height:32px;"></div>
+  <!-- Date & target -->
+  <div style="padding:var(--s3) var(--pad) 0;">
+    <div style="font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t1);" id="mp-date-label">Tomorrow</div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:var(--s1);">
+      <span style="font-family:var(--sans);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);">Calorie Target</span>
+      <span style="font-family:var(--serif);font-size:22px;font-weight:300;color:var(--ac);" id="mp-target">—</span>
+    </div>
+  </div>
+
+  <div style="margin:var(--s3) var(--pad) 0;height:1px;background:var(--rl);"></div>
+
+  <!-- Meal slots -->
+  <div id="mp-slots" style="padding:0 var(--pad);"></div>
+
+  <div style="margin:0 var(--pad);height:1px;background:var(--rl);"></div>
+
+  <!-- Total & remaining -->
+  <div style="padding:var(--s3) var(--pad);">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--s1);">
+      <span style="font-family:var(--sans);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);">Total</span>
+      <span style="font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t1);" id="mp-total">0 kcal</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+      <span style="font-family:var(--sans);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);">Remaining</span>
+      <span style="font-family:var(--serif);font-size:28px;font-weight:300;" id="mp-remaining">— kcal</span>
+    </div>
+  </div>
+
+  <!-- Share PDF -->
+  <div style="padding:0 var(--pad) var(--s4);">
+    <button class="btn-primary" onclick="shareMealPlanPdf()">Share as PDF</button>
+  </div>
 </div>
 
 <!-- RECORD -->
@@ -1323,19 +1329,18 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
     <div id="r-actual-summary"></div>
   </div>
 
-  <!-- Google Fit Steps -->
+  <!-- Steps — manual entry -->
   <div class="rec-section" style="padding-bottom:0;">
     <div class="rec-section-head">
       <span class="rec-section-label">Steps</span>
     </div>
-    <div class="gfit-row">
-      <div class="gfit-left">
-        <div class="gfit-label">Today's Steps</div>
-        <div class="gfit-steps unsynced" id="gfit-steps-display">—</div>
-        <div class="gfit-status" id="gfit-status">Tap to sync from Google Fit</div>
-      </div>
-      <button class="gfit-btn" id="gfit-btn" onclick="syncGoogleFit()">Sync →</button>
-      <button id="gfit-disconnect" onclick="disconnectGoogleFit()" style="display:none;background:none;border:none;font-family:var(--sans);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t4);cursor:pointer;padding:8px 8px;margin-left:4px;-webkit-tap-highlight-color:transparent;border-bottom:1px solid var(--rl);">Disconnect</button>
+    <div style="display:flex;align-items:baseline;gap:12px;padding:var(--s1) 0 var(--s2);">
+      <input id="r-steps-manual" type="number" inputmode="numeric" placeholder="—"
+        style="background:none;border:none;border-bottom:1px solid var(--rls);outline:none;
+          font-family:var(--serif);font-size:48px;font-weight:300;color:var(--t1);
+          caret-color:var(--ac);width:180px;padding-bottom:4px;transition:border-color .2s;"
+        oninput="onManualStepsInput()" onfocus="this.style.borderBottomColor='var(--ac)'" onblur="this.style.borderBottomColor='var(--rls)'">
+      <span style="font-family:var(--serif);font-size:18px;font-weight:300;color:var(--t3);">steps</span>
     </div>
   </div>
 
@@ -1467,6 +1472,13 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
   <div class="ni" data-tab="mission" onclick="switchTab('mission')"><div class="nl">Mission</div></div>
   <div class="ni" data-tab="patterns" onclick="switchTab('patterns')"><div class="nl">Patterns</div></div>
 </div>
+
+<!-- FAB — only shows on Today tab -->
+<button class="fab" id="fab-planner" onclick="openMealPlanner()" aria-label="Plan tomorrow's meals">
+  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11 4v14M4 11h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+</button>
 
 <!-- MEAL DETAIL OVERLAY -->
 <div class="overlay" id="meal-detail-overlay">
@@ -2055,6 +2067,10 @@ function renderToday(){
   const cw = currentWeight();
   const tw = mission.targetWeight;
   const remaining = Math.max(0, cw - tw);
+
+  // Mission day
+  const mdEl = document.getElementById('tod-mission-day');
+  if(mdEl) mdEl.textContent = 'Mission Day ' + missionDay();
 
   // Hero weight
   const hwEl = document.getElementById('hw-current');
@@ -2726,7 +2742,15 @@ function confirmDbTray(){
   if(!dbTrayItems.length) return;
   const combined = buildCombinedItem(dbTrayItems);
 
-  // Check if this is an actual meal edit (Record screen)
+  // Meal planner slot
+  if(currentReplaceSlot && currentReplaceSlot.startsWith('__mp__')){
+    const slotKey = currentReplaceSlot.replace('__mp__', '');
+    saveMpSlotItem(slotKey, combined);
+    closeDbBrowser();
+    return;
+  }
+
+  // Actual meal edit (Record screen)
   if(currentReplaceSlot && currentReplaceSlot.startsWith('__actual__')){
     const slotKey = currentReplaceSlot.replace('__actual__', '');
     saveActualMeal(currentReplaceDate, slotKey, combined);
@@ -3263,8 +3287,10 @@ function syncRecordInputs(){
 
   const wtInp = document.getElementById('r-wt');
   const stepsInp = document.getElementById('r-steps');
+  const stepsManual = document.getElementById('r-steps-manual');
   if(wtInp) wtInp.value = rec.weight || '';
   if(stepsInp) stepsInp.value = rec.steps || '';
+  if(stepsManual) stepsManual.value = rec.steps || '';
   document.getElementById('r-notes').value = rec.notes || '';
 
   if(rec.steps){
@@ -3511,6 +3537,170 @@ function saveRecord(){
 }
 
 // ═══════════════════════════════════════════════
+// SETTINGS SHEET
+// ═══════════════════════════════════════════════
+function openSettingsSheet(){
+  document.getElementById('settings-sheet').classList.add('on');
+}
+function closeSettingsSheet(e){
+  if(e && e.target !== document.getElementById('settings-sheet')) return;
+  document.getElementById('settings-sheet').classList.remove('on');
+}
+
+// ═══════════════════════════════════════════════
+// MANUAL STEPS INPUT
+// ═══════════════════════════════════════════════
+function onManualStepsInput(){
+  const val = parseInt(document.getElementById('r-steps-manual').value) || 0;
+  const key = keyForOffset(dayOffset);
+  if(!records[key]) records[key] = {};
+  records[key].steps = val;
+  // Sync to hidden input for compatibility
+  const hidden = document.getElementById('r-steps');
+  if(hidden) hidden.value = val;
+  // Auto-check steps discipline
+  autoCheckStepsDiscipline();
+  renderDeficitHero();
+}
+
+// ═══════════════════════════════════════════════
+// MEAL PLANNER OVERLAY
+// ═══════════════════════════════════════════════
+const MP_SLOTS = [
+  {key:'breakfast', label:'Breakfast'},
+  {key:'lunch',     label:'Lunch'},
+  {key:'dinner',    label:'Dinner'},
+  {key:'snack',     label:'Snack'},
+];
+
+let mpPlan = {};
+
+function openMealPlanner(){
+  const overlay = document.getElementById('meal-planner-overlay');
+  overlay.classList.add('on');
+  overlay.classList.add('slide-in');
+  setTimeout(() => overlay.classList.remove('slide-in'), 350);
+
+  // Load tomorrow's plan
+  const key = keyForOffset(1);
+  const d = keyToDate(key);
+  mpPlan = meals[key] ? {...meals[key]} : {};
+
+  // Date label
+  const dateEl = document.getElementById('mp-date-label');
+  if(dateEl) dateEl.textContent = DOW[d.getDay()] + ', ' + d.getDate() + ' ' + MO[d.getMonth()];
+
+  // Calorie target
+  const target = dailyTarget(currentWeight());
+  const targetEl = document.getElementById('mp-target');
+  if(targetEl) targetEl.textContent = target.toLocaleString() + ' kcal';
+
+  renderMpSlots();
+}
+
+function closeMealPlanner(){
+  document.getElementById('meal-planner-overlay').classList.remove('on');
+}
+
+function renderMpSlots(){
+  const container = document.getElementById('mp-slots');
+  if(!container) return;
+  container.innerHTML = '';
+
+  MP_SLOTS.forEach(slot => {
+    const item = getMpSlotItem(slot.key);
+    const div = document.createElement('div');
+    div.className = 'mp-slot';
+
+    const cal = item ? (item.cal || 0) : 0;
+    div.innerHTML = `
+      <div class="mp-slot-left" onclick="openMpSlotEdit('${slot.key}')">
+        <div class="mp-slot-label">${slot.label}</div>
+        <div class="mp-slot-dish ${item ? '' : 'empty'}">${item ? item.name : 'Tap to add'}</div>
+        <div class="mp-slot-add">${item ? 'Change →' : '+ Add dish'}</div>
+      </div>
+      <div class="mp-slot-right">
+        ${item ? `<div class="mp-slot-cal">${cal}</div>
+        <div style="font-family:var(--sans);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t4);">kcal</div>
+        <span class="mp-slot-clear" onclick="clearMpSlot('${slot.key}')">Clear</span>` : ''}
+      </div>`;
+    container.appendChild(div);
+  });
+
+  updateMpTotals();
+}
+
+function getMpSlotItem(slotKey){
+  if(slotKey === 'breakfast') return mpPlan.breakfast || null;
+  if(slotKey === 'lunch') return mpPlan.lunch_fish || mpPlan.lunch_rice || null;
+  if(slotKey === 'dinner') return mpPlan.dinner_millet || null;
+  if(slotKey === 'snack') return mpPlan.snack || null;
+  return null;
+}
+
+function clearMpSlot(slotKey){
+  if(slotKey === 'breakfast') delete mpPlan.breakfast;
+  if(slotKey === 'lunch'){ delete mpPlan.lunch_fish; delete mpPlan.lunch_rice; }
+  if(slotKey === 'dinner') delete mpPlan.dinner_millet;
+  if(slotKey === 'snack') delete mpPlan.snack;
+  saveMpPlan();
+  renderMpSlots();
+}
+
+function openMpSlotEdit(slotKey){
+  const key = keyForOffset(1);
+  currentReplaceDate = key;
+  currentReplaceSlot = '__mp__' + slotKey;
+  openDbBrowser();
+}
+
+function saveMpSlotItem(slotKey, item){
+  if(slotKey === 'breakfast') mpPlan.breakfast = {name:item.name, cal:item.cal, pro:item.pro, carb:item.carb, fat:item.fat};
+  if(slotKey === 'lunch') mpPlan.lunch_fish = {name:item.name, cal:item.cal, pro:item.pro, carb:item.carb, fat:item.fat};
+  if(slotKey === 'dinner') mpPlan.dinner_millet = {name:item.name, cal:item.cal, pro:item.pro, carb:item.carb, fat:item.fat};
+  if(slotKey === 'snack') mpPlan.snack = {name:item.name, cal:item.cal, pro:item.pro, carb:item.carb, fat:item.fat};
+  saveMpPlan();
+  renderMpSlots();
+}
+
+function saveMpPlan(){
+  const key = keyForOffset(1);
+  if(!meals[key]) meals[key] = {};
+  Object.assign(meals[key], mpPlan);
+  save();
+}
+
+function updateMpTotals(){
+  const target = dailyTarget(currentWeight());
+  const total = MP_SLOTS.reduce((s, slot) => {
+    const item = getMpSlotItem(slot.key);
+    return s + (item ? (item.cal || 0) : 0);
+  }, 0);
+  const remaining = target - total;
+
+  const totalEl = document.getElementById('mp-total');
+  const remEl = document.getElementById('mp-remaining');
+  if(totalEl) totalEl.textContent = total.toLocaleString() + ' kcal';
+  if(remEl){
+    remEl.textContent = remaining.toLocaleString() + ' kcal';
+    remEl.style.color = Math.abs(remaining) <= 100 ? 'var(--risk-on)' :
+                        remaining < 0 ? 'var(--risk-at)' : 'var(--t1)';
+  }
+}
+
+function shareMealPlanPdf(){
+  // Use existing meal detail share logic for tomorrow
+  openMealDetail(1);
+}
+
+// FAB visibility — only show on Today tab
+function updateFabVisibility(tab){
+  const fab = document.getElementById('fab-planner');
+  if(!fab) return;
+  fab.style.display = tab === 'today' ? 'flex' : 'none';
+}
+
+// ═══════════════════════════════════════════════
 // GRADUAL WAKE TARGET
 // 6:45am → 4:30am over 45 days, 15 min per 5 days
 // ═══════════════════════════════════════════════
@@ -3709,8 +3899,17 @@ async function fetchStepsFromFit(){
       display.className = 'gfit-steps';
     }
 
-    // Save to record
+    // Save to record with date validation
     const key = keyForOffset(dayOffset);
+    const syncDate = new Date().toISOString().slice(0,10);
+    const recordDate = key;
+
+    if(syncDate !== recordDate){
+      if(status) status.textContent = `⚠ Synced date (${syncDate}) doesn't match record date (${recordDate})`;
+      if(btn){ btn.textContent = 'Sync →'; btn.className = 'gfit-btn'; }
+      return;
+    }
+
     if(!records[key]) records[key] = {};
     records[key].steps = steps;
 
@@ -3725,7 +3924,8 @@ async function fetchStepsFromFit(){
 
     const now2 = new Date();
     const timeStr = now2.getHours() + ':' + String(now2.getMinutes()).padStart(2,'0');
-    if(status) status.textContent = `Synced at ${timeStr} · ${steps.toLocaleString()} steps`;
+    const dateStr = now2.toISOString().slice(0,10);
+    if(status) status.textContent = `Synced ${dateStr} at ${timeStr} · ${steps.toLocaleString()} steps`;
     if(btn){ btn.textContent = 'Sync ✓'; btn.className = 'gfit-btn connected'; }
 
     save();
@@ -4453,6 +4653,7 @@ function switchTab(tab, direction){
   document.querySelector('[data-tab="'+tab+'"]').classList.add('on');
   activeTab = tab;
   next.scrollTop = 0;
+  updateFabVisibility(tab);
   if(tab==='record'){ syncRecordInputs(); }
   if(tab==='mission'){ renderMission(); }
   if(tab==='patterns'){ renderPatterns(); }
