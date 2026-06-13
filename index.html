@@ -88,6 +88,8 @@ html,body{
   font-family:var(--sans);
   -webkit-font-smoothing:antialiased;
   min-height:100vh;width:100%;
+  overscroll-behavior:none;
+  overflow:hidden;
 }
 .phone{
   width:100%;min-height:100vh;
@@ -822,7 +824,7 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 .phone{width:100%;min-height:100vh;background:var(--bg);position:relative;transition:background .4s;overflow:hidden;}
 
 /* SCREENS */
-.screen{display:none;height:100vh;overflow-y:auto;padding-bottom:calc(var(--nav-h) + 24px);-webkit-overflow-scrolling:touch;position:absolute;top:0;left:0;width:100%;will-change:transform,opacity;}
+.screen{display:none;height:100vh;overflow-y:auto;padding-bottom:calc(var(--nav-h) + 24px);-webkit-overflow-scrolling:touch;position:absolute;top:0;left:0;width:100%;will-change:transform,opacity;overscroll-behavior-y:contain;}
 .screen.on{display:block;}
 .screen.slide-in-right{display:block;animation:sIR .32s cubic-bezier(.25,.46,.45,.94) both;}
 .screen.slide-in-left{display:block;animation:sIL .32s cubic-bezier(.25,.46,.45,.94) both;}
@@ -1028,7 +1030,7 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 /* DEFICIT HERO */
 .rec-deficit{padding:32px 28px 28px;text-align:center;}
 .rd-label{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--t3);margin-bottom:12px;}
-.rd-number{font-family:var(--serif);font-size:72px;font-weight:300;color:var(--t1);line-height:1;letter-spacing:-.02em;}
+.rd-number{font-family:var(--serif);font-size:72px;font-weight:300;color:var(--t1);line-height:1;letter-spacing:-.02em;transition:color .3s;}
 .rd-number.ahead{color:var(--risk-on);}
 .rd-number.behind{color:var(--risk-at);}
 .rd-status{font-family:var(--serif);font-size:16px;font-weight:300;font-style:italic;color:var(--t3);margin-top:8px;}
