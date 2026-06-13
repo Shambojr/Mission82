@@ -3034,110 +3034,233 @@ function downloadPdfBlob(pdf, filename){
 function buildMealPlanPDF(slots, dateStr, target){
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({orientation:'portrait', unit:'mm', format:'a5'});
-  const W = pdf.internal.pageSize.getWidth();
-  const PAD = 14;
+  const W = pdf.internal.pageSize.getWidth();   // 148mm
+  const H = pdf.internal.pageSize.getHeight();  // 210mm
+  const PAD = 16;
   const RIGHT = W - PAD;
-  let y = 20;
+  const MID = W / 2;
+  let y = 0;
 
-  const rule = (yy, dark) => {
-    pdf.setDrawColor(...(dark ? [27,24,20] : [200,191,176]));
-    pdf.setLineWidth(0.3);
-    pdf.line(PAD, yy, RIGHT, yy);
-  };
+  // ── Background tint
+  pdf.setFillColor(244, 239, 229); // #F4EFE5
+  pdf.rect(0, 0, W, H, 'F');
 
-  // Header
-  pdf.setFont('helvetica','bold');
-  pdf.setFontSize(32);
-  pdf.setTextColor(27,24,20);
-  pdf.text('89.9', W/2, y, {align:'center'});
-  y += 7;
+  // ── Top thin rule
+  pdf.setDrawColor(154, 123, 60);
+  pdf.setLineWidth(0.6);
+  pdf.line(PAD, 10, RIGHT, 10);
 
-  pdf.setFont('helvetica','normal');
-  pdf.setFontSize(7);
-  pdf.setTextColor(140,133,123);
-  pdf.text('MEAL PLAN', W/2, y, {align:'center'});
+  y = 18;
+
+  // ── "M" monogram
+  pdf.setFont('times','bold');
+  pdf.setFontSize(52);
+  pdf.setTextColor(27, 24, 20);
+  pdf.text('M', MID, y, {align:'center'});
+  y += 4;
+
+  // ── Mission OS · The Re-entry
+  pdf.setFont('times','italic');
+  pdf.setFontSize(9);
+  pdf.setTextColor(154, 123, 60);
+  pdf.text('Mission OS · The Re-entry', MID, y, {align:'center'});
   y += 5;
 
-  pdf.setFont('helvetica','italic');
+  // ── Subtitle
+  pdf.setFont('helvetica','normal');
+  pdf.setFontSize(6.5);
+  pdf.setTextColor(140, 133, 123);
+  pdf.text('A PERSONAL HEALTH JOURNAL', MID, y, {align:'center', charSpace:1.5});
+  y += 6;
+
+  // ── Gold rule
+  pdf.setDrawColor(154, 123, 60);
+  pdf.setLineWidth(0.4);
+  pdf.line(PAD + 20, y, RIGHT - 20, y);
+  y += 5;
+
+  // ── Date
+  pdf.setFont('times','italic');
   pdf.setFontSize(9);
-  pdf.text(dateStr, W/2, y, {align:'center'});
+  pdf.setTextColor(60, 55, 48);
+  pdf.text(dateStr, MID, y, {align:'center'});
+  y += 4;
+
+  // ── "Meal Plan" label
+  pdf.setFont('helvetica','normal');
+  pdf.setFontSize(6);
+  pdf.setTextColor(140, 133, 123);
+  pdf.text('MEAL PLAN', MID, y, {align:'center', charSpace:2});
   y += 7;
 
-  rule(y, true); y += 7;
+  // ── Full rule
+  pdf.setDrawColor(200, 191, 176);
+  pdf.setLineWidth(0.2);
+  pdf.line(PAD, y, RIGHT, y);
+  y += 5;
 
-  // Target
+  // ── Calorie target row
   pdf.setFont('helvetica','normal');
-  pdf.setFontSize(7);
-  pdf.setTextColor(140,133,123);
-  pdf.text('CALORIE TARGET', PAD, y);
-  pdf.setFont('helvetica','bold');
-  pdf.setFontSize(13);
-  pdf.setTextColor(154,123,60);
+  pdf.setFontSize(6.5);
+  pdf.setTextColor(140, 133, 123);
+  pdf.text('DAILY TARGET', PAD, y, {charSpace:1});
+  pdf.setFont('times','bold');
+  pdf.setFontSize(11);
+  pdf.setTextColor(154, 123, 60);
   pdf.text(`${target.toLocaleString()} kcal`, RIGHT, y, {align:'right'});
-  y += 8;
+  y += 5;
 
-  rule(y); y += 6;
+  pdf.setDrawColor(200, 191, 176);
+  pdf.setLineWidth(0.2);
+  pdf.line(PAD, y, RIGHT, y);
+  y += 6;
 
-  // Slots
-  let total = 0;
-  slots.forEach(slot => {
+  // ── Meal slots
+  let totalCal = 0, totalPro = 0, totalCarb = 0, totalFat = 0;
+
+  slots.forEach((slot, idx) => {
     if(!slot.item) return;
-    const cal = slot.item.cal || 0;
-    total += cal;
+    const item = slot.item;
+    const cal  = item.cal  || 0;
+    const pro  = item.pro  || 0;
+    const carb = item.carb || 0;
+    const fat  = item.fat  || 0;
+    totalCal  += cal;
+    totalPro  += pro;
+    totalCarb += carb;
+    totalFat  += fat;
 
+    // Slot label
     pdf.setFont('helvetica','normal');
-    pdf.setFontSize(7);
-    pdf.setTextColor(140,133,123);
-    pdf.text(slot.label.toUpperCase(), PAD, y);
-    y += 5;
+    pdf.setFontSize(6);
+    pdf.setTextColor(154, 123, 60);
+    pdf.text(slot.label.toUpperCase(), PAD, y, {charSpace:1.5});
 
-    const nameLines = pdf.splitTextToSize(slot.item.name, RIGHT - PAD - 26);
-    pdf.setFont('helvetica','normal');
-    pdf.setFontSize(11);
-    pdf.setTextColor(27,24,20);
-    pdf.text(nameLines, PAD, y);
-
-    pdf.setFont('helvetica','bold');
-    pdf.setFontSize(11);
+    // Calories right
+    pdf.setFont('times','bold');
+    pdf.setFontSize(10);
+    pdf.setTextColor(27, 24, 20);
     pdf.text(`${cal}`, RIGHT, y, {align:'right'});
     pdf.setFont('helvetica','normal');
-    pdf.setFontSize(7);
-    pdf.setTextColor(140,133,123);
-    pdf.text('kcal', RIGHT, y+4, {align:'right'});
+    pdf.setFontSize(6);
+    pdf.setTextColor(140, 133, 123);
+    pdf.text('kcal', RIGHT - pdf.getTextWidth(`${cal}`) - 1, y, {align:'right'});
 
-    y += nameLines.length * 5 + 4;
-    rule(y); y += 5;
+    y += 5;
+
+    // Dish name
+    pdf.setFont('times','normal');
+    pdf.setFontSize(11);
+    pdf.setTextColor(27, 24, 20);
+    const nameLines = pdf.splitTextToSize(item.name, RIGHT - PAD - 2);
+    pdf.text(nameLines, PAD, y);
+    y += nameLines.length * 5;
+
+    // Portion description
+    if(item.portion || item.servingSize){
+      pdf.setFont('helvetica','italic');
+      pdf.setFontSize(7);
+      pdf.setTextColor(140, 133, 123);
+      const portion = item.portion || item.servingSize || '';
+      const portionLines = pdf.splitTextToSize(portion, RIGHT - PAD - 2);
+      pdf.text(portionLines, PAD, y);
+      y += portionLines.length * 4;
+    }
+
+    // Macro row
+    pdf.setFont('helvetica','normal');
+    pdf.setFontSize(6.5);
+    pdf.setTextColor(140, 133, 123);
+    pdf.text(`P ${pro}g`, PAD, y);
+    pdf.text(`C ${carb}g`, PAD + 18, y);
+    pdf.text(`F ${fat}g`, PAD + 36, y);
+    y += 5;
+
+    // Divider (not after last)
+    pdf.setDrawColor(200, 191, 176);
+    pdf.setLineWidth(0.2);
+    pdf.line(PAD, y, RIGHT, y);
+    y += 5;
   });
 
-  // Totals
-  y += 2;
+  // ── Nutritional Summary
   pdf.setFont('helvetica','normal');
-  pdf.setFontSize(7);
-  pdf.setTextColor(140,133,123);
-  pdf.text('TOTAL', PAD, y);
-  pdf.setFont('helvetica','bold');
-  pdf.setFontSize(13);
-  pdf.setTextColor(27,24,20);
-  pdf.text(`${total.toLocaleString()} kcal`, RIGHT, y, {align:'right'});
-  y += 8;
+  pdf.setFontSize(6);
+  pdf.setTextColor(140, 133, 123);
+  pdf.text('NUTRITIONAL SUMMARY', PAD, y, {charSpace:1.5});
+  y += 5;
 
-  const rem = target - total;
-  const remC = rem < 0 ? [122,58,26] : rem <= 100 ? [46,92,46] : [27,24,20];
+  // Summary rows
+  const summaryRows = [
+    ['Protein',        `${totalPro}g`],
+    ['Carbohydrates',  `${totalCarb}g`],
+    ['Fat',            `${totalFat}g`],
+  ];
+  summaryRows.forEach(([lbl, val]) => {
+    pdf.setFont('times','normal');
+    pdf.setFontSize(9);
+    pdf.setTextColor(60, 55, 48);
+    pdf.text(lbl, PAD, y);
+    pdf.setFont('times','bold');
+    pdf.setTextColor(27, 24, 20);
+    pdf.text(val, RIGHT, y, {align:'right'});
+    y += 5;
+    pdf.setDrawColor(220, 213, 203);
+    pdf.setLineWidth(0.15);
+    pdf.line(PAD, y - 1, RIGHT, y - 1);
+  });
+
+  y += 3;
+
+  // ── Total calories — large
+  pdf.setDrawColor(27, 24, 20);
+  pdf.setLineWidth(0.5);
+  pdf.line(PAD, y, RIGHT, y);
+  y += 6;
+
   pdf.setFont('helvetica','normal');
-  pdf.setFontSize(7);
-  pdf.setTextColor(140,133,123);
-  pdf.text('REMAINING', PAD, y);
-  pdf.setFont('helvetica','bold');
-  pdf.setFontSize(16);
+  pdf.setFontSize(6.5);
+  pdf.setTextColor(140, 133, 123);
+  pdf.text('TOTAL CALORIES', PAD, y, {charSpace:1});
+
+  pdf.setFont('times','bold');
+  pdf.setFontSize(22);
+  pdf.setTextColor(27, 24, 20);
+  pdf.text(`${totalCal.toLocaleString()}`, RIGHT, y + 6, {align:'right'});
+  pdf.setFont('times','normal');
+  pdf.setFontSize(9);
+  pdf.setTextColor(140, 133, 123);
+  pdf.text('kcal', RIGHT, y + 11, {align:'right'});
+
+  // Remaining
+  const rem = target - totalCal;
+  const remC = rem < 0 ? [122,58,26] : rem <= 100 ? [46,92,46] : [60,55,48];
+  pdf.setFont('times','italic');
+  pdf.setFontSize(8);
   pdf.setTextColor(...remC);
-  pdf.text(`${rem.toLocaleString()} kcal`, RIGHT, y, {align:'right'});
-  y += 12;
+  pdf.text(rem >= 0 ? `${rem.toLocaleString()} kcal remaining` : `${Math.abs(rem).toLocaleString()} kcal over target`, PAD, y + 10);
 
-  rule(y, true); y += 6;
-  pdf.setFont('helvetica','italic');
-  pdf.setFontSize(7);
-  pdf.setTextColor(140,133,123);
-  pdf.text('The Re-entry · Mission OS · 89.9', W/2, y, {align:'center'});
+  y += 18;
+
+  // ── Bottom gold rule
+  pdf.setDrawColor(154, 123, 60);
+  pdf.setLineWidth(0.4);
+  pdf.line(PAD + 20, y, RIGHT - 20, y);
+  y += 5;
+
+  // ── Footer
+  pdf.setFont('helvetica','normal');
+  pdf.setFontSize(6);
+  pdf.setTextColor(154, 123, 60);
+  pdf.text('Mission OS', MID, y, {align:'center', charSpace:1});
+  y += 4;
+  pdf.setTextColor(180, 174, 166);
+  pdf.text(`Generated ${new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}`, MID, y, {align:'center'});
+
+  // ── Bottom thin rule
+  pdf.setDrawColor(154, 123, 60);
+  pdf.setLineWidth(0.6);
+  pdf.line(PAD, H - 8, RIGHT, H - 8);
 
   return pdf;
 }
