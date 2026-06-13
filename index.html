@@ -109,14 +109,14 @@ html,body{
   will-change:transform,opacity;
 }
 .screen.on{display:block;}
-.screen.slide-in-right{display:block;animation:sIR .3s cubic-bezier(.25,.46,.45,.94) both;}
-.screen.slide-in-left{display:block;animation:sIL .3s cubic-bezier(.25,.46,.45,.94) both;}
-.screen.slide-out-left{display:block;animation:sOL .3s cubic-bezier(.25,.46,.45,.94) both;pointer-events:none;}
-.screen.slide-out-right{display:block;animation:sOR .3s cubic-bezier(.25,.46,.45,.94) both;pointer-events:none;}
-@keyframes sIR{from{transform:translateX(100%);opacity:.5}to{transform:translateX(0);opacity:1}}
-@keyframes sIL{from{transform:translateX(-100%);opacity:.5}to{transform:translateX(0);opacity:1}}
-@keyframes sOL{from{transform:translateX(0);opacity:1}to{transform:translateX(-24%);opacity:0}}
-@keyframes sOR{from{transform:translateX(0);opacity:1}to{transform:translateX(24%);opacity:0}}
+.screen.slide-in-right{display:block;animation:sIR .28s cubic-bezier(.4,0,.2,1) both;}
+.screen.slide-in-left{display:block;animation:sIL .28s cubic-bezier(.4,0,.2,1) both;}
+.screen.slide-out-left{display:block;animation:sOL .28s cubic-bezier(.4,0,.2,1) both;pointer-events:none;}
+.screen.slide-out-right{display:block;animation:sOR .28s cubic-bezier(.4,0,.2,1) both;pointer-events:none;}
+@keyframes sIR{from{transform:translateX(100%) translateZ(0)}to{transform:translateX(0) translateZ(0)}}
+@keyframes sIL{from{transform:translateX(-100%) translateZ(0)}to{transform:translateX(0) translateZ(0)}}
+@keyframes sOL{from{transform:translateX(0) translateZ(0)}to{transform:translateX(-30%) translateZ(0)}}
+@keyframes sOR{from{transform:translateX(0) translateZ(0)}to{transform:translateX(30%) translateZ(0)}}
 
 /* ── OVERLAY ── */
 .overlay{
@@ -826,19 +826,10 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 /* SCREENS */
 .screen{display:none;height:100vh;overflow-y:auto;padding-bottom:calc(var(--nav-h) + 24px);-webkit-overflow-scrolling:touch;position:absolute;top:0;left:0;width:100%;will-change:transform,opacity;overscroll-behavior-y:contain;}
 .screen.on{display:block;}
-.screen.slide-in-right{display:block;animation:sIR .32s cubic-bezier(.25,.46,.45,.94) both;}
-.screen.slide-in-left{display:block;animation:sIL .32s cubic-bezier(.25,.46,.45,.94) both;}
-.screen.slide-out-left{display:block;animation:sOL .32s cubic-bezier(.25,.46,.45,.94) both;pointer-events:none;}
-.screen.slide-out-right{display:block;animation:sOR .32s cubic-bezier(.25,.46,.45,.94) both;pointer-events:none;}
-@keyframes sIR{from{transform:translateX(100%);opacity:.5}to{transform:translateX(0);opacity:1}}
-@keyframes sIL{from{transform:translateX(-100%);opacity:.5}to{transform:translateX(0);opacity:1}}
-@keyframes sOL{from{transform:translateX(0);opacity:1}to{transform:translateX(-26%);opacity:0}}
-@keyframes sOR{from{transform:translateX(0);opacity:1}to{transform:translateX(26%);opacity:0}}
-
 /* FULL SCREEN OVERLAY */
 .overlay{position:fixed;inset:0;background:var(--bg);z-index:60;display:none;flex-direction:column;overflow-y:auto;transition:background .4s;}
 .overlay.on{display:flex;}
-.overlay.slide-in{animation:sIR .32s cubic-bezier(.25,.46,.45,.94) both;}
+.overlay.slide-in{animation:sIR .28s cubic-bezier(.4,0,.2,1) both;}
 .ov-top{display:flex;align-items:center;justify-content:space-between;padding:52px 28px 18px;border-bottom:1px solid var(--rl);}
 .ov-back{font-family:var(--serif);font-size:26px;font-weight:300;color:var(--t3);cursor:pointer;padding:6px;-webkit-tap-highlight-color:transparent;}
 .ov-back:active{color:var(--ac);}
@@ -1169,6 +1160,8 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 .am-slot-cal{font-family:var(--serif);font-size:16px;font-weight:300;color:var(--t2);}
 .am-slot-edit{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);margin-top:3px;}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 <div class="phone" id="phone">
@@ -3014,7 +3007,7 @@ function renderCalendar(){
 // ═══════════════════════════════════════════════
 // PDF SHARE — blob URL (works in sandboxed environments)
 // ═══════════════════════════════════════════════
-function shareMealPDF(){
+async function shareMealPDF(){
   const key = keyForOffset(mealDateOffset);
   const plan = getMealPlan(key);
   const totals = mealDayTotals(plan);
@@ -3250,20 +3243,50 @@ function shareMealPDF(){
 </div>
 </body></html>`;
 
-  // Use blob URL — works in sandboxed environments where window.open is blocked
+  // Generate PDF using html2canvas + jsPDF
+  const container = document.createElement('div');
+  container.style.cssText = 'position:fixed;left:-9999px;top:0;width:420px;background:#F5F0E8;';
+  container.innerHTML = `<div style="font-family:Georgia,serif;background:#F5F0E8;color:#1B1814;padding:52px 44px 60px;width:420px;">${html.split('<body>')[1].split('</body>')[0]}</div>`;
+  document.body.appendChild(container);
+
+  // Show loading state
+  const btn = event && event.target ? event.target : null;
+  const origText = btn ? btn.textContent : '';
+  if(btn) btn.textContent = 'Generating…';
+
   try {
+    await new Promise(r => setTimeout(r, 300)); // let fonts render
+
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      backgroundColor: '#F5F0E8',
+      useCORS: true,
+      logging: false,
+    });
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a5' });
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    const pdfW = pdf.internal.pageSize.getWidth();
+    const pdfH = (canvas.height * pdfW) / canvas.width;
+    pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
+    pdf.save(`meal-plan-${key}.pdf`);
+
+    if(btn) btn.textContent = origText;
+  } catch(err) {
+    console.error('PDF error:', err);
+    if(btn) btn.textContent = origText;
+    // Fallback to HTML download
     const blob = new Blob([html], {type: 'text/html'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `meal-plan-${key}.html`;
-    a.style.display = 'none';
     document.body.appendChild(a);
     a.click();
     setTimeout(() => { URL.revokeObjectURL(url); document.body.removeChild(a); }, 1000);
-  } catch(e) {
-    // Fallback: show in-app print preview
-    showPrintPreview(html);
+  } finally {
+    document.body.removeChild(container);
   }
 }
 
@@ -3707,9 +3730,90 @@ function updateMpTotals(){
   }
 }
 
-function shareMealPlanPdf(){
-  // Use existing meal detail share logic for tomorrow
-  openMealDetail(1);
+async function shareMealPlanPdf(){
+  const key = keyForOffset(1);
+  const d = keyToDate(key);
+  const target = dailyTarget(currentWeight());
+
+  // Build plan from mpPlan
+  const slots = [
+    {label:'Breakfast', item: mpPlan.breakfast},
+    {label:'Lunch',     item: mpPlan.lunch_fish},
+    {label:'Dinner',    item: mpPlan.dinner_millet},
+    {label:'Snack',     item: mpPlan.snack},
+  ].filter(s => s.item);
+
+  const total = slots.reduce((s, sl) => s + (sl.item.cal || 0), 0);
+  const remaining = target - total;
+
+  const rows = slots.map(s => `
+    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid #C8BFB0;">
+      <div>
+        <div style="font-family:sans-serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#8C857B;margin-bottom:4px;">${s.label}</div>
+        <div style="font-family:Georgia,serif;font-size:18px;color:#1B1814;">${s.item.name}</div>
+      </div>
+      <div style="font-family:Georgia,serif;font-size:16px;color:#1B1814;text-align:right;flex-shrink:0;margin-left:16px;">${s.item.cal} kcal</div>
+    </div>`).join('');
+
+  const html = `
+    <div style="font-family:Georgia,serif;background:#F4EFE5;color:#1B1814;padding:48px 40px;width:380px;">
+      <div style="text-align:center;margin-bottom:32px;">
+        <div style="font-size:52px;font-weight:600;letter-spacing:-.02em;line-height:1;">89.9</div>
+        <div style="font-family:sans-serif;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:#8C857B;margin-top:6px;">Meal Plan</div>
+        <div style="font-size:12px;font-style:italic;color:#8C857B;margin-top:4px;">${DOW[d.getDay()]}, ${d.getDate()} ${MO[d.getMonth()]} ${d.getFullYear()}</div>
+      </div>
+      <div style="border-top:1px solid #1B1814;margin-bottom:24px;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:24px;">
+        <div style="font-family:sans-serif;font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:#8C857B;">Calorie Target</div>
+        <div style="font-family:Georgia,serif;font-size:22px;color:#9A7B3C;">${target.toLocaleString()} kcal</div>
+      </div>
+      ${rows}
+      <div style="border-top:1px solid #1B1814;margin-top:24px;padding-top:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+          <div style="font-family:sans-serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#8C857B;">Total</div>
+          <div style="font-size:18px;">${total.toLocaleString()} kcal</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <div style="font-family:sans-serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#8C857B;">Remaining</div>
+          <div style="font-size:28px;color:${remaining < 0 ? '#7A3A1A' : remaining <= 100 ? '#2E5C2E' : '#1B1814'};">${remaining.toLocaleString()} kcal</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:32px;border-top:1px solid #C8BFB0;padding-top:20px;">
+        <div style="font-family:sans-serif;font-size:8px;letter-spacing:.26em;text-transform:uppercase;color:#C8BFB0;">The Re-entry · Mission OS</div>
+      </div>
+    </div>`;
+
+  // Render to PDF
+  const container = document.createElement('div');
+  container.style.cssText = 'position:fixed;left:-9999px;top:0;width:380px;background:#F4EFE5;';
+  container.innerHTML = html;
+  document.body.appendChild(container);
+
+  const pdfBtn = document.querySelector('#meal-planner-overlay .btn-primary');
+  if(pdfBtn) pdfBtn.textContent = 'Generating…';
+
+  try {
+    await new Promise(r => setTimeout(r, 300));
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      backgroundColor: '#F4EFE5',
+      useCORS: true,
+      logging: false,
+    });
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a5' });
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    const pdfW = pdf.internal.pageSize.getWidth();
+    const pdfH = (canvas.height * pdfW) / canvas.width;
+    pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
+    pdf.save(`meal-plan-${key}.pdf`);
+  } catch(err) {
+    console.error('PDF error:', err);
+    alert('PDF generation failed. Try the PDF button in the meal detail view.');
+  } finally {
+    document.body.removeChild(container);
+    if(pdfBtn) pdfBtn.textContent = 'Share as PDF';
+  }
 }
 
 // FAB visibility — only show on Today tab
