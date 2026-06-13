@@ -944,7 +944,7 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 .wake-target-line{text-align:center;font-family:var(--serif);font-size:13px;font-weight:300;font-style:italic;color:var(--t4);padding:4px var(--pad) var(--s3);}
 
 /* FAB */
-.fab{position:fixed;bottom:calc(var(--nav-h) + 16px);right:var(--pad);width:52px;height:52px;border-radius:50%;background:var(--t1);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:35;-webkit-tap-highlight-color:transparent;transition:opacity .15s,transform .15s;}
+.fab{position:fixed;bottom:calc(var(--nav-h) + 16px);right:var(--pad);width:60px;height:60px;border-radius:30px;background:var(--t1);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:35;-webkit-tap-highlight-color:transparent;transition:opacity .15s,transform .15s;}
 .fab:active{opacity:.8;transform:scale(.95);}
 .dk .fab{box-shadow:0 4px 20px rgba(0,0,0,.5);}
 
@@ -1475,9 +1475,7 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 
 <!-- FAB — only shows on Today tab -->
 <button class="fab" id="fab-planner" onclick="openMealPlanner()" aria-label="Plan tomorrow's meals">
-  <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M11 4v14M4 11h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-  </svg>
+  <span id="fab-date" style="font-family:var(--serif);font-size:14px;font-weight:300;color:var(--bg);line-height:1;text-align:center;"></span>
 </button>
 
 <!-- MEAL DETAIL OVERLAY -->
@@ -2067,6 +2065,15 @@ function renderToday(){
   const cw = currentWeight();
   const tw = mission.targetWeight;
   const remaining = Math.max(0, cw - tw);
+
+  // FAB — tomorrow's date
+  const fabDate = document.getElementById('fab-date');
+  if(fabDate){
+    const tmr = keyToDate(keyForOffset(1));
+    const dd = String(tmr.getDate()).padStart(2,'0');
+    const mm = String(tmr.getMonth()+1).padStart(2,'0');
+    fabDate.textContent = dd + '/' + mm;
+  }
 
   // Mission day
   const mdEl = document.getElementById('tod-mission-day');
