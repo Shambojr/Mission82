@@ -1161,7 +1161,6 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 .am-slot-edit{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);margin-top:3px;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 <div class="phone" id="phone">
@@ -3005,290 +3004,203 @@ function renderCalendar(){
 }
 
 // ═══════════════════════════════════════════════
-// PDF SHARE — blob URL (works in sandboxed environments)
+// PDF EXPORT — pure jsPDF text (no html2canvas)
 // ═══════════════════════════════════════════════
-async function shareMealPDF(){
-  const key = keyForOffset(mealDateOffset);
-  const plan = getMealPlan(key);
-  const totals = mealDayTotals(plan);
-  const d = keyToDate(key);
-  const { target: targetCal } = dailyTargetForDate(currentWeight(), key);
 
-  let lunchRows = '';
-  let dinnerRows = '';
-  let travelRows = '';
+function loadScript(src){
+  return new Promise((resolve, reject) => {
+    if(document.querySelector(`script[src="${src}"]`)){ resolve(); return; }
+    const s = document.createElement('script');
+    s.src = src; s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
 
-  if(!plan.travel){
-    lunchRows = [
-      {l:'Rice',    i:plan.lunch_rice},
-      {l:'Fish',    i:plan.lunch_fish},
-      {l:'Thoran',  i:plan.lunch_thoran},
-      {l:'Sprouts', i:plan.lunch_sprouts},
-      {l:'Moru',    i:plan.lunch_moru},
-      {l:'Sweet',   i:plan.lunch_sweet},
-    ].filter(x=>x.i).map(x=>`
-      <div class="item-row"><span>${x.l}: ${x.i.name}</span><span>${x.i.cal} kcal</span></div>
-      <div class="item-note">${x.i.portion}</div>
-    `).join('');
-
-    dinnerRows = [
-      {l:'Millet Base', i:plan.dinner_millet},
-      {l:'Salad',       i:plan.dinner_salad},
-    ].filter(x=>x.i).map(x=>`
-      <div class="item-row"><span>${x.l}: ${x.i.name}</span><span>${x.i.cal} kcal</span></div>
-      <div class="item-note">${x.i.portion}</div>
-    `).join('');
-  } else {
-    travelRows = [
-      {l:'Meal',   i:plan.lunch_fish},
-      {l:'Dinner', i:plan.dinner_millet},
-    ].filter(x=>x.i).map(x=>`
-      <div class="item-row"><span>${x.l}: ${x.i.name}</span><span>${x.i.cal} kcal</span></div>
-      <div class="item-note">${x.i.portion}</div>
-    `).join('');
-  }
-
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
-<title>Meal Plan — ${formatDate(d)}</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{
-    font-family:'Cormorant Garamond',Georgia,serif;
-    background:#F5F0E8;
-    color:#1B1814;
-    min-height:100vh;
-    display:flex;align-items:flex-start;justify-content:center;
-    padding:40px 20px;
-  }
-  .receipt{
-    width:100%;max-width:420px;
-    background:#F5F0E8;
-    padding:52px 44px 60px;
-  }
-  /* MASTHEAD */
-  .masthead{text-align:center;margin-bottom:36px;}
-  .m-logo{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:600;color:#1B1814;line-height:1;letter-spacing:-.02em;margin-bottom:6px;}
-  .m-title{font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:.36em;text-transform:uppercase;color:#1B1814;margin-bottom:4px;}
-  .m-tagline{font-family:'Cormorant Garamond',serif;font-size:11px;font-style:italic;color:#8C857B;letter-spacing:.08em;}
-  /* DIVIDERS */
-  .divider-solid{border:none;border-top:1px solid #1B1814;margin:20px 0;}
-  .divider-light{border:none;border-top:1px solid #C8BFB0;margin:16px 0;}
-  .divider-dashed{border:none;border-top:1px dashed #C8BFB0;margin:10px 0;}
-  /* DATE LINE */
-  .date-line{text-align:center;margin-bottom:24px;}
-  .date-text{font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:#8C857B;}
-  /* SECTION */
-  .section{margin-bottom:4px;}
-  .section-label{
-    font-family:'DM Sans',sans-serif;
-    font-size:9px;letter-spacing:.32em;text-transform:uppercase;
-    color:#8C857B;margin-bottom:10px;
-  }
-  /* ITEM ROW */
-  .item{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
-  .item-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;color:#1B1814;flex:1;line-height:1.3;}
-  .item-cal{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;color:#1B1814;text-align:right;white-space:nowrap;margin-left:16px;}
-  .item-note{font-family:'Cormorant Garamond',serif;font-size:12px;font-style:italic;color:#8C857B;margin-bottom:8px;line-height:1.5;}
-  /* NOTICE */
-  .notice{font-family:'Cormorant Garamond',serif;font-size:12px;font-style:italic;color:#9A7B3C;margin-top:6px;}
-  /* TOTALS */
-  .totals{margin-top:4px;}
-  .total-label{font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:#8C857B;margin-bottom:12px;}
-  .total-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
-  .total-name{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;color:#3C3730;}
-  .total-val{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;color:#3C3730;text-align:right;}
-  /* GRAND TOTAL */
-  .grand{display:flex;justify-content:space-between;align-items:baseline;margin-top:6px;}
-  .grand-label{font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:#7A3A1A;}
-  .grand-val{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:500;color:#7A3A1A;line-height:1;}
-  /* CLOSING */
-  .closing{text-align:center;margin-top:8px;}
-  .closing-text{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:#1B1814;line-height:1.6;}
-  .closing-sub{font-family:'DM Sans',sans-serif;font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:#BEB7AE;margin-top:16px;}
-  @media print{body{padding:0;background:#F5F0E8;}@page{margin:0;size:A5;}}
-</style></head><body>
-<div class="receipt">
-
-  <!-- MASTHEAD -->
-  <div class="masthead">
-    <div class="m-logo">M</div>
-    <div class="m-title">Mission OS · The Re-entry</div>
-    <div class="m-tagline">A personal health journal</div>
-  </div>
-
-  <hr class="divider-solid">
-
-  <!-- DATE -->
-  <div class="date-line">
-    <div class="date-text">${formatDateFull(d).toUpperCase()}${plan.travel ? ' · TRAVEL MODE' : ''}</div>
-  </div>
-
-  <hr class="divider-light">
-
-  <!-- BREAKFAST -->
-  ${plan.breakfast ? `
-  <div class="section">
-    <div class="section-label">Breakfast</div>
-    <div class="item">
-      <span class="item-name">${plan.breakfast.name}</span>
-      <span class="item-cal">${plan.breakfast.cal} kcal</span>
-    </div>
-    <div class="item-note">${plan.breakfast.portion}</div>
-  </div>
-  <hr class="divider-dashed">` : ''}
-
-  <!-- LUNCH -->
-  ${!plan.travel ? `
-  <div class="section">
-    <div class="section-label">Lunch</div>
-    ${[
-      {n:'Rice',    i:plan.lunch_rice},
-      {n:'Fish',    i:plan.lunch_fish},
-      {n:'Thoran',  i:plan.lunch_thoran},
-      {n:'Sprouts', i:plan.lunch_sprouts},
-      {n:'Moru',    i:plan.lunch_moru},
-      {n:'Sweet',   i:plan.lunch_sweet},
-    ].filter(x=>x.i).map(x=>`
-      <div class="item">
-        <span class="item-name">${x.i.name}</span>
-        <span class="item-cal">${x.i.cal} kcal</span>
-      </div>
-      <div class="item-note">${x.i.portion}</div>
-    `).join('<hr class="divider-dashed">')}
-    <div class="notice">Moru is non-negotiable · Fish flesh over gravy</div>
-  </div>
-  <hr class="divider-dashed">
-
-  <!-- DINNER -->
-  <div class="section">
-    <div class="section-label">Dinner</div>
-    ${[
-      {n:'Millet', i:plan.dinner_millet},
-      {n:'Salad',  i:plan.dinner_salad},
-    ].filter(x=>x.i).map(x=>`
-      <div class="item">
-        <span class="item-name">${x.i.name}</span>
-        <span class="item-cal">${x.i.cal} kcal</span>
-      </div>
-      <div class="item-note">${x.i.portion}</div>
-    `).join('<hr class="divider-dashed">')}
-    <div class="notice">Minimum 2 eggs · Salad is non-negotiable</div>
-  </div>
-  <hr class="divider-dashed">` : `
-  <!-- TRAVEL MEALS -->
-  <div class="section">
-    <div class="section-label">Travel Meals</div>
-    ${[
-      {n:'Lunch',  i:plan.lunch_fish},
-      {n:'Dinner', i:plan.dinner_millet},
-    ].filter(x=>x.i).map(x=>`
-      <div class="item">
-        <span class="item-name">${x.i.name}</span>
-        <span class="item-cal">${x.i.cal} kcal</span>
-      </div>
-      <div class="item-note">${x.i.portion}</div>
-    `).join('<hr class="divider-dashed">')}
-  </div>
-  <hr class="divider-dashed">`}
-
-  <!-- SNACK -->
-  ${plan.snack ? `
-  <div class="section">
-    <div class="section-label">Snack</div>
-    <div class="item">
-      <span class="item-name">${plan.snack.name}</span>
-      <span class="item-cal">${plan.snack.cal} kcal</span>
-    </div>
-    <div class="item-note">${plan.snack.portion}</div>
-  </div>` : ''}
-
-  <hr class="divider-solid">
-
-  <!-- TOTALS -->
-  <div class="totals">
-    <div class="total-label">Nutritional Summary</div>
-    <div class="total-row">
-      <span class="total-name">Daily Target</span>
-      <span class="total-val">~${targetCal} kcal</span>
-    </div>
-    <div class="total-row">
-      <span class="total-name">Protein</span>
-      <span class="total-val">${totals.pro} g</span>
-    </div>
-    <div class="total-row">
-      <span class="total-name">Carbohydrates</span>
-      <span class="total-val">${totals.carb} g</span>
-    </div>
-    <div class="total-row">
-      <span class="total-name">Fat</span>
-      <span class="total-val">${totals.fat} g</span>
-    </div>
-  </div>
-
-  <hr class="divider-light">
-
-  <div class="grand">
-    <span class="grand-label">Total Calories</span>
-    <span class="grand-val">~${totals.cal}</span>
-  </div>
-
-  <hr class="divider-solid" style="margin-top:24px;">
-
-  <!-- CLOSING -->
-  <div class="closing">
-    <div class="closing-sub">Mission OS · ${new Date().toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'})}</div>
-  </div>
-
-</div>
-</body></html>`;
-
-  // Generate PDF using html2canvas + jsPDF
-  const container = document.createElement('div');
-  container.style.cssText = 'position:fixed;left:-9999px;top:0;width:420px;background:#F5F0E8;';
-  container.innerHTML = `<div style="font-family:Georgia,serif;background:#F5F0E8;color:#1B1814;padding:52px 44px 60px;width:420px;">${html.split('<body>')[1].split('</body>')[0]}</div>`;
-  document.body.appendChild(container);
-
-  // Show loading state
-  const btn = event && event.target ? event.target : null;
-  const origText = btn ? btn.textContent : '';
-  if(btn) btn.textContent = 'Generating…';
-
-  try {
-    await new Promise(r => setTimeout(r, 300)); // let fonts render
-
-    const canvas = await html2canvas(container, {
-      scale: 2,
-      backgroundColor: '#F5F0E8',
-      useCORS: true,
-      logging: false,
-    });
-
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a5' });
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-    const pdfW = pdf.internal.pageSize.getWidth();
-    const pdfH = (canvas.height * pdfW) / canvas.width;
-    pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
-    pdf.save(`meal-plan-${key}.pdf`);
-
-    if(btn) btn.textContent = origText;
-  } catch(err) {
-    console.error('PDF error:', err);
-    if(btn) btn.textContent = origText;
-    // Fallback to HTML download
-    const blob = new Blob([html], {type: 'text/html'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `meal-plan-${key}.html`;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => { URL.revokeObjectURL(url); document.body.removeChild(a); }, 1000);
-  } finally {
-    document.body.removeChild(container);
+async function ensureJsPDF(){
+  if(typeof window.jspdf === 'undefined'){
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
   }
 }
+
+function downloadPdfBlob(pdf, filename){
+  const blob = pdf.output('blob');
+  const url = URL.createObjectURL(new Blob([blob], {type:'application/pdf'}));
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); document.body.removeChild(a); }, 2000);
+}
+
+function buildMealPlanPDF(slots, dateStr, target){
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({orientation:'portrait', unit:'mm', format:'a5'});
+  const W = pdf.internal.pageSize.getWidth();
+  const PAD = 14;
+  const RIGHT = W - PAD;
+  let y = 20;
+
+  const rule = (yy, dark) => {
+    pdf.setDrawColor(...(dark ? [27,24,20] : [200,191,176]));
+    pdf.setLineWidth(0.3);
+    pdf.line(PAD, yy, RIGHT, yy);
+  };
+
+  // Header
+  pdf.setFont('helvetica','bold');
+  pdf.setFontSize(32);
+  pdf.setTextColor(27,24,20);
+  pdf.text('89.9', W/2, y, {align:'center'});
+  y += 7;
+
+  pdf.setFont('helvetica','normal');
+  pdf.setFontSize(7);
+  pdf.setTextColor(140,133,123);
+  pdf.text('MEAL PLAN', W/2, y, {align:'center'});
+  y += 5;
+
+  pdf.setFont('helvetica','italic');
+  pdf.setFontSize(9);
+  pdf.text(dateStr, W/2, y, {align:'center'});
+  y += 7;
+
+  rule(y, true); y += 7;
+
+  // Target
+  pdf.setFont('helvetica','normal');
+  pdf.setFontSize(7);
+  pdf.setTextColor(140,133,123);
+  pdf.text('CALORIE TARGET', PAD, y);
+  pdf.setFont('helvetica','bold');
+  pdf.setFontSize(13);
+  pdf.setTextColor(154,123,60);
+  pdf.text(`${target.toLocaleString()} kcal`, RIGHT, y, {align:'right'});
+  y += 8;
+
+  rule(y); y += 6;
+
+  // Slots
+  let total = 0;
+  slots.forEach(slot => {
+    if(!slot.item) return;
+    const cal = slot.item.cal || 0;
+    total += cal;
+
+    pdf.setFont('helvetica','normal');
+    pdf.setFontSize(7);
+    pdf.setTextColor(140,133,123);
+    pdf.text(slot.label.toUpperCase(), PAD, y);
+    y += 5;
+
+    const nameLines = pdf.splitTextToSize(slot.item.name, RIGHT - PAD - 26);
+    pdf.setFont('helvetica','normal');
+    pdf.setFontSize(11);
+    pdf.setTextColor(27,24,20);
+    pdf.text(nameLines, PAD, y);
+
+    pdf.setFont('helvetica','bold');
+    pdf.setFontSize(11);
+    pdf.text(`${cal}`, RIGHT, y, {align:'right'});
+    pdf.setFont('helvetica','normal');
+    pdf.setFontSize(7);
+    pdf.setTextColor(140,133,123);
+    pdf.text('kcal', RIGHT, y+4, {align:'right'});
+
+    y += nameLines.length * 5 + 4;
+    rule(y); y += 5;
+  });
+
+  // Totals
+  y += 2;
+  pdf.setFont('helvetica','normal');
+  pdf.setFontSize(7);
+  pdf.setTextColor(140,133,123);
+  pdf.text('TOTAL', PAD, y);
+  pdf.setFont('helvetica','bold');
+  pdf.setFontSize(13);
+  pdf.setTextColor(27,24,20);
+  pdf.text(`${total.toLocaleString()} kcal`, RIGHT, y, {align:'right'});
+  y += 8;
+
+  const rem = target - total;
+  const remC = rem < 0 ? [122,58,26] : rem <= 100 ? [46,92,46] : [27,24,20];
+  pdf.setFont('helvetica','normal');
+  pdf.setFontSize(7);
+  pdf.setTextColor(140,133,123);
+  pdf.text('REMAINING', PAD, y);
+  pdf.setFont('helvetica','bold');
+  pdf.setFontSize(16);
+  pdf.setTextColor(...remC);
+  pdf.text(`${rem.toLocaleString()} kcal`, RIGHT, y, {align:'right'});
+  y += 12;
+
+  rule(y, true); y += 6;
+  pdf.setFont('helvetica','italic');
+  pdf.setFontSize(7);
+  pdf.setTextColor(140,133,123);
+  pdf.text('The Re-entry · Mission OS · 89.9', W/2, y, {align:'center'});
+
+  return pdf;
+}
+
+async function shareMealPDF(){
+  try {
+    await ensureJsPDF();
+  } catch(e) {
+    alert('Could not load PDF library. Check internet connection.'); return;
+  }
+  const key = keyForOffset(mealDayOffset || 0);
+  const d = keyToDate(key);
+  const dateStr = DOW[d.getDay()] + ', ' + d.getDate() + ' ' + MO[d.getMonth()] + ' ' + d.getFullYear();
+  const plan = getMealPlan(key);
+  const target = dailyTarget(currentWeight());
+  const lunchCal = (plan.lunch_fish?.cal||0) + (plan.lunch_rice?.cal||0);
+  const lunchName = plan.lunch_rice ? `Rice + ${plan.lunch_fish?.name||''}` : (plan.lunch_fish?.name||'');
+  const slots = [
+    {label:'Breakfast', item: plan.breakfast},
+    {label:'Lunch',     item: lunchName ? {name:lunchName, cal:lunchCal} : null},
+    {label:'Dinner',    item: plan.dinner_millet},
+    {label:'Snack',     item: plan.snack},
+  ];
+  try {
+    const pdf = buildMealPlanPDF(slots, dateStr, target);
+    downloadPdfBlob(pdf, `meal-plan-${key}.pdf`);
+  } catch(err) {
+    console.error('PDF error:', err);
+    alert('PDF generation failed: ' + err.message);
+  }
+}
+
+async function shareMealPlanPdf(){
+  try {
+    await ensureJsPDF();
+  } catch(e) {
+    alert('Could not load PDF library. Check internet connection.'); return;
+  }
+  const key = keyForOffset(1);
+  const d = keyToDate(key);
+  const dateStr = DOW[d.getDay()] + ', ' + d.getDate() + ' ' + MO[d.getMonth()] + ' ' + d.getFullYear();
+  const target = dailyTarget(currentWeight());
+  const slots = [
+    {label:'Breakfast', item: mpPlan.breakfast},
+    {label:'Lunch',     item: mpPlan.lunch_fish || mpPlan.lunch_rice},
+    {label:'Dinner',    item: mpPlan.dinner_millet},
+    {label:'Snack',     item: mpPlan.snack},
+  ];
+
+  const pdfBtn = document.querySelector('#meal-planner-overlay .btn-primary');
+  if(pdfBtn) pdfBtn.textContent = 'Generating…';
+  try {
+    const pdf = buildMealPlanPDF(slots, dateStr, target);
+    downloadPdfBlob(pdf, `meal-plan-${key}.pdf`);
+  } catch(err) {
+    console.error('PDF error:', err);
+    alert('PDF generation failed: ' + err.message);
+  } finally {
+    if(pdfBtn) pdfBtn.textContent = 'Share as PDF';
+  }
+}
+
+
 
 function showPrintPreview(html){
   // Inline preview overlay for environments where blob download is also blocked
@@ -3730,91 +3642,6 @@ function updateMpTotals(){
   }
 }
 
-async function shareMealPlanPdf(){
-  const key = keyForOffset(1);
-  const d = keyToDate(key);
-  const target = dailyTarget(currentWeight());
-
-  // Build plan from mpPlan
-  const slots = [
-    {label:'Breakfast', item: mpPlan.breakfast},
-    {label:'Lunch',     item: mpPlan.lunch_fish},
-    {label:'Dinner',    item: mpPlan.dinner_millet},
-    {label:'Snack',     item: mpPlan.snack},
-  ].filter(s => s.item);
-
-  const total = slots.reduce((s, sl) => s + (sl.item.cal || 0), 0);
-  const remaining = target - total;
-
-  const rows = slots.map(s => `
-    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid #C8BFB0;">
-      <div>
-        <div style="font-family:sans-serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#8C857B;margin-bottom:4px;">${s.label}</div>
-        <div style="font-family:Georgia,serif;font-size:18px;color:#1B1814;">${s.item.name}</div>
-      </div>
-      <div style="font-family:Georgia,serif;font-size:16px;color:#1B1814;text-align:right;flex-shrink:0;margin-left:16px;">${s.item.cal} kcal</div>
-    </div>`).join('');
-
-  const html = `
-    <div style="font-family:Georgia,serif;background:#F4EFE5;color:#1B1814;padding:48px 40px;width:380px;">
-      <div style="text-align:center;margin-bottom:32px;">
-        <div style="font-size:52px;font-weight:600;letter-spacing:-.02em;line-height:1;">89.9</div>
-        <div style="font-family:sans-serif;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:#8C857B;margin-top:6px;">Meal Plan</div>
-        <div style="font-size:12px;font-style:italic;color:#8C857B;margin-top:4px;">${DOW[d.getDay()]}, ${d.getDate()} ${MO[d.getMonth()]} ${d.getFullYear()}</div>
-      </div>
-      <div style="border-top:1px solid #1B1814;margin-bottom:24px;"></div>
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:24px;">
-        <div style="font-family:sans-serif;font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:#8C857B;">Calorie Target</div>
-        <div style="font-family:Georgia,serif;font-size:22px;color:#9A7B3C;">${target.toLocaleString()} kcal</div>
-      </div>
-      ${rows}
-      <div style="border-top:1px solid #1B1814;margin-top:24px;padding-top:20px;">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
-          <div style="font-family:sans-serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#8C857B;">Total</div>
-          <div style="font-size:18px;">${total.toLocaleString()} kcal</div>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;">
-          <div style="font-family:sans-serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#8C857B;">Remaining</div>
-          <div style="font-size:28px;color:${remaining < 0 ? '#7A3A1A' : remaining <= 100 ? '#2E5C2E' : '#1B1814'};">${remaining.toLocaleString()} kcal</div>
-        </div>
-      </div>
-      <div style="text-align:center;margin-top:32px;border-top:1px solid #C8BFB0;padding-top:20px;">
-        <div style="font-family:sans-serif;font-size:8px;letter-spacing:.26em;text-transform:uppercase;color:#C8BFB0;">The Re-entry · Mission OS</div>
-      </div>
-    </div>`;
-
-  // Render to PDF
-  const container = document.createElement('div');
-  container.style.cssText = 'position:fixed;left:-9999px;top:0;width:380px;background:#F4EFE5;';
-  container.innerHTML = html;
-  document.body.appendChild(container);
-
-  const pdfBtn = document.querySelector('#meal-planner-overlay .btn-primary');
-  if(pdfBtn) pdfBtn.textContent = 'Generating…';
-
-  try {
-    await new Promise(r => setTimeout(r, 300));
-    const canvas = await html2canvas(container, {
-      scale: 2,
-      backgroundColor: '#F4EFE5',
-      useCORS: true,
-      logging: false,
-    });
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a5' });
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-    const pdfW = pdf.internal.pageSize.getWidth();
-    const pdfH = (canvas.height * pdfW) / canvas.width;
-    pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
-    pdf.save(`meal-plan-${key}.pdf`);
-  } catch(err) {
-    console.error('PDF error:', err);
-    alert('PDF generation failed. Try the PDF button in the meal detail view.');
-  } finally {
-    document.body.removeChild(container);
-    if(pdfBtn) pdfBtn.textContent = 'Share as PDF';
-  }
-}
 
 // FAB visibility — only show on Today tab
 function updateFabVisibility(tab){
