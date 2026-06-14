@@ -701,7 +701,7 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 .phone{width:100%;min-height:100vh;background:var(--bg);position:relative;transition:background .4s;overflow:hidden;}
 
 /* SCREENS */
-.screen{display:none;height:100vh;overflow-y:auto;padding-bottom:calc(var(--nav-h) + 24px);-webkit-overflow-scrolling:touch;position:absolute;top:0;left:0;width:100%;will-change:transform,opacity;overscroll-behavior-y:contain;}
+.screen{display:none;height:100vh;overflow-y:auto;padding-bottom:calc(var(--nav-h) + 24px);-webkit-overflow-scrolling:touch;position:absolute;top:0;left:0;width:100%;will-change:transform,opacity;overscroll-behavior-y:contain;background:var(--bg);transition:background .35s;}
 .screen.on{display:block;}
 /* FULL SCREEN OVERLAY */
 .overlay{position:fixed;inset:0;background:var(--bg);z-index:60;display:none;flex-direction:column;overflow-y:auto;transition:background .4s;}
@@ -818,7 +818,7 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 .wake-target-line{text-align:center;font-family:var(--serif);font-size:13px;font-weight:300;font-style:italic;color:var(--t4);padding:4px var(--pad) var(--s3);}
 
 /* FAB — pressable shadow */
-.fab{position:fixed;bottom:calc(var(--nav-h) + 16px);right:var(--pad);width:60px;height:60px;border-radius:30px;background:var(--t1);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15),0 6px 20px rgba(0,0,0,.12);z-index:35;-webkit-tap-highlight-color:transparent;transition:opacity .15s,transform .15s,box-shadow .15s;}
+.fab{position:fixed;bottom:calc(var(--nav-h) + 16px);left:var(--pad);width:60px;height:60px;border-radius:30px;background:var(--t1);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15),0 6px 20px rgba(0,0,0,.12);z-index:35;-webkit-tap-highlight-color:transparent;transition:opacity .15s,transform .15s,box-shadow .15s;}
 .fab:active{opacity:.8;transform:scale(.95);box-shadow:0 1px 4px rgba(0,0,0,.12);}
 .dk .fab{box-shadow:0 2px 8px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);}
 
