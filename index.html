@@ -843,26 +843,289 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 .tod-verdict.positive{color:var(--risk-on);}
 .tod-verdict.warning{color:var(--risk-at);}
 
-/* Change 7 — September 1 arrival */
-/* ═══ ACHIEVEMENTS ═══ */
-.ach-category{margin-bottom:var(--s4);}
-.ach-cat-label{font-family:var(--sans);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--t4);padding:0 var(--pad);margin-bottom:var(--s2);display:block;}
-.ach-row{display:flex;gap:10px;padding:0 var(--pad);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px;}
-.ach-row::-webkit-scrollbar{display:none;}
-.badge-card{flex-shrink:0;width:116px;border-radius:12px;overflow:hidden;position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.badge-card-inner{width:100%;padding-top:145%;position:relative;border-radius:12px;overflow:hidden;}
-.badge-bg{position:absolute;inset:0;border-radius:12px;}
-.badge-lock-overlay{position:absolute;inset:0;background:rgba(0,0,0,.68);border-radius:12px;}
-.badge-earned-border{position:absolute;inset:0;border:1.5px solid rgba(154,123,60,.8);border-radius:12px;pointer-events:none;}
-.badge-content{position:absolute;inset:0;padding:12px 10px 10px;display:flex;flex-direction:column;justify-content:space-between;}
-.badge-emoji{font-size:24px;line-height:1;}
-.badge-name{font-family:var(--serif);font-size:13px;font-weight:400;color:#fff;line-height:1.2;margin-bottom:3px;}
-.badge-desc{font-family:var(--serif);font-size:9.5px;font-weight:300;font-style:italic;color:rgba(255,255,255,.62);line-height:1.3;}
-.badge-date{font-family:var(--sans);font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(154,123,60,.9);margin-top:4px;}
-.badge-progress-bar{height:2px;background:rgba(255,255,255,.15);border-radius:1px;margin:6px 0 3px;overflow:hidden;}
-.badge-progress-fill{height:100%;background:rgba(255,255,255,.45);border-radius:1px;}
-.badge-progress-text{font-family:var(--sans);font-size:7.5px;color:rgba(255,255,255,.4);letter-spacing:.08em;}
-.badge-lock-icon{position:absolute;top:8px;right:8px;font-size:11px;opacity:.45;}
+/* ═══ MISSION ARCHIVE ═══ */
+
+/* ═══ MISSION ARCHIVE — PREMIUM ARCHIVAL SYSTEM ═══ */
+
+/* Section heading */
+.arc-head{
+  padding:var(--s5) var(--pad) var(--s2);
+}
+.arc-title{
+  font-family:var(--serif);font-size:28px;font-weight:300;
+  color:var(--t1);letter-spacing:.01em;line-height:1.1;
+  margin-bottom:4px;
+}
+.arc-sub{
+  font-family:var(--sans);font-size:10px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--t4);
+}
+
+/* Category block */
+.arc-category{
+  margin-bottom:var(--s5);
+}
+.arc-cat-rule{
+  display:flex;align-items:center;gap:12px;
+  padding:0 var(--pad);margin-bottom:var(--s3);
+}
+.arc-cat-label{
+  font-family:var(--sans);font-size:9px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--t3);white-space:nowrap;
+  flex-shrink:0;
+}
+.arc-cat-line{
+  flex:1;height:1px;background:var(--rl);
+}
+.arc-cat-count{
+  font-family:var(--sans);font-size:9px;letter-spacing:.12em;
+  color:var(--t4);flex-shrink:0;
+}
+
+/* Artifact row — horizontal scroll */
+.arc-row{
+  display:flex;gap:14px;
+  padding:0 var(--pad);
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  padding-bottom:10px; /* room for shadow */
+}
+.arc-row::-webkit-scrollbar{display:none;}
+
+/* ── Individual artifact card ── */
+.artifact{
+  flex-shrink:0;
+  width:152px;
+  border-radius:15px;
+  background:#EDE7DB; /* light mode default */
+  position:relative;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+
+  /* Paper sitting on desk — two-layer shadow:
+     1) very close, ultra-soft ambient contact shadow
+     2) faint lifted halo */
+  box-shadow:
+    0 1px 2px rgba(28,25,20,.06),
+    0 3px 10px rgba(28,25,20,.07),
+    inset 0 1px 0 rgba(255,255,255,.55); /* top edge highlight = paper thickness */
+
+  /* Border as fine letterpress edge */
+  border:1px solid rgba(28,25,20,.09);
+
+  transition:box-shadow .25s, border-color .25s, opacity .18s;
+}
+
+/* Earned card — elevated presence */
+.artifact.earned{
+  background:#EAE3D6; /* very slightly richer ivory */
+  border-color:rgba(154,123,60,.22);
+  box-shadow:
+    0 1px 2px rgba(28,25,20,.05),
+    0 4px 14px rgba(28,25,20,.09),
+    0 0 0 0.5px rgba(154,123,60,.12), /* hairline gold ring */
+    inset 0 1px 0 rgba(255,255,255,.7),
+    inset 0 0 18px rgba(154,123,60,.03); /* barely-there warm interior glow */
+}
+
+.artifact:active{
+  box-shadow:
+    0 1px 2px rgba(28,25,20,.04),
+    0 2px 6px rgba(28,25,20,.05),
+    inset 0 1px 0 rgba(255,255,255,.45);
+  opacity:.93;
+}
+
+/* ── Illustration area — hero, 62% of card ── */
+.art-illustration{
+  width:100%;
+  /* 62% of card height via padding-top trick */
+  padding-top:62%;
+  position:relative;
+  overflow:hidden;
+  background:#E6DFD3;
+  border-bottom:1px solid rgba(28,25,20,.07);
+}
+
+.artifact.earned .art-illustration{
+  background:#E8E0D0;
+  border-bottom-color:rgba(154,123,60,.13);
+}
+
+/* SVG sits centered inside the padding-box */
+.art-illustration svg{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:82px;height:82px;
+  transition:opacity .3s;
+}
+
+/* Undiscovered — illustration present but very faint */
+.artifact:not(.earned) .art-illustration svg{
+  opacity:.18;
+}
+.artifact.earned .art-illustration svg{
+  opacity:1;
+}
+
+/* Letterpress-into-paper feel:
+   a soft inset vignette makes the illustration feel embossed rather than floating */
+.art-illustration::before{
+  content:'';
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(ellipse at 50% 0%,   rgba(255,255,255,.18) 0%,transparent 65%),
+    radial-gradient(ellipse at 50% 100%, rgba(28,25,20,.04)    0%,transparent 65%);
+}
+
+/* Earned: warm gold crown light */
+.artifact.earned .art-illustration::before{
+  background:
+    radial-gradient(ellipse at 50% 0%,   rgba(255,255,255,.28) 0%,transparent 60%),
+    radial-gradient(ellipse at 50% 100%, rgba(154,123,60,.05)  0%,transparent 60%);
+}
+
+/* Undiscovered veil — haze over the ghosted art */
+.art-veil{
+  position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:rgba(230,223,211,.45);
+  transition:opacity .3s;
+}
+.artifact.earned .art-veil{
+  opacity:0;
+}
+
+/* ── Text body — 38% of card ── */
+.art-body{
+  padding:11px 13px 13px;
+  flex:1;
+  display:flex;flex-direction:column;justify-content:space-between;
+  /* Subtle inner paper texture via inset top rule */
+  position:relative;
+}
+
+/* Earned body: warmer paper tone */
+.artifact.earned .art-body{
+  background:linear-gradient(to bottom,rgba(154,123,60,.025) 0%,transparent 30%);
+}
+
+.art-name{
+  font-family:var(--serif);font-size:14px;font-weight:400;
+  color:var(--t1);line-height:1.25;margin-bottom:3px;
+  letter-spacing:.01em;
+}
+.artifact:not(.earned) .art-name{
+  color:var(--t4);
+  font-weight:300;
+}
+
+.art-desc{
+  font-family:var(--serif);font-size:10px;font-weight:300;font-style:italic;
+  color:var(--t3);line-height:1.5;
+}
+.artifact:not(.earned) .art-desc{
+  color:var(--t4);
+  opacity:.7;
+}
+
+/* ── Earned meta — Archived / date ── */
+.art-meta{
+  margin-top:9px;padding-top:8px;
+  border-top:1px solid rgba(154,123,60,.16);
+}
+.art-catalogued{
+  font-family:var(--sans);font-size:7px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--ac);
+  margin-bottom:2px;opacity:.85;
+}
+.art-date{
+  font-family:var(--sans);font-size:8px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ac);
+  opacity:.7;
+}
+
+/* ── Progress bar — undiscovered ── */
+.art-progress-wrap{
+  margin-top:9px;padding-top:8px;
+  border-top:1px solid var(--rl);
+}
+.art-progress-rail{
+  height:1px;background:rgba(28,25,20,.08);
+  position:relative;overflow:hidden;margin-bottom:5px;
+}
+.art-progress-fill{
+  height:100%;background:var(--t4);
+  position:absolute;left:0;top:0;
+  transition:width .5s cubic-bezier(.4,0,.2,1);
+}
+.art-progress-label{
+  font-family:var(--sans);font-size:7px;
+  letter-spacing:.1em;color:var(--t4);
+  display:flex;justify-content:space-between;
+  opacity:.7;
+}
+
+/* ── Undiscovered label ── */
+.art-undiscovered{
+  margin-top:9px;padding-top:8px;
+  border-top:1px solid var(--rl);
+  font-family:var(--sans);font-size:7px;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--t4);opacity:.5;
+}
+
+/* ── Dark mode ── */
+.dk .artifact{
+  background:#1E1B17;
+  border-color:rgba(237,231,219,.08);
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.2),
+    0 4px 14px rgba(0,0,0,.25),
+    inset 0 1px 0 rgba(237,231,219,.06);
+}
+.dk .artifact.earned{
+  background:#221F1A;
+  border-color:rgba(184,146,74,.2);
+  box-shadow:
+    0 1px 3px rgba(0,0,0,.22),
+    0 5px 18px rgba(0,0,0,.28),
+    0 0 0 0.5px rgba(184,146,74,.1),
+    inset 0 1px 0 rgba(237,231,219,.09),
+    inset 0 0 20px rgba(184,146,74,.03);
+}
+.dk .art-illustration{
+  background:#252118;
+  border-bottom-color:rgba(237,231,219,.06);
+}
+.dk .artifact.earned .art-illustration{
+  background:#28231C;
+  border-bottom-color:rgba(184,146,74,.1);
+}
+.dk .art-illustration::before{
+  background:
+    radial-gradient(ellipse at 50% 0%,   rgba(237,231,219,.06) 0%,transparent 65%),
+    radial-gradient(ellipse at 50% 100%, rgba(0,0,0,.08)       0%,transparent 65%);
+}
+.dk .artifact.earned .art-illustration::before{
+  background:
+    radial-gradient(ellipse at 50% 0%,   rgba(237,231,219,.1)  0%,transparent 60%),
+    radial-gradient(ellipse at 50% 100%, rgba(184,146,74,.06)  0%,transparent 60%);
+}
+.dk .art-veil{
+  background:rgba(22,20,18,.55);
+}
+.dk .artifact.earned .art-body{
+  background:linear-gradient(to bottom,rgba(184,146,74,.03) 0%,transparent 30%);
+}
+.dk .art-meta{
+  border-top-color:rgba(184,146,74,.14);
+}
+.dk .art-progress-rail{
+  background:rgba(237,231,219,.07);
+}
 .best-card{flex:1;background:var(--bg-r);border-radius:10px;padding:12px 10px;text-align:center;min-width:0;}
 .best-val{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t1);line-height:1;margin-bottom:4px;}
 .best-lbl{font-family:var(--sans);font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:var(--t4);line-height:1.3;}
@@ -1407,8 +1670,11 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
   <div class="sh" style="margin-top:var(--s4);"><span class="sl">Personal Bests</span><div class="sr"></div></div>
   <div id="pat-bests" style="padding:0 var(--pad);display:flex;gap:12px;margin-bottom:var(--s2);"></div>
 
-  <!-- Achievements -->
-  <div class="sh"><span class="sl">Achievements</span><div class="sr"></div></div>
+  <!-- Mission Archive -->
+  <div class="arc-head">
+    <div class="arc-title">Mission Archive</div>
+    <div class="arc-sub">Artifacts collected along the way</div>
+  </div>
   <div id="pat-achievements" style="padding-bottom:var(--s3);"></div>
 
   <!-- Data Diagnostic -->
@@ -1421,16 +1687,25 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
   <div style="height:40px;"></div>
 </div>
 
-<!-- BADGE EARN OVERLAY -->
+<!-- ARTIFACT DISCOVERY OVERLAY -->
 <div id="badge-overlay" style="display:none;position:fixed;inset:0;z-index:96;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:var(--pad);">
-  <div id="badge-overlay-bg" style="position:absolute;inset:0;opacity:.96;"></div>
-  <div style="position:relative;z-index:1;animation:arrivalFade .6s cubic-bezier(.16,1,.3,1) both;">
-    <div id="bo-emoji" style="font-size:64px;margin-bottom:var(--s3);line-height:1;"></div>
-    <div style="font-family:var(--sans);font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:var(--s2);">Achievement Unlocked</div>
-    <div id="bo-name" style="font-family:var(--serif);font-size:32px;font-weight:300;color:#fff;margin-bottom:var(--s2);"></div>
-    <div style="height:1px;width:48px;background:rgba(255,255,255,.4);margin:0 auto var(--s3);"></div>
-    <div id="bo-desc" style="font-family:var(--serif);font-size:17px;font-weight:300;font-style:italic;color:rgba(255,255,255,.8);line-height:1.6;"></div>
+  <div id="badge-overlay-bg" style="position:absolute;inset:0;opacity:.97;background:var(--bg);"></div>
+  <div style="position:relative;z-index:1;animation:arrivalFade .7s cubic-bezier(.16,1,.3,1) both;max-width:280px;width:100%;">
+    <!-- Illustration -->
+    <div id="bo-illustration" style="margin:0 auto var(--s4);width:96px;height:96px;display:flex;align-items:center;justify-content:center;"></div>
+    <!-- Eyebrow -->
+    <div style="font-family:var(--sans);font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--ac);margin-bottom:var(--s2);">Artifact Discovered</div>
+    <!-- Rule -->
+    <div style="height:1px;width:32px;background:var(--ac);opacity:.5;margin:0 auto var(--s3);"></div>
+    <!-- Name -->
+    <div id="bo-name" style="font-family:var(--serif);font-size:26px;font-weight:300;color:var(--t1);margin-bottom:var(--s2);line-height:1.2;"></div>
+    <!-- Description -->
+    <div id="bo-desc" style="font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--t2);line-height:1.65;"></div>
+    <!-- Date -->
+    <div id="bo-date" style="font-family:var(--sans);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--t4);margin-top:var(--s4);"></div>
   </div>
+  <!-- Hidden emoji holder — kept for JS compat -->
+  <div id="bo-emoji" style="display:none;"></div>
 </div>
 
 <!-- NAV -->
@@ -3729,13 +4004,16 @@ function renderVerdict(){
 function initSwipe(){
   const phone = document.getElementById('phone');
   if(!phone) return;
-  let startX = 0, startY = 0, startTime = 0;
+  let startX = 0, startY = 0, startTime = 0, startedInScroller = false;
   phone.addEventListener('touchstart', e => {
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
     startTime = Date.now();
+    // Flag if touch begins inside any horizontal scroll container
+    startedInScroller = !!e.target.closest('.arc-row, .ach-row');
   }, {passive:true});
   phone.addEventListener('touchend', e => {
+    if(startedInScroller) return;
     const dx = e.changedTouches[0].clientX - startX;
     const dy = e.changedTouches[0].clientY - startY;
     const dt = Date.now() - startTime;
@@ -4223,18 +4501,321 @@ function checkAllBadges(){
   return newlyEarned;
 }
 
+// ═══════════════════════════════════════════════
+// MISSION ARCHIVE — ILLUSTRATION LIBRARY
+// Monochrome engraving-style SVG per badge id
+// ═══════════════════════════════════════════════
+const ARTIFACT_ILLUSTRATIONS = {
+  // WAKE
+  w1:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="36" cy="36" r="10" stroke="currentColor" stroke-width="1.2"/>
+    <line x1="36" y1="8" x2="36" y2="14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="36" y1="58" x2="36" y2="64" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="8" y1="36" x2="14" y2="36" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="58" y1="36" x2="64" y2="36" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="17.5" y1="17.5" x2="21.7" y2="21.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="50.3" y1="50.3" x2="54.5" y2="54.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="54.5" y1="17.5" x2="50.3" y2="21.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="21.7" y1="50.3" x2="17.5" y2="54.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    <path d="M20 52 Q36 28 52 52" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2" fill="none" opacity=".35"/>
+  </svg>`,
+  w2:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14 44 Q36 18 58 44" stroke="currentColor" stroke-width="1.2" fill="none"/>
+    <line x1="14" y1="44" x2="58" y2="44" stroke="currentColor" stroke-width="1" opacity=".3"/>
+    <circle cx="36" cy="34" r="4" fill="currentColor" opacity=".5"/>
+    <line x1="36" y1="10" x2="36" y2="18" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="20" y1="16" x2="24" y2="22" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity=".5"/>
+    <line x1="52" y1="16" x2="48" y2="22" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity=".5"/>
+    <path d="M28 56 L36 48 L44 56" stroke="currentColor" stroke-width="1" fill="none" opacity=".4"/>
+  </svg>`,
+  w3:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M36 12 L38.4 19.2 L46 19.2 L39.8 23.6 L42.2 30.8 L36 26.4 L29.8 30.8 L32.2 23.6 L26 19.2 L33.6 19.2 Z" stroke="currentColor" stroke-width="1.1" fill="none"/>
+    <circle cx="36" cy="42" r="12" stroke="currentColor" stroke-width="1.1" stroke-dasharray="3 2"/>
+    <line x1="36" y1="30" x2="36" y2="36" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+    <line x1="36" y1="48" x2="36" y2="54" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity=".5"/>
+    <line x1="24" y1="42" x2="30" y2="42" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity=".5"/>
+    <line x1="42" y1="42" x2="48" y2="42" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity=".5"/>
+  </svg>`,
+  w4:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 48 Q20 32 28 28 Q36 24 44 28 Q52 32 60 20" stroke="currentColor" stroke-width="1.2" fill="none"/>
+    <circle cx="60" cy="20" r="3" stroke="currentColor" stroke-width="1.1"/>
+    <line x1="12" y1="54" x2="60" y2="54" stroke="currentColor" stroke-width=".8" opacity=".25"/>
+    <line x1="12" y1="48" x2="12" y2="56" stroke="currentColor" stroke-width="1" opacity=".35"/>
+    <line x1="60" y1="54" x2="60" y2="56" stroke="currentColor" stroke-width="1" opacity=".35"/>
+    <path d="M24 54 L24 50 M36 54 L36 46 M48 54 L48 50" stroke="currentColor" stroke-width=".8" opacity=".3"/>
+  </svg>`,
+  w5:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 56 L36 18 L52 56" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+    <path d="M26 42 L46 42" stroke="currentColor" stroke-width="1" opacity=".4"/>
+    <circle cx="36" cy="18" r="2.5" fill="currentColor" opacity=".6"/>
+    <path d="M14 56 L58 56" stroke="currentColor" stroke-width=".8" opacity=".3"/>
+    <path d="M30 56 L30 50 M42 56 L42 50" stroke="currentColor" stroke-width=".8" opacity=".25"/>
+  </svg>`,
+  // ANGAMARDANA
+  a1:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="36" cy="16" r="5" stroke="currentColor" stroke-width="1.2"/>
+    <line x1="36" y1="21" x2="36" y2="38" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+    <path d="M24 30 L36 26 L48 30" stroke="currentColor" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+    <path d="M36 38 L28 52" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    <path d="M36 38 L44 52" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    <path d="M20 42 Q24 50 28 52" stroke="currentColor" stroke-width=".9" stroke-dasharray="2 2" opacity=".4" fill="none"/>
+  </svg>`,
+  a2:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M22 56 L22 28 C22 22 28 18 36 18 C44 18 50 22 50 28 L50 56" stroke="currentColor" stroke-width="1.2" fill="none"/>
+    <line x1="22" y1="38" x2="50" y2="38" stroke="currentColor" stroke-width="1" opacity=".35"/>
+    <line x1="22" y1="48" x2="50" y2="48" stroke="currentColor" stroke-width="1" opacity=".35"/>
+    <circle cx="36" cy="18" r="4" stroke="currentColor" stroke-width="1.1"/>
+    <path d="M14 56 L58 56" stroke="currentColor" stroke-width=".9" opacity=".3"/>
+  </svg>`,
+  a3:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M36 14 L44 26 L58 28 L48 38 L50 52 L36 45 L22 52 L24 38 L14 28 L28 26 Z" stroke="currentColor" stroke-width="1.1" fill="none"/>
+    <circle cx="36" cy="35" r="6" stroke="currentColor" stroke-width=".9" stroke-dasharray="2 2" opacity=".5"/>
+  </svg>`,
+  a4:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M18 54 Q26 36 36 30 Q46 36 54 54" stroke="currentColor" stroke-width="1.3" fill="none"/>
+    <path d="M26 54 Q30 42 36 38 Q42 42 46 54" stroke="currentColor" stroke-width="1" fill="none" opacity=".45"/>
+    <circle cx="36" cy="24" r="6" stroke="currentColor" stroke-width="1.2"/>
+    <line x1="36" y1="18" x2="36" y2="12" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity=".5"/>
+    <path d="M14 58 L58 58" stroke="currentColor" stroke-width=".8" opacity=".25"/>
+  </svg>`,
+  a5:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16 54 L36 16 L56 54" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M24 40 L48 40" stroke="currentColor" stroke-width="1" opacity=".35"/>
+    <path d="M20 54 L36 22 L52 54" stroke="currentColor" stroke-width=".7" stroke-dasharray="2 2" opacity=".2" stroke-linejoin="round"/>
+    <circle cx="36" cy="16" r="3" fill="currentColor" opacity=".5"/>
+  </svg>`,
+  // KRIYA
+  k1:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="36" cy="36" r="18" stroke="currentColor" stroke-width="1.1" stroke-dasharray="3 3"/>
+    <circle cx="36" cy="36" r="10" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="36" cy="36" r="3" fill="currentColor" opacity=".5"/>
+    <path d="M36 18 L36 24 M36 48 L36 54 M18 36 L24 36 M48 36 L54 36" stroke="currentColor" stroke-width=".9" stroke-linecap="round" opacity=".4"/>
+  </svg>`,
+  k2:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14 36 Q22 20 36 20 Q50 20 58 36" stroke="currentColor" stroke-width="1.2" fill="none"/>
+    <path d="M14 36 Q22 52 36 52 Q50 52 58 36" stroke="currentColor" stroke-width=".8" stroke-dasharray="3 2" fill="none" opacity=".4"/>
+    <circle cx="36" cy="36" r="5" stroke="currentColor" stroke-width="1.1"/>
+    <line x1="36" y1="31" x2="36" y2="36" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+  </svg>`,
+  k3:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M36 14 C36 14 50 26 50 38 C50 46 44 52 36 52 C28 52 22 46 22 38 C22 26 36 14 36 14Z" stroke="currentColor" stroke-width="1.2" fill="none"/>
+    <path d="M36 28 C36 28 43 35 43 41 C43 45 40 48 36 48" stroke="currentColor" stroke-width=".8" stroke-dasharray="2 2" fill="none" opacity=".4"/>
+    <circle cx="36" cy="38" r="3" stroke="currentColor" stroke-width="1"/>
+  </svg>`,
+  k4:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="36" cy="36" r="20" stroke="currentColor" stroke-width="1"/>
+    <path d="M36 16 L36 56 M16 36 L56 36" stroke="currentColor" stroke-width=".7" opacity=".2"/>
+    <path d="M36 20 C40 24 44 30 44 36 C44 42 40 48 36 52 C32 48 28 42 28 36 C28 30 32 24 36 20Z" stroke="currentColor" stroke-width=".9" fill="none" opacity=".5"/>
+    <circle cx="36" cy="36" r="4" stroke="currentColor" stroke-width="1.1"/>
+    <circle cx="36" cy="36" r="1.5" fill="currentColor"/>
+  </svg>`,
+  k5:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M36 12 C20 12 12 22 12 36 C12 50 22 60 36 60 C50 60 60 50 60 36 C60 22 52 12 36 12Z" stroke="currentColor" stroke-width="1.1" fill="none"/>
+    <path d="M36 20 C26 20 20 27 20 36 C20 45 26 52 36 52 C46 52 52 45 52 36 C52 27 46 20 36 20Z" stroke="currentColor" stroke-width=".7" opacity=".35" fill="none"/>
+    <circle cx="36" cy="36" r="5" fill="currentColor" opacity=".3"/>
+    <circle cx="36" cy="36" r="2" fill="currentColor" opacity=".6"/>
+  </svg>`,
+  // STEPS
+  s1:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M18 52 L28 52 L28 42 L38 42 L38 32 L48 32 L48 22 L58 22" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" fill="none"/>
+    <path d="M18 54 L58 54" stroke="currentColor" stroke-width=".8" opacity=".25"/>
+    <circle cx="18" cy="52" r="2.5" fill="currentColor" opacity=".5"/>
+    <circle cx="58" cy="22" r="2.5" fill="currentColor" opacity=".5"/>
+    <path d="M23 52 L23 50 M33 42 L33 40 M43 32 L43 30 M53 22 L53 20" stroke="currentColor" stroke-width=".8" opacity=".3"/>
+  </svg>`,
+  s2:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 44 Q24 30 36 36 Q48 42 60 28" stroke="currentColor" stroke-width="1.2" fill="none"/>
+    <path d="M12 50 Q24 36 36 42 Q48 48 60 34" stroke="currentColor" stroke-width=".7" stroke-dasharray="2 2" fill="none" opacity=".3"/>
+    <circle cx="36" cy="36" r="3" fill="currentColor" opacity=".5"/>
+    <path d="M12 56 L60 56" stroke="currentColor" stroke-width=".8" opacity=".2"/>
+  </svg>`,
+  s3:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 56 Q20 40 28 36 Q36 32 44 36 Q52 40 60 56" stroke="currentColor" stroke-width="1.2" fill="none"/>
+    <path d="M12 56 L60 56" stroke="currentColor" stroke-width=".8" opacity=".2"/>
+    <line x1="36" y1="32" x2="36" y2="18" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity=".5"/>
+    <path d="M28 24 L36 18 L44 24" stroke="currentColor" stroke-width=".9" fill="none" opacity=".4"/>
+    <circle cx="36" cy="36" r="3" stroke="currentColor" stroke-width="1"/>
+  </svg>`,
+  s4:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="36" cy="36" r="22" stroke="currentColor" stroke-width="1"/>
+    <path d="M36 14 L36 18 M36 54 L36 58 M14 36 L18 36 M54 36 L58 36" stroke="currentColor" stroke-width=".9" stroke-linecap="round" opacity=".4"/>
+    <path d="M36 14 L38 36 L36 58 L34 36 Z" stroke="currentColor" stroke-width=".8" fill="none" opacity=".3"/>
+    <circle cx="36" cy="32" r="2" fill="currentColor" opacity=".6"/>
+    <path d="M30 42 Q33 46 36 46 Q39 46 42 42" stroke="currentColor" stroke-width=".9" fill="none" opacity=".4"/>
+  </svg>`,
+  s5:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14 58 L22 40 L36 14 L50 40 L58 58" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" fill="none"/>
+    <path d="M20 46 L52 46" stroke="currentColor" stroke-width=".9" opacity=".3"/>
+    <path d="M14 58 L58 58" stroke="currentColor" stroke-width=".8" opacity=".25"/>
+    <circle cx="36" cy="14" r="3" fill="currentColor" opacity=".5"/>
+  </svg>`,
+  // DUMBBELL
+  d1b:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="10" y="32" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.1"/>
+    <rect x="52" y="32" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.1"/>
+    <line x1="20" y1="36" x2="52" y2="36" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    <line x1="20" y1="36" x2="52" y2="36" stroke="currentColor" stroke-width="1.4"/>
+    <rect x="14" y="29" width="6" height="14" rx="1" stroke="currentColor" stroke-width=".9" opacity=".4"/>
+    <rect x="52" y="29" width="6" height="14" rx="1" stroke="currentColor" stroke-width=".9" opacity=".4"/>
+  </svg>`,
+  d2b:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="8" y="30" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.1"/>
+    <rect x="52" y="30" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.1"/>
+    <line x1="20" y1="36" x2="52" y2="36" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+    <line x1="20" y1="36" x2="52" y2="36" stroke="currentColor" stroke-width="1.4"/>
+    <rect x="8" y="26" width="12" height="20" rx="1" stroke="currentColor" stroke-width=".8" opacity=".35"/>
+    <rect x="52" y="26" width="12" height="20" rx="1" stroke="currentColor" stroke-width=".8" opacity=".35"/>
+  </svg>`,
+  d3b:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 36 L14 24 L10 24 L10 48 L14 48 L20 36 L52 36 L58 48 L62 48 L62 24 L58 24 L52 36" stroke="currentColor" stroke-width="1.1" fill="none"/>
+    <line x1="20" y1="36" x2="52" y2="36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <line x1="32" y1="20" x2="40" y2="52" stroke="currentColor" stroke-width=".7" stroke-dasharray="2 2" opacity=".2"/>
+  </svg>`,
+  d4b:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="6" y="26" width="14" height="20" rx="2" stroke="currentColor" stroke-width="1.1"/>
+    <rect x="52" y="26" width="14" height="20" rx="2" stroke="currentColor" stroke-width="1.1"/>
+    <line x1="20" y1="36" x2="52" y2="36" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+    <line x1="20" y1="36" x2="52" y2="36" stroke="currentColor" stroke-width="1.4"/>
+    <rect x="6" y="22" width="14" height="28" rx="1.5" stroke="currentColor" stroke-width=".8" opacity=".3"/>
+    <rect x="52" y="22" width="14" height="28" rx="1.5" stroke="currentColor" stroke-width=".8" opacity=".3"/>
+  </svg>`,
+  d5b:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M18 54 L36 16 L54 54" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+    <path d="M24 42 L48 42" stroke="currentColor" stroke-width=".9" opacity=".35"/>
+    <rect x="22" y="54" width="28" height="4" rx="1" stroke="currentColor" stroke-width=".8" opacity=".3"/>
+    <circle cx="36" cy="16" r="3" fill="currentColor" opacity=".5"/>
+  </svg>`,
+  // WEIGHT LOSS
+  wl1:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 18 L52 18 L58 56 L14 56 Z" stroke="currentColor" stroke-width="1.1" fill="none"/>
+    <path d="M24 18 L20 56 M36 18 L36 56 M48 18 L52 56" stroke="currentColor" stroke-width=".7" opacity=".2"/>
+    <path d="M14 38 L58 38" stroke="currentColor" stroke-width=".8" opacity=".3"/>
+    <path d="M28 26 Q36 22 44 26" stroke="currentColor" stroke-width=".9" fill="none" opacity=".5"/>
+    <circle cx="36" cy="28" r="2" fill="currentColor" opacity=".5"/>
+  </svg>`,
+  wl2:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M36 56 C20 56 12 46 12 38 C12 28 22 20 30 20 C33 20 35 22 36 24 C37 22 39 20 42 20 C50 20 60 28 60 38 C60 46 52 56 36 56Z" stroke="currentColor" stroke-width="1.1" fill="none"/>
+    <path d="M36 48 C26 48 20 43 20 38 C20 33 26 28 30 28 C32 28 34 30 36 32 C38 30 40 28 42 28 C46 28 52 33 52 38 C52 43 46 48 36 48Z" stroke="currentColor" stroke-width=".8" fill="none" opacity=".35"/>
+  </svg>`,
+  wl3:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 58 Q12 14 36 14 Q60 14 60 58" stroke="currentColor" stroke-width="1.1" fill="none"/>
+    <path d="M12 58 L60 58" stroke="currentColor" stroke-width=".8" opacity=".3"/>
+    <line x1="36" y1="14" x2="36" y2="58" stroke="currentColor" stroke-width="1" stroke-dasharray="3 2" opacity=".4"/>
+    <circle cx="36" cy="36" r="4" stroke="currentColor" stroke-width="1.1"/>
+    <path d="M20 36 L32 36" stroke="currentColor" stroke-width=".9" stroke-linecap="round" opacity=".4"/>
+  </svg>`,
+  wl4:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M36 16 Q52 28 52 42 Q52 54 36 58 Q20 54 20 42 Q20 28 36 16Z" stroke="currentColor" stroke-width="1.1" fill="none"/>
+    <path d="M36 26 Q46 34 46 42 Q46 50 36 52 Q26 50 26 42 Q26 34 36 26Z" stroke="currentColor" stroke-width=".7" fill="none" opacity=".3"/>
+    <line x1="36" y1="16" x2="36" y2="58" stroke="currentColor" stroke-width=".7" stroke-dasharray="2 2" opacity=".25"/>
+    <circle cx="36" cy="40" r="3" stroke="currentColor" stroke-width="1"/>
+  </svg>`,
+  wl5:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16 52 L36 14 L56 52" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+    <circle cx="36" cy="14" r="3.5" stroke="currentColor" stroke-width="1.1"/>
+    <path d="M22 40 L50 40" stroke="currentColor" stroke-width=".9" opacity=".3"/>
+    <path d="M16 52 L56 52" stroke="currentColor" stroke-width=".8" opacity=".25"/>
+    <path d="M28 52 L28 46 M44 52 L44 46" stroke="currentColor" stroke-width=".8" opacity=".3"/>
+    <circle cx="36" cy="14" r="1.2" fill="currentColor"/>
+  </svg>`,
+  // OVERALL DISCIPLINE
+  od1:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="36" cy="36" r="20" stroke="currentColor" stroke-width="1.1"/>
+    <path d="M36 16 L36 36 L48 28" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="36" cy="36" r="2.5" fill="currentColor" opacity=".5"/>
+    <path d="M36 16 L37 16 M52 24 L53 23 M56 36 L57 36 M52 48 L53 49 M36 56 L36 57 M20 48 L19 49 M16 36 L15 36 M20 24 L19 23" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity=".3"/>
+  </svg>`,
+  od2:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16 56 L16 24 L56 24 L56 56 L16 56Z" stroke="currentColor" stroke-width="1.1" fill="none"/>
+    <path d="M26 24 L26 18 M36 24 L36 18 M46 24 L46 18" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" opacity=".5"/>
+    <line x1="16" y1="34" x2="56" y2="34" stroke="currentColor" stroke-width=".8" opacity=".25"/>
+    <line x1="16" y1="44" x2="56" y2="44" stroke="currentColor" stroke-width=".8" opacity=".25"/>
+    <line x1="26" y1="24" x2="26" y2="56" stroke="currentColor" stroke-width=".7" opacity=".2"/>
+    <line x1="46" y1="24" x2="46" y2="56" stroke="currentColor" stroke-width=".7" opacity=".2"/>
+    <rect x="28" y="36" width="8" height="8" fill="currentColor" opacity=".25"/>
+  </svg>`,
+  od3:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M36 12 C18 12 12 22 12 36 C12 50 22 60 36 60 C50 60 60 50 60 36 C60 22 54 12 36 12Z" stroke="currentColor" stroke-width="1.1" fill="none"/>
+    <path d="M26 36 L33 43 L48 28" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`,
+  od4:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M36 12 L40 24 L54 24 L43 32 L47 44 L36 36 L25 44 L29 32 L18 24 L32 24 Z" stroke="currentColor" stroke-width="1.1" fill="none"/>
+    <path d="M36 24 L38.4 31.2 L46 31.2 L39.8 35.6 L42.2 42.8 L36 38.4" stroke="currentColor" stroke-width=".7" fill="none" opacity=".3"/>
+    <line x1="26" y1="56" x2="46" y2="56" stroke="currentColor" stroke-width=".9" opacity=".3"/>
+    <line x1="36" y1="44" x2="36" y2="56" stroke="currentColor" stroke-width=".9" opacity=".3"/>
+  </svg>`,
+  od5:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14 56 L36 12 L58 56" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M20 44 L52 44" stroke="currentColor" stroke-width=".9" opacity=".3"/>
+    <path d="M14 56 L58 56" stroke="currentColor" stroke-width=".8" opacity=".25"/>
+    <circle cx="36" cy="12" r="3" fill="currentColor" opacity=".5"/>
+    <path d="M30 56 L30 48 L42 48 L42 56" stroke="currentColor" stroke-width=".8" fill="none" opacity=".3"/>
+  </svg>`,
+  // CALORIE / DEFICIT
+  c1:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="36" cy="36" r="20" stroke="currentColor" stroke-width="1.1"/>
+    <path d="M36 22 L36 38" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+    <circle cx="36" cy="44" r="2" fill="currentColor" opacity=".6"/>
+    <path d="M28 16 Q36 12 44 16" stroke="currentColor" stroke-width=".8" fill="none" opacity=".35"/>
+  </svg>`,
+  c2:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 52 L22 38 L32 44 L42 28 L52 34 L62 20" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M12 58 L62 58" stroke="currentColor" stroke-width=".8" opacity=".2"/>
+    <circle cx="62" cy="20" r="2.5" fill="currentColor" opacity=".5"/>
+  </svg>`,
+  c3:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14 48 Q24 30 36 28 Q48 30 58 48" stroke="currentColor" stroke-width="1.2" fill="none"/>
+    <path d="M14 54 L58 54" stroke="currentColor" stroke-width=".8" opacity=".2"/>
+    <line x1="36" y1="28" x2="36" y2="14" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+    <path d="M30 20 L36 14 L42 20" stroke="currentColor" stroke-width=".9" fill="none" opacity=".5"/>
+    <line x1="26" y1="54" x2="26" y2="48" stroke="currentColor" stroke-width=".8" opacity=".3"/>
+    <line x1="46" y1="54" x2="46" y2="48" stroke="currentColor" stroke-width=".8" opacity=".3"/>
+  </svg>`,
+  c4:`<svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16 56 L36 14 L56 56" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M22 42 L50 42" stroke="currentColor" stroke-width=".9" opacity=".3"/>
+    <path d="M16 56 L56 56" stroke="currentColor" stroke-width=".8" opacity=".25"/>
+    <circle cx="36" cy="14" r="3" fill="currentColor" opacity=".5"/>
+    <path d="M26 36 L33 43 L48 28" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity=".5"/>
+  </svg>`,
+};
+
+function getArtifactSVG(badgeId, earned){
+  const svg = ARTIFACT_ILLUSTRATIONS[badgeId];
+  if(!svg) return '';
+  const color = earned
+    ? (document.body.classList.contains('dk') ? '#B8924A' : '#9A7B3C')
+    : (document.body.classList.contains('dk') ? '#3E3A34' : '#C2BAB0');
+  // Inject position:absolute + centering into the svg tag
+  return svg
+    .replace(/currentColor/g, color)
+    .replace('<svg ', '<svg style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:82px;height:82px;z-index:3;" ');
+}
+
 function showBadgeEarned(badge){
   const overlay = document.getElementById('badge-overlay');
-  const bg = document.getElementById('badge-overlay-bg');
-  const emojiEl = document.getElementById('bo-emoji');
   const nameEl = document.getElementById('bo-name');
   const descEl = document.getElementById('bo-desc');
+  const illEl = document.getElementById('bo-illustration');
+  const dateEl = document.getElementById('bo-date');
   if(!overlay) return;
 
-  bg.style.background = badge.grad;
-  emojiEl.textContent = badge.emoji;
-  nameEl.textContent = badge.name;
-  descEl.textContent = badge.desc;
+  if(nameEl) nameEl.textContent = badge.name;
+  if(descEl) descEl.textContent = badge.desc;
+  if(illEl){
+    const svg = ARTIFACT_ILLUSTRATIONS[badge.id];
+    if(svg){
+      const color = document.body.classList.contains('dk') ? '#B8924A' : '#9A7B3C';
+      illEl.innerHTML = svg
+        .replace(/currentColor/g, color)
+        .replace('<svg ', '<svg style="width:96px;height:96px;" ');
+    }
+  }
+  if(dateEl){
+    const stored = JSON.parse(localStorage.getItem('mos_badges')||'{}');
+    const d = stored[badge.id];
+    dateEl.textContent = d ? new Date(d+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'}) : '';
+  }
 
   overlay.style.display = 'flex';
   setTimeout(() => {
@@ -4245,7 +4826,7 @@ function showBadgeEarned(badge){
       overlay.style.opacity = '';
       overlay.style.transition = '';
     }, 400);
-  }, 3000);
+  }, 3200);
   overlay.onclick = () => {
     overlay.style.transition = 'opacity .2s';
     overlay.style.opacity = '0';
@@ -4260,7 +4841,7 @@ function showBadgeEarned(badge){
 function showBadgesSequentially(badges, idx=0){
   if(idx >= badges.length) return;
   showBadgeEarned(badges[idx]);
-  setTimeout(() => showBadgesSequentially(badges, idx+1), 3500);
+  setTimeout(() => showBadgesSequentially(badges, idx+1), 3700);
 }
 
 // ── Render achievements
@@ -4325,16 +4906,21 @@ function renderBadgeCategories(){
     const badges = BADGES.filter(b => b.cat === cat.key);
     if(!badges.length) return;
 
-    const section = document.createElement('div');
-    section.className = 'ach-category';
+    const earnedCount = badges.filter(b => !!getBadgeEarned(b.id)).length;
 
-    const label = document.createElement('span');
-    label.className = 'ach-cat-label';
-    label.textContent = cat.label;
-    section.appendChild(label);
+    const section = document.createElement('div');
+    section.className = 'arc-category';
+
+    // Category rule header
+    section.innerHTML = `
+      <div class="arc-cat-rule">
+        <span class="arc-cat-label">${cat.label}</span>
+        <div class="arc-cat-line"></div>
+        <span class="arc-cat-count">${earnedCount}/${badges.length}</span>
+      </div>`;
 
     const row = document.createElement('div');
-    row.className = 'ach-row';
+    row.className = 'arc-row';
 
     badges.forEach(badge => {
       const earnedDate = getBadgeEarned(badge.id);
@@ -4343,33 +4929,48 @@ function renderBadgeCategories(){
       try { prog = badge.prog(); } catch(e){}
 
       const card = document.createElement('div');
-      card.className = 'badge-card';
-      card.onclick = () => {
-        if(earned) showBadgeEarned(badge);
-      };
+      card.className = 'artifact' + (earned ? ' earned' : '');
+      card.onclick = () => { if(earned) showBadgeEarned(badge); };
 
       const pct = prog ? Math.min(1, prog.cur / prog.max) : 0;
-      const progBar = !earned && prog ? `
-        <div class="badge-progress-bar"><div class="badge-progress-fill" style="width:${Math.round(pct*100)}%"></div></div>
-        <div class="badge-progress-text">${typeof prog.cur === 'number' ? (prog.cur % 1 === 0 ? prog.cur : prog.cur.toFixed(1)) : prog.cur} / ${typeof prog.max === 'number' ? (prog.max % 1 === 0 ? prog.max : prog.max.toFixed(1)) : prog.max}</div>` : '';
+      const dateStr = earnedDate
+        ? new Date(earnedDate + 'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
+        : '';
 
-      const dateStr = earnedDate ? new Date(earnedDate + 'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '';
+      const curVal = prog && typeof prog.cur === 'number'
+        ? (prog.cur % 1 === 0 ? prog.cur : prog.cur.toFixed(1)) : (prog ? prog.cur : 0);
+      const maxVal = prog && typeof prog.max === 'number'
+        ? (prog.max % 1 === 0 ? prog.max : prog.max.toFixed(1)) : (prog ? prog.max : 1);
+
+      const metaHTML = earned
+        ? `<div class="art-meta">
+            <div class="art-catalogued">Catalogued</div>
+            <div class="art-date">${dateStr}</div>
+           </div>`
+        : prog
+          ? `<div class="art-progress-wrap">
+              <div class="art-progress-rail">
+                <div class="art-progress-fill" style="width:${Math.round(pct*100)}%"></div>
+              </div>
+              <div class="art-progress-label">
+                <span>${curVal}</span><span>${maxVal}</span>
+              </div>
+             </div>`
+          : `<div class="art-undiscovered">Not yet discovered</div>`;
 
       card.innerHTML = `
-        <div class="badge-card-inner">
-          <div class="badge-bg" style="background:${badge.grad};"></div>
-          ${!earned ? '<div class="badge-lock-overlay"></div>' : ''}
-          ${earned ? '<div class="badge-earned-border"></div>' : ''}
-          ${!earned ? '<div class="badge-lock-icon">🔒</div>' : ''}
-          <div class="badge-content">
-            <div class="badge-emoji">${badge.emoji}</div>
-            <div class="badge-bottom">
-              <div class="badge-name">${badge.name}</div>
-              <div class="badge-desc">${badge.desc}</div>
-              ${earned ? `<div class="badge-date">${dateStr}</div>` : progBar}
-            </div>
+        <div class="art-illustration">
+          <div class="art-veil"></div>
+          ${getArtifactSVG(badge.id, earned)}
+        </div>
+        <div class="art-body">
+          <div>
+            <div class="art-name">${badge.name}</div>
+            <div class="art-desc">${badge.desc}</div>
           </div>
+          ${metaHTML}
         </div>`;
+
       row.appendChild(card);
     });
 
@@ -5347,7 +5948,6 @@ function renderPatterns(){
   renderEnergyBreakdown();
   renderPatternInsights();
   renderAchievements();
-  // Check for newly earned badges
   const newBadges = checkAllBadges();
   if(newBadges.length) setTimeout(() => showBadgesSequentially(newBadges), 600);
 }
