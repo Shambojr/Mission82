@@ -270,129 +270,6 @@ html,body{
 }
 .tb-off:active{color:var(--ac);}
 
-/* Hero weight */
-.hero-weight{
-  padding:var(--s5) var(--pad) 0;
-  position:relative;cursor:text;
-}
-.hw-display{display:flex;align-items:baseline;gap:10px;}
-.hw-current{
-  font-family:var(--serif);font-size:96px;font-weight:300;
-  color:var(--t1);line-height:1;letter-spacing:-.02em;
-  transition:color .2s;
-}
-.hw-unit{
-  font-family:var(--serif);font-size:28px;font-weight:300;
-  color:var(--t3);padding-bottom:8px;
-}
-.hw-input{
-  position:absolute;top:0;left:0;width:100%;height:100%;
-  opacity:0;font-size:96px;background:none;border:none;outline:none;cursor:text;
-}
-
-/* Gap line — Cormorant values, DM Sans labels */
-.gap-line{
-  padding:var(--s2) var(--pad) 0;
-  display:flex;align-items:baseline;gap:var(--s1);
-}
-.gl-label{
-  font-family:var(--sans);font-size:10px;letter-spacing:.22em;
-  text-transform:uppercase;color:var(--t4);
-}
-.gl-target-val{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t3);}
-.gl-sep{font-family:var(--sans);font-size:12px;color:var(--t4);margin:0 4px;}
-.gl-rem-val{font-family:var(--serif);font-size:28px;font-weight:300;color:var(--t1);}
-
-/* Pace line */
-.pace-line{
-  padding:var(--s2) var(--pad) 0;
-  font-family:var(--serif);font-size:18px;font-weight:300;font-style:italic;
-  color:var(--t3);line-height:1.5;
-}
-.pace-line.on-track{color:var(--risk-on);}
-.pace-line.at-risk{color:var(--risk-at);}
-
-/* Discipline dots */
-.disc-dots-wrap{padding:var(--s4) var(--pad) var(--s2);}
-.disc-dots{display:flex;gap:0;justify-content:space-between;}
-.dd-item{
-  display:flex;flex-direction:column;align-items:center;gap:var(--s1);
-  flex:1;cursor:pointer;-webkit-tap-highlight-color:transparent;
-  padding:var(--s1) 0;
-  transition:opacity .15s;
-}
-.dd-item:active{opacity:.6;}
-.dd-dot{
-  width:10px;height:10px;border-radius:50%;
-  border:1px solid var(--t4);
-  transition:background .25s,border-color .25s,transform .25s cubic-bezier(.16,1,.3,1);
-}
-.dd-item.done .dd-dot{
-  background:var(--ac);border-color:var(--ac);
-  transform:scale(1.2);
-}
-.dd-name{
-  font-family:var(--sans);font-size:8px;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--t4);
-  text-align:center;line-height:1.3;max-width:52px;
-  transition:color .2s;
-}
-.dd-item.done .dd-name{color:var(--t3);}
-.wake-target-line{
-  text-align:center;
-  font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;
-  color:var(--t3);padding:0 var(--pad) var(--s3);
-}
-
-/* Meal one-liner */
-.meal-oneliner{
-  padding:var(--s3) var(--pad);
-  display:flex;align-items:flex-start;gap:var(--s2);
-  cursor:pointer;-webkit-tap-highlight-color:transparent;
-  transition:opacity .15s;
-}
-.meal-oneliner:active{opacity:.6;}
-.mol-label{
-  font-family:var(--sans);font-size:10px;letter-spacing:.2em;
-  text-transform:uppercase;color:var(--t4);
-  flex-shrink:0;padding-top:4px;min-width:68px;
-}
-.mol-meals{
-  font-family:var(--serif);font-size:18px;font-weight:300;
-  color:var(--t2);flex:1;line-height:1.5;
-}
-.mol-arrow{
-  font-family:var(--serif);font-size:18px;
-  color:var(--t4);flex-shrink:0;padding-top:2px;
-  transition:color .15s;
-}
-.meal-oneliner:active .mol-arrow{color:var(--ac);}
-
-/* ════════════════════════════════════
-   MEAL DETAIL OVERLAY
-════════════════════════════════════ */
-.md-date-strip{
-  padding:0 var(--pad) var(--s2);
-  display:flex;align-items:center;justify-content:space-between;
-}
-.md-date-nav{display:flex;align-items:center;gap:var(--s2);}
-.md-date-arr{
-  font-family:var(--serif);font-size:24px;color:var(--t3);
-  cursor:pointer;-webkit-tap-highlight-color:transparent;
-  user-select:none;transition:color .15s;
-}
-.md-date-arr:active{color:var(--ac);}
-.md-date-arr.dis{opacity:.2;pointer-events:none;}
-.md-date-lbl{font-family:var(--serif);font-size:16px;font-weight:300;font-style:italic;color:var(--t2);}
-.md-cal-btn{
-  font-family:var(--sans);font-size:10px;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--t3);
-  cursor:pointer;-webkit-tap-highlight-color:transparent;
-  transition:color .15s;
-}
-.md-cal-btn:active{color:var(--ac);}
-.md-travel{
-  margin:0 var(--pad);padding:var(--s2) 0;
   border-top:1px solid var(--rl);
   display:flex;justify-content:space-between;align-items:center;
 }
@@ -906,10 +783,14 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 .tb-lbl{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ac);}
 .tb-off{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);cursor:pointer;-webkit-tap-highlight-color:transparent;}
 
-/* Hero weight */
+/* Hero weight — arrive animation */
+.hw-current{font-family:var(--serif);font-size:96px;font-weight:300;color:var(--t1);line-height:1;letter-spacing:-.02em;transition:color .4s;}
+@keyframes weightArrive{from{transform:scale(.97);opacity:.6}to{transform:scale(1);opacity:1}}
+.hw-current.arriving{animation:weightArrive .4s cubic-bezier(.16,1,.3,1) both;}
+
+/* Hero weight container */
 .hero-weight{padding:var(--s5) var(--pad) 0;position:relative;cursor:text;}
 .hw-display{display:flex;align-items:baseline;gap:10px;}
-.hw-current{font-family:var(--serif);font-size:96px;font-weight:300;color:var(--t1);line-height:1;letter-spacing:-.02em;transition:color .2s;}
 .hw-unit{font-family:var(--serif);font-size:28px;font-weight:300;color:var(--t3);padding-bottom:8px;}
 .hw-input{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;font-size:96px;background:none;border:none;outline:none;cursor:text;}
 
@@ -925,21 +806,53 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 .pace-line.on-track{color:var(--risk-on);}
 .pace-line.at-risk{color:var(--risk-at);}
 
-/* Discipline dots */
+/* Discipline dots — 14px, more room */
 .disc-dots-wrap{padding:var(--s4) var(--pad) var(--s2);}
 .disc-dots{display:flex;gap:0;justify-content:space-between;}
-.dd-item{display:flex;flex-direction:column;align-items:center;gap:var(--s1);flex:1;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:var(--s1) 0;transition:opacity .15s;}
+.dd-item{display:flex;flex-direction:column;align-items:center;gap:10px;flex:1;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:var(--s2) 0;transition:opacity .15s;}
 .dd-item:active{opacity:.6;}
-.dd-dot{width:10px;height:10px;border-radius:50%;border:1px solid var(--t4);transition:background .25s,border-color .25s,transform .25s cubic-bezier(.16,1,.3,1);}
-.dd-item.done .dd-dot{background:var(--ac);border-color:var(--ac);transform:scale(1.2);}
+.dd-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--t4);transition:background .25s,border-color .25s,transform .3s cubic-bezier(.16,1,.3,1);}
+.dd-item.done .dd-dot{background:var(--ac);border-color:var(--ac);transform:scale(1.15);}
 .dd-name{font-family:var(--sans);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--t4);text-align:center;line-height:1.3;max-width:52px;transition:color .2s;}
 .dd-item.done .dd-name{color:var(--t3);}
 .wake-target-line{text-align:center;font-family:var(--serif);font-size:13px;font-weight:300;font-style:italic;color:var(--t4);padding:4px var(--pad) var(--s3);}
 
-/* FAB */
-.fab{position:fixed;bottom:calc(var(--nav-h) + 16px);right:var(--pad);width:60px;height:60px;border-radius:30px;background:var(--t1);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:35;-webkit-tap-highlight-color:transparent;transition:opacity .15s,transform .15s;}
-.fab:active{opacity:.8;transform:scale(.95);}
-.dk .fab{box-shadow:0 4px 20px rgba(0,0,0,.5);}
+/* FAB — pressable shadow */
+.fab{position:fixed;bottom:calc(var(--nav-h) + 16px);right:var(--pad);width:60px;height:60px;border-radius:30px;background:var(--t1);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15),0 6px 20px rgba(0,0,0,.12);z-index:35;-webkit-tap-highlight-color:transparent;transition:opacity .15s,transform .15s,box-shadow .15s;}
+.fab:active{opacity:.8;transform:scale(.95);box-shadow:0 1px 4px rgba(0,0,0,.12);}
+.dk .fab{box-shadow:0 2px 8px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);}
+
+/* Change 2 — Day performance color shift */
+.phone.day-good{--ac:#7A6A2E;--risk-on:#1E4A1E;}
+.phone.day-behind{--ac:#9A7B3C;}
+
+/* Change 4 — Time-aware Today sections */
+.tod-evening-only{display:none;}
+.tod-morning-only{display:block;}
+.time-evening .tod-evening-only{display:block;}
+.time-evening .tod-morning-only{display:none;}
+
+/* Change 5 — Verdict sentence */
+.tod-verdict{
+  padding:var(--s3) var(--pad) 0;
+  font-family:var(--serif);font-size:18px;font-weight:300;font-style:italic;
+  color:var(--t3);line-height:1.6;text-align:center;
+  opacity:0;transition:opacity .6s;
+}
+.tod-verdict.visible{opacity:1;}
+.tod-verdict.positive{color:var(--risk-on);}
+.tod-verdict.warning{color:var(--risk-at);}
+
+/* Change 7 — September 1 arrival */
+.arrival-overlay{
+  position:fixed;inset:0;background:var(--bg);
+  z-index:100;display:none;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:var(--pad);
+}
+.arrival-overlay.on{display:flex;}
+@keyframes arrivalFade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.arrival-content{animation:arrivalFade 1.2s cubic-bezier(.16,1,.3,1) both;}
 
 /* Meal planner slots */
 .mp-slot{padding:var(--s3) 0;border-bottom:1px solid var(--rl);display:flex;align-items:flex-start;justify-content:space-between;}
@@ -1199,6 +1112,14 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
       oninput="onHeroWeightInput()" onblur="onHeroWeightBlur()">
   </div>
 
+  <!-- Weight +/- buttons -->
+  <div style="display:flex;align-items:center;gap:16px;padding:8px var(--pad) 0;">
+    <button onclick="adjustWeight(-0.1)" style="background:none;border:1px solid var(--rl);width:36px;height:36px;border-radius:50%;font-family:var(--serif);font-size:18px;color:var(--t3);cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;">−</button>
+    <span style="font-family:var(--sans);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--t4);">0.1 kg</span>
+    <button onclick="adjustWeight(0.1)" style="background:none;border:1px solid var(--rl);width:36px;height:36px;border-radius:50%;font-family:var(--serif);font-size:18px;color:var(--t3);cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;">+</button>
+  </div>
+  </div>
+
   <!-- Gap row -->
   <div class="gap-line">
     <span class="gl-label">Target</span>
@@ -1223,10 +1144,35 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
   <!-- Rule -->
   <div style="margin:0 28px;height:1px;background:var(--rl);"></div>
 
+  <!-- Verdict sentence — appears after 6pm -->
+  <div class="tod-verdict" id="tod-verdict"></div>
+
+  <!-- Discipline Ascent — Today screen version (compact) -->
+  <div style="margin:var(--s4) var(--pad) 0;">
+    <div style="font-family:var(--sans);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--t4);margin-bottom:var(--s2);">Discipline Ascent</div>
+    <svg id="tod-ascent-svg" width="100%" viewBox="0 0 320 120" preserveAspectRatio="xMidYMid meet" style="display:block;"></svg>
+    <div style="font-family:var(--serif);font-size:11px;font-weight:300;font-style:italic;color:var(--t4);text-align:center;margin-top:var(--s1);">Five disciplines. One summit.</div>
+  </div>
+
   <div style="height:80px;"></div>
 </div>
 
-<!-- SETTINGS SHEET -->
+<!-- SEPTEMBER 1 ARRIVAL OVERLAY -->
+<div class="arrival-overlay" id="arrival-overlay">
+  <div class="arrival-content">
+    <div style="font-family:var(--serif);font-size:80px;font-weight:300;color:var(--t1);line-height:1;margin-bottom:var(--s3);">89.9</div>
+    <div style="font-family:var(--sans);font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--ac);margin-bottom:var(--s5);">Mission Complete</div>
+    <div style="font-family:var(--serif);font-size:26px;font-weight:300;font-style:italic;color:var(--t1);line-height:1.4;margin-bottom:var(--s4);">The Re-entry is complete.</div>
+    <div style="font-family:var(--serif);font-size:17px;font-weight:300;color:var(--t3);line-height:1.8;margin-bottom:var(--s5);">
+      You started at <span id="arr-start"></span> kg.<br>
+      You arrived at <span id="arr-current"></span> kg.<br>
+      September 1, 2026.
+    </div>
+    <div style="height:1px;background:var(--ac);width:48px;margin:0 auto var(--s4);"></div>
+    <div style="font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--t3);margin-bottom:var(--s5);">"The pain of discipline is far less<br>than the pain of regret."</div>
+    <button onclick="dismissArrival()" style="background:none;border:1px solid var(--t4);padding:14px 36px;font-family:var(--sans);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);cursor:pointer;-webkit-tap-highlight-color:transparent;">Continue →</button>
+  </div>
+</div>
 <div class="bottom-sheet" id="settings-sheet" onclick="closeSettingsSheet(event)">
   <div class="bs-inner">
     <div class="bs-handle"></div>
@@ -1798,6 +1744,7 @@ function keyForOffset(offset){
   return d.toISOString().slice(0,10);
 }
 function keyToDate(key){ return new Date(key + 'T00:00:00'); }
+function dateToKey(d){ return d.toISOString().slice(0,10); }
 function formatDate(d){
   return DOW[d.getDay()] + ', ' + d.getDate() + ' ' + MO_SHORT[d.getMonth()];
 }
@@ -2073,9 +2020,17 @@ function renderToday(){
   const mdEl = document.getElementById('tod-mission-day');
   if(mdEl) mdEl.textContent = 'Mission Day ' + missionDay();
 
-  // Hero weight
+  // Hero weight — with arrive animation
   const hwEl = document.getElementById('hw-current');
-  if(hwEl) hwEl.textContent = cw !== mission.startWeight || Object.keys(records).length > 0 ? cw : '—';
+  if(hwEl){
+    const val = cw !== mission.startWeight || Object.keys(records).length > 0 ? cw : '—';
+    if(hwEl.textContent !== String(val)){
+      hwEl.textContent = val;
+      animateWeightArrive();
+    } else {
+      hwEl.textContent = val;
+    }
+  }
 
   // Target and remaining
   const glTarget = document.getElementById('gl-target-val');
@@ -2088,16 +2043,29 @@ function renderToday(){
   if(tDot) tDot.classList.toggle('on', travelMode);
 
   // Travel banner
-  document.getElementById('travel-banner').classList.toggle('on', travelMode);
+  const tb = document.getElementById('travel-banner');
+  if(tb) tb.classList.toggle('on', travelMode);
 
-  // Pace line — the honest sentence
+  // Time awareness
+  updateTimeAwareness();
+
+  // Day performance color
+  updateDayColor();
+
+  // Pace line
   renderPaceLine();
 
   // Discipline dots
   renderDiscDots();
 
-  // Tomorrow meal oneliner
-  renderMealOneliner();
+  // Verdict sentence
+  renderVerdict();
+
+  // Compact Discipline Ascent
+  renderTodayAscent();
+
+  // September 1 arrival check
+  checkArrival();
 }
 
 function renderPaceLine(){
@@ -2185,6 +2153,10 @@ function toggleTodayDiscDot(idx, el){
     save();
   }
   if(activeTab === 'record') syncDlList();
+  updateDayColor();
+  renderVerdict();
+  renderTodayAscent();
+  checkRewardMoments();
 }
 
 function renderMealOneliner(){
@@ -3612,6 +3584,400 @@ function saveRecord(){
 }
 
 // ═══════════════════════════════════════════════
+// STEP 1 — JOBS SUGGESTIONS
+// ═══════════════════════════════════════════════
+
+// Change 1 — Hero weight arrive animation
+function animateWeightArrive(){
+  const el = document.getElementById('hw-current');
+  if(!el) return;
+  el.classList.remove('arriving');
+  void el.offsetWidth; // reflow to restart animation
+  el.classList.add('arriving');
+  setTimeout(() => el.classList.remove('arriving'), 500);
+}
+
+// Change 2 — Day performance color
+function updateDayColor(){
+  const phone = document.getElementById('phone');
+  if(!phone) return;
+  const key = todayKey();
+  const rec = records[key] || {};
+  const discs = (rec.disciplines || []).filter(d => d && d.done).length;
+  const total = DISCIPLINES.length;
+  const discPct = total > 0 ? discs / total : 0;
+  // Good day: 80%+ disciplines + steps done
+  if(discPct >= 0.8){
+    phone.classList.add('day-good');
+    phone.classList.remove('day-behind');
+  } else if(discPct < 0.4 && new Date().getHours() >= 18){
+    phone.classList.add('day-behind');
+    phone.classList.remove('day-good');
+  } else {
+    phone.classList.remove('day-good','day-behind');
+  }
+}
+
+// Change 4 — Time-aware Today
+function updateTimeAwareness(){
+  const h = new Date().getHours();
+  const phone = document.getElementById('phone');
+  if(!phone) return;
+  if(h >= 18){
+    phone.classList.add('time-evening');
+  } else {
+    phone.classList.remove('time-evening');
+  }
+}
+
+// Change 5 — Verdict sentence
+function renderVerdict(){
+  const el = document.getElementById('tod-verdict');
+  if(!el) return;
+  const h = new Date().getHours();
+
+  // Only show after 6pm
+  if(h < 18){
+    el.className = 'tod-verdict';
+    el.textContent = '';
+    return;
+  }
+
+  const key = todayKey();
+  const rec = records[key] || {};
+  const discs = (rec.disciplines || []).filter(d => d && d.done).length;
+  const total = DISCIPLINES.length;
+  const steps = rec.steps || 0;
+
+  // Get deficit
+  const cw = currentWeight();
+  const { tdee } = calcTDEE(cw, steps, rec.disciplines);
+  const { deficitPerDay } = calcDynamicDeficit();
+  const actualMeals = rec.actualMeals;
+  const plan = meals[key];
+  let foodCal = null;
+  if(actualMeals && Object.keys(actualMeals).length > 0){
+    foodCal = Object.values(actualMeals).reduce((s,m) => s+(m&&m.cal||0), 0);
+  } else if(plan){
+    foodCal = mealDayTotals(plan).cal;
+  }
+
+  const deficit = foodCal !== null ? tdee - foodCal : null;
+  const ahead = deficit !== null && deficit > deficitPerDay + 200;
+  const behind = deficit !== null && deficit < deficitPerDay - 200;
+  const allDiscs = discs === total;
+  const mostDiscs = discs >= total * 0.8;
+
+  let verdict = '';
+  let cls = 'tod-verdict visible';
+
+  if(allDiscs && ahead){
+    verdict = 'Strong day. You\'re closing in.';
+    cls += ' positive';
+  } else if(allDiscs && !behind){
+    verdict = 'Disciplines complete. On track.';
+    cls += ' positive';
+  } else if(mostDiscs && ahead){
+    verdict = 'Good deficit today. Keep this up.';
+    cls += ' positive';
+  } else if(behind && discs < total * 0.5){
+    verdict = 'Behind today. Don\'t carry it forward.';
+    cls += ' warning';
+  } else if(behind){
+    verdict = 'Slightly off pace. Recoverable tomorrow.';
+    cls += ' warning';
+  } else if(deficit === null){
+    verdict = 'Log your meals to see today\'s verdict.';
+  } else {
+    verdict = 'On track. The mission is working.';
+    cls += ' positive';
+  }
+
+  el.className = cls;
+  el.textContent = verdict;
+}
+
+// Change 6 — Swipe velocity responsive transitions
+function initSwipe(){
+  const phone = document.getElementById('phone');
+  if(!phone) return;
+  let startX = 0, startY = 0, startTime = 0;
+  phone.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    startTime = Date.now();
+  }, {passive:true});
+  phone.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    const dt = Date.now() - startTime;
+    if(Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx) * 0.8) return;
+    if(dt > 400) return;
+
+    // Velocity — fast swipe = faster transition
+    const velocity = Math.abs(dx) / dt; // px/ms
+    const duration = Math.max(180, Math.min(320, 300 - velocity * 80));
+
+    // Apply velocity-based duration
+    document.querySelectorAll('.screen').forEach(s => {
+      s.style.animationDuration = duration + 'ms';
+    });
+
+    const tabs = ['today','record','mission','patterns'];
+    const cur = tabs.indexOf(activeTab);
+    if(dx < 0 && cur < tabs.length - 1) switchTab(tabs[cur + 1]);
+    else if(dx > 0 && cur > 0) switchTab(tabs[cur - 1]);
+
+    // Reset after animation
+    setTimeout(() => {
+      document.querySelectorAll('.screen').forEach(s => s.style.animationDuration = '');
+    }, duration + 50);
+  }, {passive:true});
+}
+
+// Change 7 — September 1 arrival
+function checkArrival(){
+  const targetDate = mission.targetDate; // 'YYYY-MM-DD'
+  if(!targetDate) return;
+  const today = todayKey();
+  if(today < targetDate) return;
+  // Already dismissed?
+  if(localStorage.getItem('arrival_dismissed') === targetDate) return;
+  // Show arrival
+  const overlay = document.getElementById('arrival-overlay');
+  if(!overlay) return;
+  const start = document.getElementById('arr-start');
+  const curr = document.getElementById('arr-current');
+  if(start) start.textContent = mission.startWeight;
+  if(curr) curr.textContent = currentWeight();
+  overlay.classList.add('on');
+}
+
+function dismissArrival(){
+  document.getElementById('arrival-overlay').classList.remove('on');
+  localStorage.setItem('arrival_dismissed', mission.targetDate);
+}
+
+// ═══════════════════════════════════════════════
+// STEP 2A — WEIGHT SWIPE GESTURE
+// ═══════════════════════════════════════════════
+function initWeightSwipe(){
+  // Weight swipe conflicts with tab swipe — use +/- buttons instead
+  // Buttons are rendered in renderToday via the hero-weight area
+}
+
+function adjustWeight(delta){
+  const cw = parseFloat(currentWeight()) || 0;
+  const newVal = Math.max(40, Math.min(200, parseFloat((cw + delta).toFixed(1))));
+  const key = todayKey();
+  if(!records[key]) records[key] = {};
+  records[key].weight = newVal;
+  save();
+  const hwEl = document.getElementById('hw-current');
+  if(hwEl) hwEl.textContent = newVal;
+  animateWeightArrive();
+  renderPaceLine();
+  renderVerdict();
+  updateDayColor();
+  if(activeTab === 'mission') renderMission();
+  if(activeTab === 'patterns') renderPatterns();
+}
+
+// ═══════════════════════════════════════════════
+// STEP 2B — COMPACT DISCIPLINE ASCENT FOR TODAY
+// ═══════════════════════════════════════════════
+function renderTodayAscent(){
+  const svg = document.getElementById('tod-ascent-svg');
+  if(!svg) return;
+
+  const W = 320, H = 120;
+  const SUMMIT = {x: W/2, y: 12};
+  const total = missionTotalDays();
+  const today = missionDay();
+
+  const colors = ['#9A7B3C','#6B8C6B','#6B7A8C','#8C6B8C','#8C7B6B'];
+  const labels = DISCIPLINES.map(d => {
+    if(d.id === 'd1') return getWakeTarget().label;
+    return d.name.replace('Angamardana','Angamar.').replace('10,000 Steps','Steps')
+      .replace('Dumbbell Training','Dumbbell').replace('Kriya','Kriya');
+  });
+
+  // Base positions spread across bottom
+  const bases = DISCIPLINES.map((_, i) => ({
+    x: 32 + (i/(DISCIPLINES.length-1)) * (W-64),
+    y: H - 16
+  }));
+
+  const todayRec = records[todayKey()] || {};
+  const discs = todayRec.disciplines || [];
+
+  let html = '';
+
+  DISCIPLINES.forEach((disc, i) => {
+    const done = completionDays(disc.id);
+    const pct = total > 0 ? Math.min(1, done / total) : 0;
+    const base = bases[i];
+
+    // Ghost path
+    html += `<path d="M${base.x},${base.y} Q${base.x + (SUMMIT.x-base.x)*0.3},${base.y - (base.y-SUMMIT.y)*0.4} ${SUMMIT.x},${SUMMIT.y}"
+      fill="none" stroke="${colors[i]}" stroke-width="1" stroke-dasharray="3,3" opacity="0.25"/>`;
+
+    // Progress path — partial
+    if(pct > 0){
+      const px = base.x + (SUMMIT.x - base.x) * pct;
+      const py = base.y + (SUMMIT.y - base.y) * pct;
+      const cpx = base.x + (SUMMIT.x-base.x)*0.3;
+      const cpy = base.y - (base.y-SUMMIT.y)*0.4;
+      // Interpolate along bezier approx
+      const t = pct;
+      const bx = (1-t)*(1-t)*base.x + 2*(1-t)*t*cpx + t*t*SUMMIT.x;
+      const by = (1-t)*(1-t)*base.y + 2*(1-t)*t*cpy + t*t*SUMMIT.y;
+      html += `<path d="M${base.x},${base.y} Q${cpx},${cpy} ${bx},${by}"
+        fill="none" stroke="${colors[i]}" stroke-width="1.5" opacity="0.8"/>`;
+
+      // Position dot
+      const isDone = discs[i] && discs[i].done;
+      html += `<circle cx="${bx}" cy="${by}" r="${isDone ? 4 : 2.5}"
+        fill="${isDone ? colors[i] : 'none'}" stroke="${colors[i]}" stroke-width="1.5"/>`;
+      if(isDone){
+        html += `<circle cx="${bx}" cy="${by}" r="6"
+          fill="${colors[i]}" opacity="0.2"/>`;
+      }
+    }
+
+    // Base label
+    html += `<text x="${base.x}" y="${H-2}" text-anchor="middle"
+      font-family="sans-serif" font-size="6" fill="${colors[i]}" opacity="0.7">${labels[i]}</text>`;
+  });
+
+  // Summit marker
+  html += `<circle cx="${SUMMIT.x}" cy="${SUMMIT.y}" r="3" fill="var(--ac)" opacity="0.6"/>`;
+  html += `<text x="${SUMMIT.x}" y="${SUMMIT.y - 6}" text-anchor="middle"
+    font-family="sans-serif" font-size="7" fill="var(--ac)" opacity="0.8">Sep 1</text>`;
+
+  svg.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════
+// STEP 2C — PRE-FILL ACTUAL MEALS FROM HISTORY
+// ═══════════════════════════════════════════════
+function prefillActualMealsFromHistory(dateKey){
+  // Check if actual meals already logged for this date
+  const rec = records[dateKey] || {};
+  if(rec.actualMeals && Object.keys(rec.actualMeals).length > 0) return; // already has data
+
+  // Look back up to 7 days for the same weekday
+  const targetDate = keyToDate(dateKey);
+  const targetDay = targetDate.getDay();
+
+  for(let daysBack = 7; daysBack <= 21; daysBack += 7){
+    const pastDate = new Date(targetDate);
+    pastDate.setDate(pastDate.getDate() - daysBack);
+    const pastKey = dateToKey(pastDate);
+    const pastRec = records[pastKey] || {};
+
+    if(pastRec.actualMeals && Object.keys(pastRec.actualMeals).length > 0){
+      // Pre-fill but mark as 'suggested' not 'edited'
+      if(!records[dateKey]) records[dateKey] = {};
+      // Don't auto-save — just pre-populate the plan
+      const pastPlan = meals[pastKey];
+      if(pastPlan && !meals[dateKey]){
+        meals[dateKey] = {...pastPlan};
+        save();
+      }
+      return;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════
+// STEP 2D — REWARD MOMENTS
+// ═══════════════════════════════════════════════
+let rewardShown = {};
+
+function checkRewardMoments(){
+  const key = todayKey();
+  const rec = records[key] || {};
+
+  // Reward 1: 10,000 steps
+  if(rec.steps >= 10000 && !rewardShown['steps_' + key]){
+    rewardShown['steps_' + key] = true;
+    showRewardMoment('10,000', 'steps today', 'You walked the distance.');
+  }
+
+  // Reward 2: Weekly deficit achieved
+  const weeklyResult = checkWeeklyDeficit();
+  const weekKey = 'week_' + getWeekKey();
+  if(weeklyResult && !rewardShown[weekKey]){
+    rewardShown[weekKey] = true;
+    showRewardMoment('Week', 'deficit complete', 'The mission is working.');
+  }
+}
+
+function checkWeeklyDeficit(){
+  const { deficitPerDay } = calcDynamicDeficit();
+  const weeklyTarget = deficitPerDay * 7;
+  let weeklyActual = 0;
+  for(let i = 0; i < 7; i++){
+    const k = keyForOffset(-i);
+    const rec = records[k] || {};
+    const plan = meals[k];
+    if(!plan) continue;
+    const cw = rec.weight || currentWeight();
+    const steps = rec.steps || 0;
+    const { tdee } = calcTDEE(cw, steps, rec.disciplines);
+    const food = mealDayTotals(plan).cal;
+    weeklyActual += tdee - food;
+  }
+  return weeklyActual >= weeklyTarget;
+}
+
+function getWeekKey(){
+  const d = new Date();
+  const day = d.getDay();
+  const monday = new Date(d);
+  monday.setDate(d.getDate() - day + 1);
+  return monday.toISOString().slice(0,10);
+}
+
+function showRewardMoment(big, sub, caption){
+  // Create a brief overlay that auto-dismisses
+  const existing = document.getElementById('reward-overlay');
+  if(existing) existing.remove();
+
+  const div = document.createElement('div');
+  div.id = 'reward-overlay';
+  div.style.cssText = `
+    position:fixed;inset:0;background:rgba(244,239,229,0.96);
+    z-index:95;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    text-align:center;padding:32px;
+    animation:arrivalFade .5s cubic-bezier(.16,1,.3,1) both;
+  `;
+  div.innerHTML = `
+    <div style="font-family:var(--serif);font-size:72px;font-weight:300;color:var(--ac);line-height:1;">${big}</div>
+    <div style="font-family:var(--sans);font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--t3);margin-top:8px;">${sub}</div>
+    <div style="height:1px;background:var(--ac);width:40px;margin:24px auto;"></div>
+    <div style="font-family:var(--serif);font-size:18px;font-weight:300;font-style:italic;color:var(--t2);">${caption}</div>
+  `;
+  document.body.appendChild(div);
+
+  // Auto-dismiss after 2.5 seconds
+  setTimeout(() => {
+    div.style.transition = 'opacity .4s';
+    div.style.opacity = '0';
+    setTimeout(() => div.remove(), 400);
+  }, 2500);
+
+  // Tap to dismiss early
+  div.addEventListener('click', () => {
+    div.style.transition = 'opacity .2s';
+    div.style.opacity = '0';
+    setTimeout(() => div.remove(), 200);
+  });
+}
+
+// ═══════════════════════════════════════════════
 // SETTINGS SHEET
 // ═══════════════════════════════════════════════
 function openSettingsSheet(){
@@ -3630,12 +3996,13 @@ function onManualStepsInput(){
   const key = keyForOffset(dayOffset);
   if(!records[key]) records[key] = {};
   records[key].steps = val;
-  // Sync to hidden input for compatibility
   const hidden = document.getElementById('r-steps');
   if(hidden) hidden.value = val;
-  // Auto-check steps discipline
   autoCheckStepsDiscipline();
   renderDeficitHero();
+  checkRewardMoments();
+  // Update today ascent if on today tab
+  if(activeTab === 'today') renderTodayAscent();
 }
 
 // ═══════════════════════════════════════════════
@@ -4747,26 +5114,16 @@ function toggleDark(){
 // ═══════════════════════════════════════════════
 // SWIPE
 // ═══════════════════════════════════════════════
-function initSwipe(){
-  const phone = document.getElementById('phone');
-  let startX=0, startY=0, startTime=0;
-  phone.addEventListener('touchstart', e => { startX=e.touches[0].clientX; startY=e.touches[0].clientY; startTime=Date.now(); }, {passive:true});
-  phone.addEventListener('touchend', e => {
-    const dx=e.changedTouches[0].clientX-startX, dy=e.changedTouches[0].clientY-startY, dt=Date.now()-startTime;
-    if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.5 && dt<400){
-      const cur=TAB_ORDER.indexOf(activeTab);
-      if(dx<0 && cur<TAB_ORDER.length-1) switchTab(TAB_ORDER[cur+1],'forward');
-      else if(dx>0 && cur>0) switchTab(TAB_ORDER[cur-1],'back');
-    }
-  }, {passive:true});
-}
-
 // ═══════════════════════════════════════════════
 // CLOCK
 // ═══════════════════════════════════════════════
 function updateClock(){
   renderPaceLine();
-  if(activeTab === 'today') renderDiscDots();
+  if(activeTab === 'today'){
+    renderDiscDots();
+    updateTimeAwareness();
+    renderVerdict();
+  }
 }
 function startClock(){
   updateClock();
@@ -4783,12 +5140,16 @@ function init(){
   if(isDark){
     document.getElementById('phone').classList.add('dk');
   }
+  // Pre-fill today's meal plan from history
+  prefillActualMealsFromHistory(todayKey());
   renderToday();
   syncRecordInputs();
   startClock();
   initGoogleFit();
   initSwipe();
+  initWeightSwipe();
   setTimeout(updateProgress, 400);
+  setTimeout(checkRewardMoments, 1000);
 }
 
 init();
