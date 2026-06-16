@@ -1360,7 +1360,7 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
     <div id="r-actual-summary"></div>
   </div>
 
-  <!-- Steps — manual entry + Google Fit -->
+  <!-- Steps — Google Fit -->
   <div class="rec-section" style="padding-bottom:0;">
     <div class="rec-section-head">
       <span class="rec-section-label">Steps</span>
@@ -1373,14 +1373,6 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
         <div class="gfit-status" id="gfit-status">Not synced</div>
       </div>
       <button class="gfit-btn" id="gfit-btn" onclick="syncGoogleFit()">Sync →</button>
-    </div>
-    <div style="display:flex;align-items:baseline;gap:12px;padding:var(--s1) 0 var(--s2);">
-      <input id="r-steps-manual" type="number" inputmode="numeric" placeholder="—"
-        style="background:none;border:none;border-bottom:1px solid var(--rls);outline:none;
-          font-family:var(--serif);font-size:48px;font-weight:300;color:var(--t1);
-          caret-color:var(--ac);width:180px;padding-bottom:4px;transition:border-color .2s;"
-        oninput="onManualStepsInput()" onfocus="this.style.borderBottomColor='var(--ac)'" onblur="this.style.borderBottomColor='var(--rls)'">
-      <span style="font-family:var(--serif);font-size:18px;font-weight:300;color:var(--t3);">steps</span>
     </div>
   </div>
 
@@ -1416,6 +1408,7 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
   <div style="display:none;">
     <input id="r-wt" type="number" step="0.1" oninput="onWtChange()">
     <input id="r-steps" type="number" oninput="onStepsChange()">
+    <input id="r-steps-manual" type="number">
     <svg id="spark-svg" viewBox="0 0 320 32"></svg>
     <div id="dl-list"></div>
     <div id="r-esumm"></div>
@@ -6456,7 +6449,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v12';
+const CACHE = 'mission-os-v13';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
