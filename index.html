@@ -843,6 +843,19 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 .tod-verdict.positive{color:var(--risk-on);}
 .tod-verdict.warning{color:var(--risk-at);}
 
+/* ═══ LUNAR PIP (top bar) ═══ */
+.tod-lunar-pip{display:flex;align-items:center;gap:4px;cursor:default;}
+.tod-lunar-label{font-family:var(--sans);font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--t4);white-space:nowrap;}
+
+/* ═══ EKADASHI SENTENCE ═══ */
+.tod-ekadashi{
+  font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;
+  color:var(--ac);text-align:center;
+  padding:0 var(--pad);margin-top:20px;
+  line-height:1.6;opacity:0;transition:opacity .4s;
+}
+.tod-ekadashi.visible{opacity:1;}
+
 /* Change 7 — September 1 arrival */
 /* ═══ ACHIEVEMENTS ═══ */
 .ach-archive-head{padding:0 var(--pad);margin-bottom:var(--s3);}
@@ -1164,12 +1177,18 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
       <div class="tod-meta">The Re-<em>entry</em></div>
       <div class="tod-mission-day" id="tod-mission-day">Mission Day —</div>
     </div>
-    <button class="tod-settings-btn" onclick="openSettingsSheet()" aria-label="Settings">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="9" cy="9" r="2.5" stroke="currentColor" stroke-width="1.2"/>
-        <path d="M9 1v2M9 15v2M1 9h2M15 9h2M3.22 3.22l1.41 1.41M13.37 13.37l1.41 1.41M3.22 14.78l1.41-1.41M13.37 4.63l1.41-1.41" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-      </svg>
-    </button>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+      <button class="tod-settings-btn" onclick="openSettingsSheet()" aria-label="Settings">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="9" cy="9" r="2.5" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M9 1v2M9 15v2M1 9h2M15 9h2M3.22 3.22l1.41 1.41M13.37 13.37l1.41 1.41M3.22 14.78l1.41-1.41M13.37 4.63l1.41-1.41" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="tod-lunar-pip" id="tod-lunar-pip">
+        <svg id="tod-moon-svg" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14"></svg>
+        <span class="tod-lunar-label" id="tod-lunar-label"></span>
+      </div>
+    </div>
   </div>
 
   <!-- Travel banner -->
@@ -1222,6 +1241,9 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 
   <!-- Verdict sentence — appears after 6pm -->
   <div class="tod-verdict" id="tod-verdict"></div>
+
+  <!-- Ekadashi sentence — appears only on Dashami or Ekadashi -->
+  <div class="tod-ekadashi" id="tod-ekadashi"></div>
 
   <div style="height:80px;"></div>
 </div>
@@ -1338,10 +1360,19 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
     <div id="r-actual-summary"></div>
   </div>
 
-  <!-- Steps — manual entry -->
+  <!-- Steps — manual entry + Google Fit -->
   <div class="rec-section" style="padding-bottom:0;">
     <div class="rec-section-head">
       <span class="rec-section-label">Steps</span>
+    </div>
+    <!-- Google Fit row -->
+    <div class="gfit-row">
+      <div class="gfit-left">
+        <div class="gfit-label">Google Fit</div>
+        <div class="gfit-steps unsynced" id="gfit-steps-display">—</div>
+        <div class="gfit-status" id="gfit-status">Not synced</div>
+      </div>
+      <button class="gfit-btn" id="gfit-btn" onclick="syncGoogleFit()">Sync →</button>
     </div>
     <div style="display:flex;align-items:baseline;gap:12px;padding:var(--s1) 0 var(--s2);">
       <input id="r-steps-manual" type="number" inputmode="numeric" placeholder="—"
@@ -5340,10 +5371,19 @@ async function fetchStepsFromFit(){
   if(btn) btn.textContent = 'Syncing…';
   if(status) status.textContent = 'Fetching today\'s steps…';
 
-  // Get today's start and end in milliseconds
+  // Today's window in IST (UTC+5:30 = 19800 seconds offset)
+  // Midnight IST = midnight local - 5h30m in UTC
   const now = new Date();
-  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  const endOfDay = startOfDay + 86400000;
+  const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000; // 19800000ms
+  // Start: midnight IST today
+  const todayIST = new Date(now.getTime() + IST_OFFSET_MS);
+  const midnightIST = new Date(Date.UTC(
+    todayIST.getUTCFullYear(),
+    todayIST.getUTCMonth(),
+    todayIST.getUTCDate()
+  ));
+  const startOfDay = midnightIST.getTime() - IST_OFFSET_MS; // back to UTC ms
+  const endOfDay = now.getTime(); // now, not future midnight
 
   try {
     const res = await fetch(
@@ -6205,6 +6245,180 @@ function startClock(){
 }
 
 // ═══════════════════════════════════════════════
+// LUNAR CALENDAR ENGINE
+// Jean Meeus "Astronomical Algorithms" Ch.22/25
+// Tithi at Kannur sunrise (~6:10am IST = UTC+5:30)
+// ═══════════════════════════════════════════════
+
+function getLunarData(date){
+  // Use 6:10am IST for sunrise-based tithi (traditional Kerala reckoning)
+  const d = new Date(date);
+  d.setHours(0,40,0,0); // 6:10am IST = 00:40 UTC
+  const JD = dateToJD(d);
+  const sunLon  = getSunLongitude(JD);
+  const moonLon = getMoonLongitude(JD);
+  let diff = moonLon - sunLon;
+  if(diff < 0) diff += 360;
+  const tithiIndex = Math.floor(diff / 12); // 0–29
+  const paksha = tithiIndex < 15 ? 'Shukla' : 'Krishna';
+  const tithiNum = tithiIndex < 15 ? tithiIndex + 1 : tithiIndex - 14;
+  const illumination = (1 - Math.cos(diff * Math.PI / 180)) / 2;
+  const waxing = diff < 180;
+  return { tithiIndex, tithiNum, paksha, illumination, waxing, sunLon, moonLon, diff };
+}
+
+function dateToJD(date){
+  // Julian Day Number from JS Date
+  const Y = date.getUTCFullYear();
+  const M = date.getUTCMonth() + 1;
+  const D = date.getUTCDate() + date.getUTCHours()/24 + date.getUTCMinutes()/1440;
+  let y = Y, m = M;
+  if(m <= 2){ y--; m += 12; }
+  const A = Math.floor(y/100);
+  const B = 2 - A + Math.floor(A/4);
+  return Math.floor(365.25*(y+4716)) + Math.floor(30.6001*(m+1)) + D + B - 1524.5;
+}
+
+function getSunLongitude(JD){
+  const T = (JD - 2451545.0) / 36525;
+  const L0 = 280.46646 + 36000.76983*T + 0.0003032*T*T;
+  const M  = 357.52911 + 35999.05029*T - 0.0001537*T*T;
+  const Mr = M * Math.PI / 180;
+  const C  = (1.914602 - 0.004817*T - 0.000014*T*T)*Math.sin(Mr)
+            + (0.019993 - 0.000101*T)*Math.sin(2*Mr)
+            + 0.000289*Math.sin(3*Mr);
+  let lon = (L0 + C) % 360;
+  if(lon < 0) lon += 360;
+  return lon;
+}
+
+function getMoonLongitude(JD){
+  const T = (JD - 2451545.0) / 36525;
+  // Moon's mean longitude
+  let Lp = 218.3164477 + 481267.88123421*T - 0.0015786*T*T + T*T*T/538841 - T*T*T*T/65194000;
+  // Moon's mean anomaly
+  const M  = (357.52911 + 35999.05029*T - 0.0001537*T*T) * Math.PI / 180;
+  // Moon's mean anomaly
+  const Mp = (134.9634114 + 477198.8676313*T + 0.008997*T*T + T*T*T/69699 - T*T*T*T/14712000) * Math.PI / 180;
+  // Moon's argument of latitude
+  const F  = (93.2720950 + 483202.0175233*T - 0.0036539*T*T - T*T*T/3526000 + T*T*T*T/863310000) * Math.PI / 180;
+  // Sun's mean elongation of moon
+  const D  = (297.8501921 + 445267.1114034*T - 0.0018819*T*T + T*T*T/545868 - T*T*T*T/113065000) * Math.PI / 180;
+  // Longitude corrections (main terms)
+  const dL = 6288774*Math.sin(Mp)
+    + 1274027*Math.sin(2*D - Mp)
+    + 658314*Math.sin(2*D)
+    + 213618*Math.sin(2*Mp)
+    - 185116*Math.sin(M)
+    - 114332*Math.sin(2*F)
+    + 58793*Math.sin(2*D - 2*Mp)
+    + 57066*Math.sin(2*D - M - Mp)
+    + 53322*Math.sin(2*D + Mp)
+    + 45758*Math.sin(2*D - M)
+    - 40923*Math.sin(M - Mp)
+    - 34720*Math.sin(D)
+    - 30383*Math.sin(M + Mp)
+    + 15327*Math.sin(2*D - 2*F)
+    - 12528*Math.sin(Mp + 2*F)
+    + 10980*Math.sin(Mp - 2*F)
+    + 10675*Math.sin(4*D - Mp)
+    + 10034*Math.sin(3*Mp)
+    + 8548*Math.sin(4*D - 2*Mp)
+    - 7888*Math.sin(2*D + M - Mp)
+    - 6766*Math.sin(2*D + M)
+    - 5163*Math.sin(D - Mp);
+  let lon = (Lp + dL/1000000) % 360;
+  if(lon < 0) lon += 360;
+  return lon;
+}
+
+function getMalayalamMonth(sunLon){
+  // Malayalam solar months based on sun's sidereal longitude
+  // Adjust for ayanamsa (precession) ~24° for current epoch
+  let siderealLon = (sunLon - 23.5 + 360) % 360;
+  const monthIdx = Math.floor(siderealLon / 30);
+  // Malayalam months start from Medam (Aries=0), but Chingam (Leo=4) is month 1
+  // Medam=0, Edavam=1, Midhunam=2, Karkidakam=3, Chingam=4...
+  // Map rashi index to Malayalam month
+  const MALAYALAM_MONTHS = [
+    'Medam','Edavam','Midhunam','Karkidakam',
+    'Chingam','Kanni','Thulam','Vrischikam',
+    'Dhanu','Makaram','Kumbham','Meenam'
+  ];
+  return MALAYALAM_MONTHS[monthIdx % 12];
+}
+
+function getMalayalamDay(date){
+  // Approximate Malayalam solar day within month
+  // Solar day changes at sunrise based on sun's ingress into next rashi
+  // Simplified: track sun longitude change from month start
+  const d = new Date(date);
+  d.setHours(0,40,0,0);
+  const JD = dateToJD(d);
+  const sunLon = getSunLongitude(JD);
+  const siderealLon = (sunLon - 23.5 + 360) % 360;
+  const dayInMonth = Math.ceil(siderealLon % 30) || 1;
+  return Math.min(dayInMonth, 30);
+}
+
+const TITHI_NAMES = [
+  'Prathama','Dwitiya','Tritiya','Chaturthi','Panchami',
+  'Shashthi','Saptami','Ashtami','Navami','Dashami',
+  'Ekadashi','Dwadashi','Trayodashi','Chaturdashi','Pournami',
+  'Prathama','Dwitiya','Tritiya','Chaturthi','Panchami',
+  'Shashthi','Saptami','Ashtami','Navami','Dashami',
+  'Ekadashi','Dwadashi','Trayodashi','Chaturdashi','Amavasya'
+];
+
+function drawMoonPip(illumination, waxing){
+  // Tiny 14×14 moon pip for the top bar
+  const cx=7, cy=7, r=5.5;
+  const il = Math.max(0, Math.min(1, illumination));
+  if(il < 0.02) return `<circle cx="${cx}" cy="${cy}" r="${r}" stroke="var(--t4)" stroke-width=".8" fill="none"/>`;
+  if(il > 0.98) return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="var(--t3)"/>`;
+  const x1=cx, y1=cy-r, x2=cx, y2=cy+r;
+  const k = waxing ? (1-2*il) : (2*il-1);
+  const rx = Math.abs(k)*r;
+  const so = waxing ? 0 : 1;
+  const si = k>0 ? 1 : 0;
+  return `<path d="M${x1} ${y1} A${r} ${r} 0 0 ${so} ${x2} ${y2} A${rx.toFixed(2)} ${r} 0 0 ${si} ${x1} ${y1}Z" fill="var(--t3)"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" stroke="var(--t4)" stroke-width=".6" fill="none"/>`;
+}
+
+function renderLunar(){
+  const today = new Date();
+  const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
+
+  const lunar = getLunarData(today);
+  const lunarTmrw = getLunarData(tomorrow);
+
+  const tithiName = TITHI_NAMES[lunar.tithiIndex];
+  const tmrwTithiName = TITHI_NAMES[lunarTmrw.tithiIndex];
+
+  // ── Top bar pip: tiny moon + tithi label
+  const pipSvg = document.getElementById('tod-moon-svg');
+  if(pipSvg) pipSvg.innerHTML = drawMoonPip(lunar.illumination, lunar.waxing);
+
+  const pipLabel = document.getElementById('tod-lunar-label');
+  if(pipLabel) pipLabel.textContent = tithiName;
+
+  // ── Ekadashi sentence: only on Dashami or Ekadashi
+  const ekEl = document.getElementById('tod-ekadashi');
+  if(ekEl){
+    if(tithiName === 'Dashami'){
+      ekEl.textContent = 'Ekadashi tomorrow. Fast begins at sunrise.';
+      ekEl.classList.add('visible');
+    } else if(tithiName === 'Ekadashi'){
+      ekEl.textContent = 'Ekadashi today.';
+      ekEl.classList.add('visible');
+    } else {
+      ekEl.textContent = '';
+      ekEl.classList.remove('visible');
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════
 function init(){
@@ -6213,6 +6427,7 @@ function init(){
     document.getElementById('phone').classList.add('dk');
   }
   renderToday();
+  renderLunar();
   syncRecordInputs();
   startClock();
   initGoogleFit();
