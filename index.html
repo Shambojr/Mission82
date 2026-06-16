@@ -845,24 +845,31 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 
 /* Change 7 — September 1 arrival */
 /* ═══ ACHIEVEMENTS ═══ */
+.ach-archive-head{padding:0 var(--pad);margin-bottom:var(--s3);}
+.ach-archive-title{font-family:var(--serif);font-size:28px;font-weight:300;color:var(--t1);line-height:1.1;margin-bottom:4px;}
+.ach-archive-sub{font-family:var(--sans);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--t4);}
 .ach-category{margin-bottom:var(--s4);}
-.ach-cat-label{font-family:var(--sans);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--t4);padding:0 var(--pad);margin-bottom:var(--s2);display:block;}
+.ach-cat-row{display:flex;align-items:center;justify-content:space-between;padding:0 var(--pad);margin-bottom:var(--s2);}
+.ach-cat-label{font-family:var(--sans);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--t4);}
+.ach-cat-count{font-family:var(--sans);font-size:9px;letter-spacing:.1em;color:var(--t4);}
 .ach-row{display:flex;gap:10px;padding:0 var(--pad);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px;}
 .ach-row::-webkit-scrollbar{display:none;}
-.badge-card{flex-shrink:0;width:116px;border-radius:12px;overflow:hidden;position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.badge-card-inner{width:100%;padding-top:145%;position:relative;border-radius:12px;overflow:hidden;}
-.badge-bg{position:absolute;inset:0;border-radius:12px;}
-.badge-lock-overlay{position:absolute;inset:0;background:rgba(0,0,0,.68);border-radius:12px;}
-.badge-earned-border{position:absolute;inset:0;border:1.5px solid rgba(154,123,60,.8);border-radius:12px;pointer-events:none;}
-.badge-content{position:absolute;inset:0;padding:12px 10px 10px;display:flex;flex-direction:column;justify-content:space-between;}
-.badge-emoji{font-size:24px;line-height:1;}
-.badge-name{font-family:var(--serif);font-size:13px;font-weight:400;color:#fff;line-height:1.2;margin-bottom:3px;}
-.badge-desc{font-family:var(--serif);font-size:9.5px;font-weight:300;font-style:italic;color:rgba(255,255,255,.62);line-height:1.3;}
-.badge-date{font-family:var(--sans);font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(154,123,60,.9);margin-top:4px;}
-.badge-progress-bar{height:2px;background:rgba(255,255,255,.15);border-radius:1px;margin:6px 0 3px;overflow:hidden;}
-.badge-progress-fill{height:100%;background:rgba(255,255,255,.45);border-radius:1px;}
-.badge-progress-text{font-family:var(--sans);font-size:7.5px;color:rgba(255,255,255,.4);letter-spacing:.08em;}
-.badge-lock-icon{position:absolute;top:8px;right:8px;font-size:11px;opacity:.45;}
+.badge-card{flex-shrink:0;width:148px;border-radius:14px;overflow:hidden;position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent;background:var(--bg-r);border:1px solid rgba(0,0,0,.06);}
+.badge-card-inner{width:100%;padding-top:138%;position:relative;}
+.badge-art{position:absolute;top:0;left:0;right:0;height:62%;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.badge-art svg{width:72%;height:72%;opacity:.18;}
+.badge-card.earned .badge-art svg{opacity:.28;}
+.badge-divider{position:absolute;left:14px;right:14px;top:62%;height:1px;background:rgba(0,0,0,.08);}
+.badge-content{position:absolute;left:0;right:0;bottom:0;top:62%;padding:10px 12px 10px;}
+.badge-name{font-family:var(--serif);font-size:13.5px;font-weight:400;color:var(--t1);line-height:1.25;margin-bottom:3px;}
+.badge-desc{font-family:var(--serif);font-size:9px;font-weight:300;font-style:italic;color:var(--t3);line-height:1.4;}
+.badge-date{font-family:var(--sans);font-size:7px;letter-spacing:.12em;text-transform:uppercase;color:var(--ac);margin-top:5px;}
+.badge-prog-row{display:flex;justify-content:space-between;align-items:flex-end;position:absolute;bottom:9px;left:12px;right:12px;}
+.badge-prog-cur{font-family:var(--sans);font-size:9px;color:var(--t4);}
+.badge-prog-max{font-family:var(--sans);font-size:9px;color:var(--t4);}
+.badge-earned-mark{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;}
+.badge-earned-mark svg{width:10px;height:10px;}
+.badge-lock-dim{position:absolute;inset:0;background:rgba(244,239,229,.35);border-radius:14px;pointer-events:none;}
 .best-card{flex:1;background:var(--bg-r);border-radius:10px;padding:12px 10px;text-align:center;min-width:0;}
 .best-val{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t1);line-height:1;margin-bottom:4px;}
 .best-lbl{font-family:var(--sans);font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:var(--t4);line-height:1.3;}
@@ -907,6 +914,12 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
   border:1px solid var(--ac);border-radius:4px;
   padding:2px 6px;margin-bottom:6px;opacity:.7;
 }
+
+/* ═══ ANT SCENE ═══ */
+.ant-scene-wrap{margin:var(--s4) var(--pad) 0;position:relative;height:160px;}
+.ant-scene-label{font-family:var(--sans);font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--t4);position:absolute;top:0;left:0;}
+.ant-scene-day{font-family:var(--serif);font-size:11px;font-weight:300;color:var(--t3);position:absolute;top:0;right:0;letter-spacing:.04em;}
+.ant-scene-svg{position:absolute;top:18px;left:0;width:100%;height:calc(100% - 18px);pointer-events:none;}
 
 .arrival-overlay{
   position:fixed;inset:0;background:var(--bg);
@@ -1200,6 +1213,13 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
   <!-- Rule -->
   <div style="margin:0 28px;height:1px;background:var(--rl);"></div>
 
+  <!-- Ant Scene -->
+  <div class="ant-scene-wrap" id="ant-scene-wrap">
+    <span class="ant-scene-label">Mission Progress</span>
+    <span class="ant-scene-day" id="ant-scene-day"></span>
+    <svg class="ant-scene-svg" id="ant-scene-svg" viewBox="0 0 320 142" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
   <!-- Verdict sentence — appears after 6pm -->
   <div class="tod-verdict" id="tod-verdict"></div>
 
@@ -1463,8 +1483,11 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
   <div class="sh" style="margin-top:var(--s4);"><span class="sl">Personal Bests</span><div class="sr"></div></div>
   <div id="pat-bests" style="padding:0 var(--pad);display:flex;gap:12px;margin-bottom:var(--s2);"></div>
 
-  <!-- Achievements -->
-  <div class="sh"><span class="sl">Achievements</span><div class="sr"></div></div>
+  <!-- Mission Archive -->
+  <div class="ach-archive-head" style="margin-top:var(--s4);">
+    <div class="ach-archive-title">Mission Archive</div>
+    <div class="ach-archive-sub">Artifacts collected along the way</div>
+  </div>
   <div id="pat-achievements" style="padding-bottom:var(--s3);"></div>
 
   <!-- Data Diagnostic -->
@@ -1521,10 +1544,10 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
   <div id="badge-overlay-bg" style="position:absolute;inset:0;opacity:.96;"></div>
   <div style="position:relative;z-index:1;animation:arrivalFade .6s cubic-bezier(.16,1,.3,1) both;">
     <div id="bo-emoji" style="font-size:64px;margin-bottom:var(--s3);line-height:1;"></div>
-    <div style="font-family:var(--sans);font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:var(--s2);">Achievement Unlocked</div>
-    <div id="bo-name" style="font-family:var(--serif);font-size:32px;font-weight:300;color:#fff;margin-bottom:var(--s2);"></div>
-    <div style="height:1px;width:48px;background:rgba(255,255,255,.4);margin:0 auto var(--s3);"></div>
-    <div id="bo-desc" style="font-family:var(--serif);font-size:17px;font-weight:300;font-style:italic;color:rgba(255,255,255,.8);line-height:1.6;"></div>
+    <div style="font-family:var(--sans);font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--t4);margin-bottom:var(--s2);">Achievement Unlocked</div>
+    <div id="bo-name" style="font-family:var(--serif);font-size:32px;font-weight:300;color:var(--t1);margin-bottom:var(--s2);"></div>
+    <div style="height:1px;width:48px;background:var(--rl);margin:0 auto var(--s3);"></div>
+    <div id="bo-desc" style="font-family:var(--serif);font-size:17px;font-weight:300;font-style:italic;color:var(--t3);line-height:1.6;"></div>
   </div>
 </div>
 
@@ -2186,6 +2209,9 @@ function renderToday(){
   // Discipline dots
   renderDiscDots();
 
+  // Ant scene
+  renderAntScene();
+
   // Verdict sentence
   renderVerdict();
 
@@ -2280,6 +2306,7 @@ function toggleTodayDiscDot(idx, el){
   if(activeTab === 'record') syncDlList();
   updateDayColor();
   renderVerdict();
+  renderAntScene();
 }
 
 function renderMealOneliner(){
@@ -3720,6 +3747,135 @@ function saveRecord(){
 }
 
 // ═══════════════════════════════════════════════
+// ANT SCENE
+// ═══════════════════════════════════════════════
+function isDayEarned(dateKey){
+  const rec = records[dateKey] || {};
+  const discs = rec.disciplines || [];
+  let count = 0;
+  DISCIPLINES.forEach((disc, i) => {
+    if(!discs[i] || !discs[i].done) return;
+    if(disc.id === 'd3'){
+      const steps = parseInt(rec.steps) || 0;
+      if(steps >= 10000) count++;
+    } else {
+      count++;
+    }
+  });
+  return count >= 4;
+}
+
+function countEarnedSeeds(){
+  const start = mission.startDate;
+  const today = todayKey();
+  let seeds = 0;
+  let d = keyToDate(start);
+  const todayD = keyToDate(today);
+  while(d <= todayD){
+    const k = d.toISOString().slice(0,10);
+    if(isDayEarned(k)) seeds++;
+    d.setDate(d.getDate() + 1);
+  }
+  return seeds;
+}
+
+function renderAntScene(){
+  const svg = document.getElementById('ant-scene-svg');
+  const dayEl = document.getElementById('ant-scene-day');
+  if(!svg) return;
+
+  const day = missionDay();
+  const startD = keyToDate(mission.startDate);
+  const endD = keyToDate(mission.targetDate);
+  const totalDays = Math.max(1, Math.round((endD - startD) / 86400000));
+  const seeds = countEarnedSeeds();
+  const maxSeeds = totalDays;
+
+  if(dayEl) dayEl.textContent = `Day ${day} of ${totalDays}`;
+
+  const W = 320, H = 142;
+  const isDarkMode = document.getElementById('phone').classList.contains('dk');
+  const inkColor   = isDarkMode ? '#C8C0B0' : '#2A2620';
+  const goldColor  = isDarkMode ? '#B8924A' : '#9A7B3C';
+  const mutedColor = isDarkMode ? '#4A4540' : '#C8C0B0';
+  const bgColor    = isDarkMode ? '#1A1710' : '#EDE7DB';
+
+  const pileX = 258, pileY = 120;
+  const SEED_POSITIONS = [];
+  const ring0 = [[0,0],[8,-4],[-6,-5],[4,7],[-8,2],[10,3],[-3,8],[6,-10],[-11,-2],[13,-6],[2,11],[-9,8],[14,2],[-5,12],[8,9]];
+  const ring1 = [[17,-4],[-14,5],[11,14],[-3,16],[18,8],[-16,-7],[6,18],[20,-10],[-18,10],[15,13],[-10,17],[22,3],[-20,2],[12,-16],[20,14]];
+  const ring2 = [[-22,14],[24,-5],[18,-17],[-6,22],[26,7],[-24,-4],[10,22],[28,-12],[-26,8],[22,16],[-14,22],[28,5],[-28,12]];
+  [...ring0,...ring1,...ring2].forEach(([dx,dy]) => SEED_POSITIONS.push([pileX+dx, pileY+dy]));
+
+  const antStartX = 28, antStartY = 80;
+  const cp1x = 100, cp1y = 130;
+  const cp2x = 200, cp2y = 100;
+  const antEndX = pileX - 24, antEndY = pileY - 12;
+
+  const pathProgress = Math.min(0.96, seeds / Math.max(1, maxSeeds));
+  function bezier(t, p0, p1, p2, p3){
+    const u = 1-t;
+    return u*u*u*p0 + 3*u*u*t*p1 + 3*u*t*t*p2 + t*t*t*p3;
+  }
+  const antX = bezier(pathProgress, antStartX, cp1x, cp2x, antEndX);
+  const antY = bezier(pathProgress, antStartY, cp1y, cp2y, antEndY);
+  const dt = 0.02;
+  const t2 = Math.min(pathProgress + dt, 1);
+  const ax2 = bezier(t2, antStartX, cp1x, cp2x, antEndX);
+  const ay2 = bezier(t2, antStartY, cp1y, cp2y, antEndY);
+  const angle = Math.atan2(ay2 - antY, ax2 - antX) * 180 / Math.PI;
+  const todayEarned = isDayEarned(todayKey());
+
+  let out = '';
+
+  // Dotted trail
+  out += `<path d="M${antStartX},${antStartY} C${cp1x},${cp1y} ${cp2x},${cp2y} ${antEndX},${antEndY}" stroke="${mutedColor}" stroke-width="1" stroke-dasharray="3 4" fill="none" opacity="0.5"/>`;
+  if(pathProgress > 0.02){
+    out += `<path d="M${antStartX},${antStartY} C${cp1x},${cp1y} ${cp2x},${cp2y} ${antX},${antY}" stroke="${inkColor}" stroke-width="1.1" stroke-dasharray="3 4" fill="none" opacity="0.55"/>`;
+  }
+
+  // Seeds
+  SEED_POSITIONS.forEach(([sx, sy], idx) => {
+    if(idx < seeds){
+      out += `<ellipse cx="${sx}" cy="${sy}" rx="4.5" ry="2.2" transform="rotate(-20,${sx},${sy})" fill="${inkColor}" opacity="0.75"/>`;
+      out += `<line x1="${sx-2}" y1="${sy}" x2="${sx+2}" y2="${sy}" stroke="${bgColor}" stroke-width="0.5" transform="rotate(-20,${sx},${sy})" opacity="0.4"/>`;
+    } else if(idx === seeds && seeds < maxSeeds){
+      out += `<ellipse cx="${sx}" cy="${sy}" rx="4.5" ry="2.2" transform="rotate(-20,${sx},${sy})" fill="none" stroke="${mutedColor}" stroke-width="0.6" opacity="0.3"/>`;
+    }
+  });
+
+  // Pile shadow
+  if(seeds > 0){
+    const pr = Math.min(8 + seeds * 0.6, 28);
+    out += `<ellipse cx="${pileX}" cy="${pileY+6}" rx="${pr}" ry="4" fill="${inkColor}" opacity="0.04"/>`;
+  }
+
+  // Ant
+  out += `<g transform="translate(${antX},${antY}) rotate(${angle})">
+    <ellipse cx="-5" cy="0" rx="4.5" ry="2.8" fill="${inkColor}" opacity="0.85"/>
+    <ellipse cx="0.5" cy="0" rx="2.4" ry="1.8" fill="${inkColor}" opacity="0.85"/>
+    <ellipse cx="5" cy="0" rx="2" ry="1.7" fill="${inkColor}" opacity="0.85"/>
+    <line x1="6.5" y1="-1" x2="10" y2="-4.5" stroke="${inkColor}" stroke-width="0.8" stroke-linecap="round" opacity="0.8"/>
+    <line x1="6.5" y1="-0.5" x2="11" y2="-2" stroke="${inkColor}" stroke-width="0.8" stroke-linecap="round" opacity="0.8"/>
+    <line x1="-2" y1="2" x2="-4" y2="5.5" stroke="${inkColor}" stroke-width="0.9" stroke-linecap="round" opacity="0.75"/>
+    <line x1="0.5" y1="1.8" x2="0" y2="5.5" stroke="${inkColor}" stroke-width="0.9" stroke-linecap="round" opacity="0.75"/>
+    <line x1="3" y1="1.5" x2="4.5" y2="5" stroke="${inkColor}" stroke-width="0.9" stroke-linecap="round" opacity="0.75"/>
+    <line x1="-2" y1="-2" x2="-4" y2="-5.5" stroke="${inkColor}" stroke-width="0.9" stroke-linecap="round" opacity="0.75"/>
+    <line x1="0.5" y1="-1.8" x2="0" y2="-5.5" stroke="${inkColor}" stroke-width="0.9" stroke-linecap="round" opacity="0.75"/>
+    <line x1="3" y1="-1.5" x2="4.5" y2="-5" stroke="${inkColor}" stroke-width="0.9" stroke-linecap="round" opacity="0.75"/>
+    ${todayEarned
+      ? `<ellipse cx="8" cy="-5.5" rx="3.8" ry="1.8" transform="rotate(-30,8,-5.5)" fill="${goldColor}" opacity="0.9"/>
+         <line x1="6.5" y1="-2" x2="7.5" y2="-4" stroke="${inkColor}" stroke-width="0.7" opacity="0.6"/>`
+      : ''}
+  </g>`;
+
+  // Corner bracket
+  out += `<path d="M298,136 L314,136 L314,120" stroke="${mutedColor}" stroke-width="0.8" fill="none" opacity="0.25"/>`;
+
+  svg.innerHTML = out;
+}
+
+// ═══════════════════════════════════════════════
 // STEP 1 — JOBS SUGGESTIONS
 // ═══════════════════════════════════════════════
 
@@ -3835,15 +3991,16 @@ function renderVerdict(){
 
 // Change 6 — Swipe velocity responsive transitions
 function initSwipe(){
-  const phone = document.getElementById('phone');
-  if(!phone) return;
-  let startX = 0, startY = 0, startTime = 0;
-  phone.addEventListener('touchstart', e => {
+  let startX = 0, startY = 0, startTime = 0, inScrollRow = false;
+  document.addEventListener('touchstart', e => {
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
     startTime = Date.now();
+    // Check if touch started inside a horizontal scroll row
+    inScrollRow = !!e.target.closest('.ach-row, .range-btns, #db-cats');
   }, {passive:true});
-  phone.addEventListener('touchend', e => {
+  document.addEventListener('touchend', e => {
+    if(inScrollRow) return; // let the scroll row handle it
     const dx = e.changedTouches[0].clientX - startX;
     const dy = e.changedTouches[0].clientY - startY;
     const dt = Date.now() - startTime;
@@ -4447,112 +4604,173 @@ function updateTrainingSummary(){
 // BADGE ENGINE
 // ═══════════════════════════════════════════════
 
-const BADGE_GRADIENTS = {
-  wake:       'linear-gradient(160deg,#0a0a2e 0%,#1a1a4e 40%,#8B6914 100%)',
-  angamardana:'linear-gradient(160deg,#2a0a0a 0%,#5c1010 50%,#2a1a0a 100%)',
-  kriya:      'linear-gradient(160deg,#050520 0%,#1a0a3a 50%,#2a1a4a 100%)',
-  steps:      'linear-gradient(160deg,#0a2a2a 0%,#0a3a4a 50%,#1a4a5a 100%)',
-  dumbbell:   'linear-gradient(160deg,#1a1a1a 0%,#2a2a3a 50%,#1a2a3a 100%)',
-  weight:     'linear-gradient(160deg,#0a2a0a 0%,#1a3a1a 50%,#4a5a1a 100%)',
-  discipline: 'linear-gradient(160deg,#0a0a0a 0%,#1a1a0a 40%,#3a2a0a 100%)',
-  deficit:    'linear-gradient(160deg,#0a1a0a 0%,#1a2a1a 50%,#2a3a2a 100%)',
-  mission:    'linear-gradient(160deg,#0a0a14 0%,#141428 40%,#3a2800 70%,#5a3800 100%)',
+// Badge SVG line-art illustrations (one per category)
+const BADGE_ART = {
+  wake: `<svg viewBox="0 0 80 80" fill="none" stroke="#1B1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="40" cy="38" r="14"/>
+    <line x1="40" y1="8" x2="40" y2="14"/>
+    <line x1="40" y1="62" x2="40" y2="68"/>
+    <line x1="10" y1="38" x2="16" y2="38"/>
+    <line x1="64" y1="38" x2="70" y2="38"/>
+    <line x1="20" y1="18" x2="24" y2="22"/>
+    <line x1="56" y1="54" x2="60" y2="58"/>
+    <line x1="60" y1="18" x2="56" y2="22"/>
+    <line x1="24" y1="54" x2="20" y2="58"/>
+    <path d="M28 60 Q40 52 52 60" stroke-width="1"/>
+  </svg>`,
+  angamardana: `<svg viewBox="0 0 80 80" fill="none" stroke="#1B1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="40" cy="18" r="6"/>
+    <line x1="40" y1="24" x2="40" y2="44"/>
+    <line x1="40" y1="32" x2="24" y2="26"/>
+    <line x1="40" y1="32" x2="56" y2="26"/>
+    <line x1="40" y1="44" x2="30" y2="62"/>
+    <line x1="40" y1="44" x2="50" y2="62"/>
+    <path d="M22 24 Q16 34 20 44" stroke-width="1"/>
+    <path d="M58 24 Q64 34 60 44" stroke-width="1"/>
+  </svg>`,
+  kriya: `<svg viewBox="0 0 80 80" fill="none" stroke="#1B1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M40 14 C40 14 54 26 54 40 C54 54 40 66 40 66 C40 66 26 54 26 40 C26 26 40 14 40 14Z"/>
+    <path d="M34 40 C34 40 40 34 46 40 C40 46 34 40 34 40Z" stroke-width="1"/>
+    <line x1="40" y1="14" x2="40" y2="10"/>
+    <line x1="40" y1="66" x2="40" y2="70"/>
+  </svg>`,
+  steps: `<svg viewBox="0 0 80 80" fill="none" stroke="#1B1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 58 Q28 42 40 46 Q52 50 64 28"/>
+    <ellipse cx="30" cy="30" rx="5" ry="7" transform="rotate(-15 30 30)"/>
+    <ellipse cx="50" cy="22" rx="4" ry="6" transform="rotate(-10 50 22)"/>
+    <path d="M25 37 L22 52 L30 54 L34 42" stroke-width="1.2"/>
+    <path d="M45 28 L43 43 L51 44 L53 32" stroke-width="1.2"/>
+  </svg>`,
+  dumbbell: `<svg viewBox="0 0 80 80" fill="none" stroke="#1B1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="20" y1="40" x2="60" y2="40"/>
+    <rect x="10" y="32" width="10" height="16" rx="2"/>
+    <rect x="60" y="32" width="10" height="16" rx="2"/>
+    <rect x="16" y="35" width="6" height="10" rx="1"/>
+    <rect x="58" y="35" width="6" height="10" rx="1"/>
+  </svg>`,
+  weight: `<svg viewBox="0 0 80 80" fill="none" stroke="#1B1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M40 18 L40 58"/>
+    <path d="M40 18 C40 18 52 26 52 38 C52 50 40 58 40 58 C40 58 28 50 28 38 C28 26 40 18 40 18Z"/>
+    <path d="M36 44 L40 30 L44 44" stroke-width="1.2"/>
+    <line x1="35" y1="41" x2="45" y2="41" stroke-width="1"/>
+  </svg>`,
+  discipline: `<svg viewBox="0 0 80 80" fill="none" stroke="#1B1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="40" cy="40" r="22"/>
+    <circle cx="40" cy="40" r="14"/>
+    <circle cx="40" cy="40" r="5"/>
+    <line x1="40" y1="10" x2="40" y2="18"/>
+    <line x1="40" y1="62" x2="40" y2="70"/>
+    <line x1="10" y1="40" x2="18" y2="40"/>
+    <line x1="62" y1="40" x2="70" y2="40"/>
+  </svg>`,
+  deficit: `<svg viewBox="0 0 80 80" fill="none" stroke="#1B1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 54 L26 42 L34 48 L46 30 L60 36 L68 22"/>
+    <path d="M58 22 L68 22 L68 32"/>
+    <line x1="14" y1="60" x2="68" y2="60" stroke-width="1" stroke-dasharray="2 3"/>
+  </svg>`,
+  mission: `<svg viewBox="0 0 80 80" fill="none" stroke="#1B1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M40 14 L52 48 L40 42 L28 48 Z"/>
+    <path d="M40 14 L40 70"/>
+    <path d="M28 48 L20 62"/>
+    <path d="M52 48 L60 62"/>
+    <line x1="20" y1="62" x2="60" y2="62"/>
+  </svg>`,
 };
 
 const BADGES = [
   // ── WAKE
-  {id:'w1', cat:'wake', emoji:'🌅', name:'First Light', desc:'The alarm was answered.', grad:BADGE_GRADIENTS.wake,
+  {id:'w1', cat:'wake', emoji:'🌅', name:'First Light', desc:'The alarm was answered.', art:BADGE_ART.wake,
     check:()=>completionDays('d1') >= 1, prog:()=>({cur:Math.min(1,completionDays('d1')),max:1})},
-  {id:'w2', cat:'wake', emoji:'☀️', name:'Rising Rhythm', desc:'The body learns before the mind does.', grad:BADGE_GRADIENTS.wake,
+  {id:'w2', cat:'wake', emoji:'☀️', name:'Rising Rhythm', desc:'The body learns before the mind does.', art:BADGE_ART.wake,
     check:()=>maxConsecutiveDays('d1') >= 7, prog:()=>({cur:Math.min(7,maxConsecutiveDays('d1')),max:7})},
-  {id:'w3', cat:'wake', emoji:'🕊', name:'Dawn Keeper', desc:'Waking early is no longer a decision.', grad:BADGE_GRADIENTS.wake,
+  {id:'w3', cat:'wake', emoji:'🕊', name:'Dawn Keeper', desc:'Waking early is no longer a decision.', art:BADGE_ART.wake,
     check:()=>maxConsecutiveDays('d1') >= 21, prog:()=>({cur:Math.min(21,maxConsecutiveDays('d1')),max:21})},
-  {id:'w4', cat:'wake', emoji:'🌄', name:'The Early Hours', desc:'The final resistance breaks.', grad:BADGE_GRADIENTS.wake,
+  {id:'w4', cat:'wake', emoji:'🌄', name:'The Early Hours', desc:'The final resistance breaks.', art:BADGE_ART.wake,
     check:()=>completionDays('d1') >= 50, prog:()=>({cur:Math.min(50,completionDays('d1')),max:50})},
-  {id:'w5', cat:'wake', emoji:'🏔', name:'Brahma Muhurta', desc:'The final hour is claimed.', grad:BADGE_GRADIENTS.mission,
+  {id:'w5', cat:'wake', emoji:'🏔', name:'Brahma Muhurta', desc:'The final hour is claimed.', art:BADGE_ART.mission,
     check:()=>getWakeTarget().reached, prog:()=>({cur:missionDay(),max:46})},
 
   // ── ANGAMARDANA
-  {id:'a1', cat:'angamardana', emoji:'🕉', name:'First Bend', desc:'Body enters the process.', grad:BADGE_GRADIENTS.angamardana,
+  {id:'a1', cat:'angamardana', emoji:'🕉', name:'First Bend', desc:'Body enters the process.', art:BADGE_ART.angamardana,
     check:()=>completionDays('d2') >= 1, prog:()=>({cur:Math.min(1,completionDays('d2')),max:1})},
-  {id:'a2', cat:'angamardana', emoji:'⚔️', name:'Forging the Body', desc:'Discipline enters muscle memory.', grad:BADGE_GRADIENTS.angamardana,
+  {id:'a2', cat:'angamardana', emoji:'⚔️', name:'Forging the Body', desc:'Discipline enters muscle memory.', art:BADGE_ART.angamardana,
     check:()=>completionDays('d2') >= 7, prog:()=>({cur:Math.min(7,completionDays('d2')),max:7})},
-  {id:'a3', cat:'angamardana', emoji:'🦅', name:'Anga Siddhi', desc:'The body begins responding willingly.', grad:BADGE_GRADIENTS.angamardana,
+  {id:'a3', cat:'angamardana', emoji:'🦅', name:'Anga Siddhi', desc:'The body begins responding willingly.', art:BADGE_ART.angamardana,
     check:()=>completionDays('d2') >= 21, prog:()=>({cur:Math.min(21,completionDays('d2')),max:21})},
-  {id:'a4', cat:'angamardana', emoji:'🔥', name:'Fire in the Limbs', desc:'Consistency becomes strength.', grad:BADGE_GRADIENTS.angamardana,
+  {id:'a4', cat:'angamardana', emoji:'🔥', name:'Fire in the Limbs', desc:'Consistency becomes strength.', art:BADGE_ART.angamardana,
     check:()=>completionDays('d2') >= 50, prog:()=>({cur:Math.min(50,completionDays('d2')),max:50})},
-  {id:'a5', cat:'angamardana', emoji:'🏔', name:'Master of the Body', desc:'Angamardana completed across the mission.', grad:BADGE_GRADIENTS.mission,
+  {id:'a5', cat:'angamardana', emoji:'🏔', name:'Master of the Body', desc:'Angamardana completed across the mission.', art:BADGE_ART.mission,
     check:()=>completionDays('d2') >= missionTotalDays() * 0.8, prog:()=>({cur:completionDays('d2'),max:missionTotalDays()})},
 
   // ── KRIYA
-  {id:'k1', cat:'kriya', emoji:'🌙', name:'First Stillness', desc:'The mind experiences a pause.', grad:BADGE_GRADIENTS.kriya,
+  {id:'k1', cat:'kriya', emoji:'🌙', name:'First Stillness', desc:'The mind experiences a pause.', art:BADGE_ART.kriya,
     check:()=>completionDays('d4') >= 1, prog:()=>({cur:Math.min(1,completionDays('d4')),max:1})},
-  {id:'k2', cat:'kriya', emoji:'🕊', name:'Settling Dust', desc:'Inner noise begins settling.', grad:BADGE_GRADIENTS.kriya,
+  {id:'k2', cat:'kriya', emoji:'🕊', name:'Settling Dust', desc:'Inner noise begins settling.', art:BADGE_ART.kriya,
     check:()=>completionDays('d4') >= 7, prog:()=>({cur:Math.min(7,completionDays('d4')),max:7})},
-  {id:'k3', cat:'kriya', emoji:'🪷', name:'Inner Space', desc:'Consistency in Kriya established.', grad:BADGE_GRADIENTS.kriya,
+  {id:'k3', cat:'kriya', emoji:'🪷', name:'Inner Space', desc:'Consistency in Kriya established.', art:BADGE_ART.kriya,
     check:()=>completionDays('d4') >= 21, prog:()=>({cur:Math.min(21,completionDays('d4')),max:21})},
-  {id:'k4', cat:'kriya', emoji:'✨', name:'Silent Current', desc:'The process continues effortlessly.', grad:BADGE_GRADIENTS.kriya,
+  {id:'k4', cat:'kriya', emoji:'✨', name:'Silent Current', desc:'The process continues effortlessly.', art:BADGE_ART.kriya,
     check:()=>completionDays('d4') >= 50, prog:()=>({cur:Math.min(50,completionDays('d4')),max:50})},
-  {id:'k5', cat:'kriya', emoji:'🏔', name:'Keeper of Stillness', desc:'Kriya sustained through the mission.', grad:BADGE_GRADIENTS.mission,
+  {id:'k5', cat:'kriya', emoji:'🏔', name:'Keeper of Stillness', desc:'Kriya sustained through the mission.', art:BADGE_ART.mission,
     check:()=>completionDays('d4') >= missionTotalDays() * 0.8, prog:()=>({cur:completionDays('d4'),max:missionTotalDays()})},
 
   // ── STEPS
-  {id:'s1', cat:'steps', emoji:'👣', name:'The First Mile', desc:'Movement begins.', grad:BADGE_GRADIENTS.steps,
+  {id:'s1', cat:'steps', emoji:'👣', name:'The First Mile', desc:'Movement begins.', art:BADGE_ART.steps,
     check:()=>Object.values(records).some(r=>r.steps >= 10000), prog:()=>({cur:Math.min(10000,Math.max(...Object.values(records).map(r=>r.steps||0),0)),max:10000})},
-  {id:'s2', cat:'steps', emoji:'🌊', name:'Steady Flow', desc:'Movement becomes part of life.', grad:BADGE_GRADIENTS.steps,
+  {id:'s2', cat:'steps', emoji:'🌊', name:'Steady Flow', desc:'Movement becomes part of life.', art:BADGE_ART.steps,
     check:()=>completionDays('d3') >= 7, prog:()=>({cur:Math.min(7,completionDays('d3')),max:7})},
-  {id:'s3', cat:'steps', emoji:'🏝', name:'Payyambalam Walker', desc:'A tribute to your beach.', grad:BADGE_GRADIENTS.steps,
+  {id:'s3', cat:'steps', emoji:'🏝', name:'Payyambalam Walker', desc:'A tribute to your beach.', art:BADGE_ART.steps,
     check:()=>weeklySteps() >= 70000, prog:()=>({cur:Math.min(70000,weeklySteps()),max:70000})},
-  {id:'s4', cat:'steps', emoji:'🌍', name:'Earth Underfoot', desc:'The journey accumulates.', grad:BADGE_GRADIENTS.steps,
+  {id:'s4', cat:'steps', emoji:'🌍', name:'Earth Underfoot', desc:'The journey accumulates.', art:BADGE_ART.steps,
     check:()=>totalSteps() >= 500000, prog:()=>({cur:Math.min(500000,totalSteps()),max:500000})},
-  {id:'s5', cat:'steps', emoji:'🏔', name:'Path Maker', desc:'The path was walked.', grad:BADGE_GRADIENTS.mission,
+  {id:'s5', cat:'steps', emoji:'🏔', name:'Path Maker', desc:'The path was walked.', art:BADGE_ART.mission,
     check:()=>completionDays('d3') >= missionTotalDays() * 0.8, prog:()=>({cur:completionDays('d3'),max:missionTotalDays()})},
 
   // ── DUMBBELL
-  {id:'d1b', cat:'dumbbell', emoji:'🏋️', name:'First Lift', desc:'Strength enters the mission.', grad:BADGE_GRADIENTS.dumbbell,
+  {id:'d1b', cat:'dumbbell', emoji:'🏋️', name:'First Lift', desc:'Strength enters the mission.', art:BADGE_ART.dumbbell,
     check:()=>completionDays('d5') >= 1, prog:()=>({cur:Math.min(1,completionDays('d5')),max:1})},
-  {id:'d2b', cat:'dumbbell', emoji:'⚒', name:'Forging Iron', desc:'The body adapts.', grad:BADGE_GRADIENTS.dumbbell,
+  {id:'d2b', cat:'dumbbell', emoji:'⚒', name:'Forging Iron', desc:'The body adapts.', art:BADGE_ART.dumbbell,
     check:()=>completionDays('d5') >= 7, prog:()=>({cur:Math.min(7,completionDays('d5')),max:7})},
-  {id:'d3b', cat:'dumbbell', emoji:'🦍', name:'Steady Strength', desc:'Strength is becoming a habit.', grad:BADGE_GRADIENTS.dumbbell,
+  {id:'d3b', cat:'dumbbell', emoji:'🦍', name:'Steady Strength', desc:'Strength is becoming a habit.', art:BADGE_ART.dumbbell,
     check:()=>completionDays('d5') >= 21, prog:()=>({cur:Math.min(21,completionDays('d5')),max:21})},
-  {id:'d4b', cat:'dumbbell', emoji:'🔥', name:'Unshakable', desc:'Consistency over motivation.', grad:BADGE_GRADIENTS.dumbbell,
+  {id:'d4b', cat:'dumbbell', emoji:'🔥', name:'Unshakable', desc:'Consistency over motivation.', art:BADGE_ART.dumbbell,
     check:()=>completionDays('d5') >= 50, prog:()=>({cur:Math.min(50,completionDays('d5')),max:50})},
-  {id:'d5b', cat:'dumbbell', emoji:'🏔', name:'Bearer of Strength', desc:'The discipline was honored.', grad:BADGE_GRADIENTS.mission,
+  {id:'d5b', cat:'dumbbell', emoji:'🏔', name:'Bearer of Strength', desc:'The discipline was honored.', art:BADGE_ART.mission,
     check:()=>completionDays('d5') >= missionTotalDays() * 0.8, prog:()=>({cur:completionDays('d5'),max:missionTotalDays()})},
 
   // ── WEIGHT LOSS
-  {id:'wl1', cat:'weight', emoji:'🍂', name:'The First Fall', desc:'This is actually a beautiful name.', grad:BADGE_GRADIENTS.weight,
+  {id:'wl1', cat:'weight', emoji:'🍂', name:'The First Fall', desc:'This is actually a beautiful name.', art:BADGE_ART.weight,
     check:()=>weightLost() >= 1, prog:()=>({cur:Math.min(1,weightLost()),max:1})},
-  {id:'wl2', cat:'weight', emoji:'🌿', name:'Lightening', desc:'The burden begins reducing.', grad:BADGE_GRADIENTS.weight,
+  {id:'wl2', cat:'weight', emoji:'🌿', name:'Lightening', desc:'The burden begins reducing.', art:BADGE_ART.weight,
     check:()=>weightLost() >= 3, prog:()=>({cur:Math.min(3,weightLost()),max:3})},
-  {id:'wl3', cat:'weight', emoji:'🪶', name:'Half the Load', desc:'Halfway to transformation.', grad:BADGE_GRADIENTS.weight,
+  {id:'wl3', cat:'weight', emoji:'🪶', name:'Half the Load', desc:'Halfway to transformation.', art:BADGE_ART.weight,
     check:()=>weightLost() >= (mission.startWeight - mission.targetWeight) / 2, prog:()=>({cur:Math.min((mission.startWeight-mission.targetWeight)/2,weightLost()),max:(mission.startWeight-mission.targetWeight)/2})},
-  {id:'wl4', cat:'weight', emoji:'🌬', name:'The Shedding', desc:'Old weight leaves.', grad:BADGE_GRADIENTS.weight,
+  {id:'wl4', cat:'weight', emoji:'🌬', name:'The Shedding', desc:'Old weight leaves.', art:BADGE_ART.weight,
     check:()=>weightLost() >= 7, prog:()=>({cur:Math.min(7,weightLost()),max:7})},
-  {id:'wl5', cat:'weight', emoji:'🏔', name:'The Re-entry Begins', desc:'You have entered a new phase.', grad:BADGE_GRADIENTS.mission,
+  {id:'wl5', cat:'weight', emoji:'🏔', name:'The Re-entry Begins', desc:'You have entered a new phase.', art:BADGE_ART.mission,
     check:()=>weightLost() >= (mission.startWeight - mission.targetWeight), prog:()=>({cur:Math.min(mission.startWeight-mission.targetWeight,weightLost()),max:mission.startWeight-mission.targetWeight})},
 
   // ── OVERALL DISCIPLINE
-  {id:'od1', cat:'discipline', emoji:'⭐', name:'Alignment', desc:'Everything worked together.', grad:BADGE_GRADIENTS.discipline,
+  {id:'od1', cat:'discipline', emoji:'⭐', name:'Alignment', desc:'Everything worked together.', art:BADGE_ART.discipline,
     check:()=>Object.values(records).some(r=>(r.disciplines||[]).filter(d=>d&&d.done).length === DISCIPLINES.length),
     prog:()=>({cur:Math.min(DISCIPLINES.length,Math.max(...Object.values(records).map(r=>(r.disciplines||[]).filter(d=>d&&d.done).length),0)),max:DISCIPLINES.length})},
-  {id:'od2', cat:'discipline', emoji:'🕉', name:'Sadhana Week', desc:'The process stabilizes.', grad:BADGE_GRADIENTS.discipline,
+  {id:'od2', cat:'discipline', emoji:'🕉', name:'Sadhana Week', desc:'The process stabilizes.', art:BADGE_ART.discipline,
     check:()=>maxOverallConsecutive() >= 7, prog:()=>({cur:Math.min(7,maxOverallConsecutive()),max:7})},
-  {id:'od3', cat:'discipline', emoji:'🔥', name:'Unbroken', desc:'Commitment remains uninterrupted.', grad:BADGE_GRADIENTS.discipline,
+  {id:'od3', cat:'discipline', emoji:'🔥', name:'Unbroken', desc:'Commitment remains uninterrupted.', art:BADGE_ART.discipline,
     check:()=>maxOverallConsecutive() >= 21, prog:()=>({cur:Math.min(21,maxOverallConsecutive()),max:21})},
-  {id:'od4', cat:'discipline', emoji:'⚔️', name:'The Steadfast', desc:'Discipline becomes identity.', grad:BADGE_GRADIENTS.discipline,
+  {id:'od4', cat:'discipline', emoji:'⚔️', name:'The Steadfast', desc:'Discipline becomes identity.', art:BADGE_ART.discipline,
     check:()=>maxOverallConsecutive() >= 50, prog:()=>({cur:Math.min(50,maxOverallConsecutive()),max:50})},
-  {id:'od5', cat:'discipline', emoji:'🏔', name:'Consecrated Effort', desc:'Nothing dramatic. You simply showed up every day.', grad:BADGE_GRADIENTS.mission,
+  {id:'od5', cat:'discipline', emoji:'🏔', name:'Consecrated Effort', desc:'Nothing dramatic. You simply showed up every day.', art:BADGE_ART.mission,
     check:()=>maxOverallConsecutive() >= missionTotalDays() * 0.8, prog:()=>({cur:Math.min(missionTotalDays(),maxOverallConsecutive()),max:missionTotalDays()})},
 
   // ── CALORIE / DEFICIT
-  {id:'c1', cat:'deficit', emoji:'🍃', name:'Balance', desc:'Three days of intention.', grad:BADGE_GRADIENTS.deficit,
+  {id:'c1', cat:'deficit', emoji:'🍃', name:'Balance', desc:'Three days of intention.', art:BADGE_ART.deficit,
     check:()=>deficitStreakMax() >= 3, prog:()=>({cur:Math.min(3,deficitStreakMax()),max:3})},
-  {id:'c2', cat:'deficit', emoji:'🌿', name:'Steady Course', desc:'The week held.', grad:BADGE_GRADIENTS.deficit,
+  {id:'c2', cat:'deficit', emoji:'🌿', name:'Steady Course', desc:'The week held.', art:BADGE_ART.deficit,
     check:()=>deficitStreakMax() >= 7, prog:()=>({cur:Math.min(7,deficitStreakMax()),max:7})},
-  {id:'c3', cat:'deficit', emoji:'🔥', name:'On Pace', desc:'21 days without deviation.', grad:BADGE_GRADIENTS.deficit,
+  {id:'c3', cat:'deficit', emoji:'🔥', name:'On Pace', desc:'21 days without deviation.', art:BADGE_ART.deficit,
     check:()=>deficitStreakMax() >= 21, prog:()=>({cur:Math.min(21,deficitStreakMax()),max:21})},
-  {id:'c4', cat:'deficit', emoji:'🏔', name:'Keeper of the Course', desc:'The mission was honored through the plate.', grad:BADGE_GRADIENTS.mission,
+  {id:'c4', cat:'deficit', emoji:'🏔', name:'Keeper of the Course', desc:'The mission was honored through the plate.', art:BADGE_ART.mission,
     check:()=>deficitStreakMax() >= 60, prog:()=>({cur:Math.min(60,deficitStreakMax()),max:60})},
 ];
 
@@ -4668,7 +4886,7 @@ function showBadgeEarned(badge){
   const descEl = document.getElementById('bo-desc');
   if(!overlay) return;
 
-  bg.style.background = badge.grad;
+  bg.style.background = 'linear-gradient(160deg,#EDE7DB 0%,#E0D8C8 100%)';
   emojiEl.textContent = badge.emoji;
   nameEl.textContent = badge.name;
   descEl.textContent = badge.desc;
@@ -4762,13 +4980,16 @@ function renderBadgeCategories(){
     const badges = BADGES.filter(b => b.cat === cat.key);
     if(!badges.length) return;
 
+    const earnedCount = badges.filter(b => !!getBadgeEarned(b.id)).length;
+
     const section = document.createElement('div');
     section.className = 'ach-category';
 
-    const label = document.createElement('span');
-    label.className = 'ach-cat-label';
-    label.textContent = cat.label;
-    section.appendChild(label);
+    // Category header row: label left, count right
+    const catRow = document.createElement('div');
+    catRow.className = 'ach-cat-row';
+    catRow.innerHTML = `<span class="ach-cat-label">${cat.label}</span><span class="ach-cat-count">${earnedCount}/${badges.length}</span>`;
+    section.appendChild(catRow);
 
     const row = document.createElement('div');
     row.className = 'ach-row';
@@ -4780,32 +5001,34 @@ function renderBadgeCategories(){
       try { prog = badge.prog(); } catch(e){}
 
       const card = document.createElement('div');
-      card.className = 'badge-card';
-      card.onclick = () => {
-        if(earned) showBadgeEarned(badge);
-      };
+      card.className = 'badge-card' + (earned ? ' earned' : '');
+      card.onclick = () => { if(earned) showBadgeEarned(badge); };
 
-      const pct = prog ? Math.min(1, prog.cur / prog.max) : 0;
-      const progBar = !earned && prog ? `
-        <div class="badge-progress-bar"><div class="badge-progress-fill" style="width:${Math.round(pct*100)}%"></div></div>
-        <div class="badge-progress-text">${typeof prog.cur === 'number' ? (prog.cur % 1 === 0 ? prog.cur : prog.cur.toFixed(1)) : prog.cur} / ${typeof prog.max === 'number' ? (prog.max % 1 === 0 ? prog.max : prog.max.toFixed(1)) : prog.max}</div>` : '';
+      const fmtNum = n => typeof n === 'number' ? (n % 1 === 0 ? n : n.toFixed(1)) : n;
+      const progCur = prog ? fmtNum(prog.cur) : 0;
+      const progMax = prog ? fmtNum(prog.max) : 1;
+      const dateStr = earnedDate
+        ? new Date(earnedDate + 'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'})
+        : '';
 
-      const dateStr = earnedDate ? new Date(earnedDate + 'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '';
+      // Determine SVG art key from cat, fall back to mission for cat 5 badges
+      const artKey = (badge.cat === 'discipline') ? 'discipline'
+        : (badge.cat === 'deficit') ? 'deficit'
+        : badge.cat;
+      const artSvg = BADGE_ART[artKey] || BADGE_ART.mission;
 
       card.innerHTML = `
         <div class="badge-card-inner">
-          <div class="badge-bg" style="background:${badge.grad};"></div>
-          ${!earned ? '<div class="badge-lock-overlay"></div>' : ''}
-          ${earned ? '<div class="badge-earned-border"></div>' : ''}
-          ${!earned ? '<div class="badge-lock-icon">🔒</div>' : ''}
+          <div class="badge-art">${artSvg}</div>
+          <div class="badge-divider"></div>
           <div class="badge-content">
-            <div class="badge-emoji">${badge.emoji}</div>
-            <div class="badge-bottom">
-              <div class="badge-name">${badge.name}</div>
-              <div class="badge-desc">${badge.desc}</div>
-              ${earned ? `<div class="badge-date">${dateStr}</div>` : progBar}
-            </div>
+            <div class="badge-name">${badge.name}</div>
+            <div class="badge-desc">${badge.desc}</div>
+            ${earned ? `<div class="badge-date">${dateStr}</div>` : ''}
           </div>
+          ${!earned ? `<div class="badge-prog-row"><span class="badge-prog-cur">${progCur}</span><span class="badge-prog-max">${progMax}</span></div>` : ''}
+          ${earned ? `<div class="badge-earned-mark"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"><polyline points="2,5 4,7 8,3"/></svg></div>` : ''}
+          ${!earned ? '<div class="badge-lock-dim"></div>' : ''}
         </div>`;
       row.appendChild(card);
     });
@@ -4816,14 +5039,7 @@ function renderBadgeCategories(){
 }
 
 // ── Hook into renderPatterns
-const _origRenderPatterns = renderPatterns;
-function renderPatterns(){
-  _origRenderPatterns();
-  renderAchievements();
-  // Check for newly earned badges
-  const newBadges = checkAllBadges();
-  if(newBadges.length) setTimeout(() => showBadgesSequentially(newBadges), 600);
-}
+// renderAchievements is called directly from renderPatterns below
 
 // ═══════════════════════════════════════════════
 // SETTINGS SHEET
@@ -5876,7 +6092,13 @@ function renderEnergyBreakdown(){
 function renderPatternInsights(){
   const el = document.getElementById('pat-insights');
   const recs = Object.entries(records);
-  if(recs.length < 5){ el.innerHTML='<div class="chart-empty" style="padding:8px 0;">Patterns appear after 5 days of records.</div>'; return; }
+  if(recs.length < 5){
+    if(el) el.innerHTML='<div class="chart-empty" style="padding:8px 0;">Patterns appear after 5 days of records.</div>';
+    renderAchievements();
+    const newBadges = checkAllBadges();
+    if(newBadges.length) setTimeout(() => showBadgesSequentially(newBadges), 600);
+    return;
+  }
   const insights = [];
   // Weight trend
   const entries = weightEntries();
@@ -5904,12 +6126,17 @@ function renderPatternInsights(){
     const worst = [...dowEntries].sort((a,b)=>(a[1].sum/a[1].count)-(b[1].sum/b[1].count))[0];
     insights.push(`${DOW[parseInt(best[0])]}s show highest discipline completion. ${DOW[parseInt(worst[0])]}s are the lowest.`);
   }
-  if(!insights.length){ el.innerHTML='<div class="chart-empty" style="padding:8px 0;">Keep logging — patterns will surface soon.</div>'; return; }
-  el.innerHTML = insights.map(text=>`
+  if(!insights.length){ el.innerHTML='<div class="chart-empty" style="padding:8px 0;">Keep logging — patterns will surface soon.</div>'; }
+  else { el.innerHTML = insights.map(text=>`
     <div class="pat-item">
       <div class="pat-from">From your record</div>
       <div class="pat-text">${text}</div>
-    </div>`).join('');
+    </div>`).join(''); }
+
+  // Always render achievements regardless of record count
+  renderAchievements();
+  const newBadges = checkAllBadges();
+  if(newBadges.length) setTimeout(() => showBadgesSequentially(newBadges), 600);
 }
 
 // ═══════════════════════════════════════════════
