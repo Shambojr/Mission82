@@ -4376,16 +4376,18 @@ function getNextTrainingInfo(){
   let consecutiveCount = 0;
 
   for(const k of keys){
+    if(k === today) continue; // skip today — it hasn't been saved yet
     const tr = (records[k] || {}).training;
-    if(!tr) break;
+    if(!tr) continue; // skip days with no training entry
     if(tr.restDay){
       consecutiveCount = 0;
-      if(lastDayId !== null) break;
+      if(lastDayId !== null) break; // stop looking after a rest day once we have context
       continue;
     }
     if(tr.completed){
       if(lastDayId === null) lastDayId = tr.dayId;
       consecutiveCount++;
+      if(consecutiveCount >= 2) break; // have enough info
     }
   }
 
@@ -6450,7 +6452,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v14';
+const CACHE = 'mission-os-v15';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
