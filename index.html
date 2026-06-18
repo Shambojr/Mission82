@@ -2930,7 +2930,9 @@ const MASTER_DB = [{"id":"b001","name":"Puttu","mealSlot":"breakfast","category"
 {"id":"nut008","name":"Brazil Nuts (handful)","mealSlot":"snack","category":"fruit","servingSize":"1 handful (~25g) — ~5 pieces","calories":165,"protein":4,"carbs":3,"fat":17,"fiber":2,"satietyScore":6,"proteinScore":3,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":true,"frequencyLimitPerWeek":3,"tags":["Snack","Vegetarian","Protein","TGFriendly","Nuts","BrazilNuts"]},
 {"id":"tx01","name":"Chicken Cheesy Fries","mealSlot":"snack","category":"travel_arabic","servingSize":"1 plate — fries, grilled chicken strips, cheese sauce","calories":680,"protein":28,"carbs":62,"fat":36,"fiber":3,"satietyScore":8,"proteinScore":6,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","Lunch","Chicken","TreatMeal","Junk","Fries"]},
 {"id":"tx02","name":"Shawarma (with mayo)","mealSlot":"lunch","category":"travel_arabic","servingSize":"1 wrap (~280g) chicken shawarma with mayo sauce","calories":560,"protein":28,"carbs":42,"fat":28,"fiber":3,"satietyScore":8,"proteinScore":6,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Lunch","Arabic","Chicken","TreatMeal","Travel"]},
-{"id":"tx03","name":"KitKat Milkshake","mealSlot":"snack","category":"beverage","servingSize":"1 large glass (~400ml) — milk, KitKat, ice cream","calories":580,"protein":10,"carbs":78,"fat":24,"fiber":1,"satietyScore":6,"proteinScore":3,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","Beverage","TreatMeal","Dessert","Chocolate"]}];
+{"id":"tx03","name":"KitKat Milkshake","mealSlot":"snack","category":"beverage","servingSize":"1 large glass (~400ml) — milk, KitKat, ice cream","calories":580,"protein":10,"carbs":78,"fat":24,"fiber":1,"satietyScore":6,"proteinScore":3,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","Beverage","TreatMeal","Dessert","Chocolate"]},
+{"id":"kl01","name":"Uzhunnu Vada","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~100g) urad dal vada, deep fried","calories":280,"protein":9,"carbs":32,"fat":13,"fiber":2,"satietyScore":6,"proteinScore":4,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Breakfast","Kerala","Kannur","Vegetarian","Vada","TreatMeal"]},
+{"id":"kl02","name":"Ney Pathiri","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~100g) rice flour pathiri fried in ghee","calories":320,"protein":4,"carbs":42,"fat":14,"fiber":1,"satietyScore":6,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Breakfast","Kerala","Kannur","Malabar","Vegetarian","TreatMeal","Ghee"]}];
 
 // Category display labels
 const CAT_LABELS = {
@@ -6577,7 +6579,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v18';
+const CACHE = 'mission-os-v19';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
