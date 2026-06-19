@@ -2377,10 +2377,12 @@ function renderDiscDots(){
   // Wake target line
   const wakeLine = document.getElementById('wake-target-line');
   if(wakeLine){
-    if(reached){
+    const wt = getWakeTarget();
+    if(wt.reached){
       wakeLine.textContent = 'Wake target reached — 4:30 am';
     } else {
-      wakeLine.textContent = `Today's wake target: ${wakeLabel}`;
+      const prog = `${wt.completionsAtCurrentLevel}/5`;
+      wakeLine.textContent = `Wake target: ${wt.label} · ${prog} days done`;
     }
   }
 }
@@ -2932,7 +2934,11 @@ const MASTER_DB = [{"id":"b001","name":"Puttu","mealSlot":"breakfast","category"
 {"id":"tx02","name":"Shawarma (with mayo)","mealSlot":"lunch","category":"travel_arabic","servingSize":"1 wrap (~280g) chicken shawarma with mayo sauce","calories":560,"protein":28,"carbs":42,"fat":28,"fiber":3,"satietyScore":8,"proteinScore":6,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Lunch","Arabic","Chicken","TreatMeal","Travel"]},
 {"id":"tx03","name":"KitKat Milkshake","mealSlot":"snack","category":"beverage","servingSize":"1 large glass (~400ml) — milk, KitKat, ice cream","calories":580,"protein":10,"carbs":78,"fat":24,"fiber":1,"satietyScore":6,"proteinScore":3,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","Beverage","TreatMeal","Dessert","Chocolate"]},
 {"id":"kl01","name":"Uzhunnu Vada","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~100g) urad dal vada, deep fried","calories":280,"protein":9,"carbs":32,"fat":13,"fiber":2,"satietyScore":6,"proteinScore":4,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Breakfast","Kerala","Kannur","Vegetarian","Vada","TreatMeal"]},
-{"id":"kl02","name":"Ney Pathiri","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~100g) rice flour pathiri fried in ghee","calories":320,"protein":4,"carbs":42,"fat":14,"fiber":1,"satietyScore":6,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Breakfast","Kerala","Kannur","Malabar","Vegetarian","TreatMeal","Ghee"]}];
+{"id":"kl02","name":"Ney Pathiri","mealSlot":"breakfast","category":"breakfast_main","servingSize":"2 pieces (~100g) rice flour pathiri fried in ghee","calories":320,"protein":4,"carbs":42,"fat":14,"fiber":1,"satietyScore":6,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Breakfast","Kerala","Kannur","Malabar","Vegetarian","TreatMeal","Ghee"]},
+{"id":"kl03","name":"Kovakka Thoran","mealSlot":"lunch","category":"thoran","servingSize":"1 small bowl (~120g) ivy gourd stir-fry with coconut","calories":110,"protein":3,"carbs":12,"fat":6,"fiber":4,"satietyScore":6,"proteinScore":2,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Lunch","Kerala","Vegetarian","Thoran","TGFriendly","WeightLoss","LowCalorie"]},
+{"id":"kl04","name":"Steamed Vanpayar","mealSlot":"snack","category":"sprouts","servingSize":"1 bowl (~100g) steamed red cowpea, soaked overnight","calories":130,"protein":9,"carbs":22,"fat":1,"fiber":7,"satietyScore":8,"proteinScore":6,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Snack","Breakfast","Kerala","Vegetarian","Pulses","TGFriendly","WeightLoss","HighFiber","HighProtein"]},
+{"id":"kl05","name":"Steamed Cherupayar","mealSlot":"snack","category":"sprouts","servingSize":"1 bowl (~100g) steamed or sprouted green moong","calories":105,"protein":7,"carbs":19,"fat":0,"fiber":6,"satietyScore":8,"proteinScore":5,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Snack","Breakfast","Kerala","Vegetarian","Pulses","Sprouts","TGFriendly","WeightLoss","HighFiber"]},
+{"id":"kl06","name":"Steamed Peanuts (soaked/sprouted)","mealSlot":"snack","category":"sprouts","servingSize":"1 handful (~50g) soaked or sprouted peanuts, steamed","calories":160,"protein":7,"carbs":10,"fat":10,"fiber":3,"satietyScore":7,"proteinScore":5,"tgFriendly":true,"weightLossFriendly":true,"travelModeEligible":false,"frequencyLimitPerWeek":null,"tags":["Snack","Kerala","Vegetarian","Peanuts","Sprouts","TGFriendly","WeightLoss"]}];
 
 // Category display labels
 const CAT_LABELS = {
@@ -5356,28 +5362,67 @@ function updateFabVisibility(tab){
 
 // ═══════════════════════════════════════════════
 // GRADUAL WAKE TARGET
-// 6:45am → 4:30am over 45 days, 15 min per 5 days
+// 6:45am → 4:30am, advancing every 5 SUCCESSFUL wake completions at current level
 // ═══════════════════════════════════════════════
-function getWakeTarget(){
-  const day = missionDay(); // 1-indexed
-  // Schedule: every 5 days shift 15 minutes earlier
-  // Day 1–5: 6:45, Day 6–10: 6:30 ... Day 46+: 4:30
-  const START_MINS = 6 * 60 + 45; // 6:45am in minutes
-  const TARGET_MINS = 4 * 60 + 30; // 4:30am in minutes
-  const STEP = 15; // minutes per shift
-  const DAYS_PER_STEP = 5;
+function countWakeCompletionsAtLevel(levelMins){
+  // Count days where wake discipline (d1, index 0) was checked AND the wake target was this level
+  let count = 0;
+  const keys = Object.keys(records).sort();
+  for(const k of keys){
+    const r = records[k];
+    if(!r || !r.disciplines) continue;
+    const wakeDisc = r.disciplines[0];
+    if(!wakeDisc || !wakeDisc.done) continue;
+    // What was the wake target on that day?
+    const dayTarget = getWakeTargetForCompletions(r.wakeCompletionsOnSave || 0);
+    if(dayTarget.minutes === levelMins) count++;
+  }
+  return count;
+}
 
-  const shiftsCompleted = Math.floor((day - 1) / DAYS_PER_STEP);
+function getWakeTargetForCompletions(completionsBefore){
+  // Given N total prior completions, what level are we on?
+  const START_MINS = 6 * 60 + 45;
+  const TARGET_MINS = 4 * 60 + 30;
+  const STEP = 15;
+  const COMPLETIONS_PER_LEVEL = 5;
+  const shiftsCompleted = Math.floor(completionsBefore / COMPLETIONS_PER_LEVEL);
   const currentMins = Math.max(TARGET_MINS, START_MINS - shiftsCompleted * STEP);
+  return { minutes: currentMins };
+}
+
+function getWakeTarget(){
+  const START_MINS = 6 * 60 + 45;
+  const TARGET_MINS = 4 * 60 + 30;
+  const STEP = 15;
+  const COMPLETIONS_PER_LEVEL = 5;
+
+  // Count total wake completions across all records
+  let totalCompletions = 0;
+  const keys = Object.keys(records).sort();
+  for(const k of keys){
+    const r = records[k];
+    if(!r || !r.disciplines) continue;
+    const wakeDisc = r.disciplines[0];
+    if(wakeDisc && wakeDisc.done) totalCompletions++;
+  }
+
+  const shiftsCompleted = Math.floor(totalCompletions / COMPLETIONS_PER_LEVEL);
+  const currentMins = Math.max(TARGET_MINS, START_MINS - shiftsCompleted * STEP);
+  const completionsAtCurrentLevel = totalCompletions % COMPLETIONS_PER_LEVEL;
+  const isAtFinal = currentMins === TARGET_MINS;
 
   const hours = Math.floor(currentMins / 60);
   const mins = currentMins % 60;
   const ampm = hours < 12 ? 'am' : 'pm';
-  const h12 = hours > 12 ? hours - 12 : hours;
+  const h12 = hours === 0 ? 12 : (hours > 12 ? hours - 12 : hours);
   return {
     label: `${h12}:${String(mins).padStart(2,'0')} ${ampm}`,
-    reached: currentMins === TARGET_MINS,
+    reached: isAtFinal,
     minutes: currentMins,
+    totalCompletions,
+    completionsAtCurrentLevel,
+    completionsNeeded: COMPLETIONS_PER_LEVEL - completionsAtCurrentLevel,
   };
 }
 
@@ -6366,18 +6411,34 @@ function toggleDark(){
 // CLOCK
 // ═══════════════════════════════════════════════
 function updateClock(){
-  renderPaceLine();
   if(activeTab === 'today'){
+    renderPaceLine();
     renderDiscDots();
     updateTimeAwareness();
     renderVerdict();
   }
+  // renderPaceLine only matters on today tab — skip otherwise
 }
 function startClock(){
   updateClock();
   const now=new Date();
   const msToNext=(60-now.getSeconds())*1000-now.getMilliseconds();
-  setTimeout(()=>{updateClock();setInterval(updateClock,60000);},msToNext);
+  let clockInterval = null;
+  const startInterval = () => {
+    clockInterval = setInterval(updateClock, 60000);
+  };
+  setTimeout(()=>{ updateClock(); startInterval(); }, msToNext);
+
+  // ── Battery optimisation: pause clock when screen/tab hidden ──
+  document.addEventListener('visibilitychange', () => {
+    if(document.hidden){
+      if(clockInterval){ clearInterval(clockInterval); clockInterval = null; }
+    } else {
+      // Resume — fire immediately then restart interval
+      updateClock();
+      if(!clockInterval) startInterval();
+    }
+  });
 }
 
 // ═══════════════════════════════════════════════
@@ -6592,7 +6653,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v20';
+const CACHE = 'mission-os-v21';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
