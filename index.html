@@ -5431,15 +5431,23 @@ function initGoogleFit(){
 
 function syncGoogleFit(){
   if(gfitToken){
-    // Already have token — just fetch steps
+    // Token in memory — fetch directly
     fetchStepsFromFit();
   } else {
-    // Need to auth first
-    authGoogleFit();
+    // Check localStorage again (in case memory was cleared)
+    const saved = localStorage.getItem('gfit_token');
+    const expiry = localStorage.getItem('gfit_token_expiry');
+    if(saved && expiry && Date.now() < parseInt(expiry)){
+      gfitToken = saved;
+      fetchStepsFromFit();
+    } else {
+      // Token expired or missing — silent re-auth (no consent screen, uses existing Google session)
+      authGoogleFit(false);
+    }
   }
 }
 
-function authGoogleFit(){
+function authGoogleFit(forceConsent = false){
   const btn = document.getElementById('gfit-btn');
   const status = document.getElementById('gfit-status');
   if(btn) btn.textContent = 'Connecting…';
@@ -5447,12 +5455,16 @@ function authGoogleFit(){
 
   const redirectUri = encodeURIComponent('https://shambojr.github.io/Mission82');
   const scope = encodeURIComponent(GFIT_SCOPE);
+  // Only show consent screen on first auth or explicit disconnect
+  // Omit prompt entirely for silent re-auth — Google will use existing session
+  const promptParam = forceConsent ? '&prompt=consent&select_account' : '';
   const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
     `client_id=${GFIT_CLIENT_ID}` +
     `&redirect_uri=${redirectUri}` +
     `&response_type=token` +
     `&scope=${scope}` +
-    `&prompt=consent`;
+    `&login_hint=anirudhcheriyath91%40gmail.com` +
+    promptParam;
 
   const popup = window.open(authUrl, 'gfit_auth', 'width=500,height=600,left=100,top=100');
 
@@ -5473,8 +5485,9 @@ function authGoogleFit(){
         const expiresIn = parseInt(params.get('expires_in') || '3600');
         if(token){
           gfitToken = token;
+          // Store with a small buffer so we re-auth before actual expiry
           localStorage.setItem('gfit_token', token);
-          localStorage.setItem('gfit_token_expiry', Date.now() + expiresIn * 1000);
+          localStorage.setItem('gfit_token_expiry', Date.now() + (expiresIn - 120) * 1000);
           updateGfitUI(true);
           fetchStepsFromFit();
         }
@@ -6579,7 +6592,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v19';
+const CACHE = 'mission-os-v20';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
