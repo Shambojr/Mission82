@@ -877,22 +877,22 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 .ach-cat-count{font-family:var(--sans);font-size:9px;letter-spacing:.1em;color:var(--t4);}
 .ach-row{display:flex;gap:10px;padding:0 var(--pad);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px;}
 .ach-row::-webkit-scrollbar{display:none;}
-.badge-card{flex-shrink:0;width:148px;border-radius:14px;overflow:hidden;position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent;background:var(--bg-r);border:1px solid rgba(0,0,0,.06);}
+.badge-card{flex-shrink:0;width:148px;border-radius:14px;overflow:hidden;position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent;background:var(--bg-r);border:1px solid rgba(0,0,0,.07);}
 .badge-card-inner{width:100%;padding-top:138%;position:relative;}
-.badge-art{position:absolute;top:0;left:0;right:0;height:62%;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.badge-art svg{width:72%;height:72%;opacity:.18;}
-.badge-card.earned .badge-art svg{opacity:.28;}
-.badge-divider{position:absolute;left:14px;right:14px;top:62%;height:1px;background:rgba(0,0,0,.08);}
-.badge-content{position:absolute;left:0;right:0;bottom:0;top:62%;padding:10px 12px 10px;}
-.badge-name{font-family:var(--serif);font-size:13.5px;font-weight:400;color:var(--t1);line-height:1.25;margin-bottom:3px;}
-.badge-desc{font-family:var(--serif);font-size:9px;font-weight:300;font-style:italic;color:var(--t3);line-height:1.4;}
+.badge-art{position:absolute;top:0;left:0;right:0;height:60%;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.badge-art svg{width:68%;height:68%;color:var(--t2);opacity:.22;}
+.badge-card.earned .badge-art svg{opacity:.55;color:var(--t1);}
+.badge-divider{position:absolute;left:14px;right:14px;top:60%;height:1px;background:rgba(0,0,0,.08);}
+.badge-content{position:absolute;left:0;right:0;bottom:0;top:60%;padding:10px 12px 10px;}
+.badge-name{font-family:var(--serif);font-size:13px;font-weight:500;color:var(--t1);line-height:1.2;margin-bottom:4px;}
+.badge-desc{font-family:var(--sans);font-size:8.5px;font-weight:400;color:var(--t2);line-height:1.4;letter-spacing:.01em;}
 .badge-date{font-family:var(--sans);font-size:7px;letter-spacing:.12em;text-transform:uppercase;color:var(--ac);margin-top:5px;}
 .badge-prog-row{display:flex;justify-content:space-between;align-items:flex-end;position:absolute;bottom:9px;left:12px;right:12px;}
-.badge-prog-cur{font-family:var(--sans);font-size:9px;color:var(--t4);}
+.badge-prog-cur{font-family:var(--sans);font-size:9px;color:var(--t3);font-weight:500;}
 .badge-prog-max{font-family:var(--sans);font-size:9px;color:var(--t4);}
 .badge-earned-mark{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;}
 .badge-earned-mark svg{width:10px;height:10px;}
-.badge-lock-dim{position:absolute;inset:0;background:rgba(244,239,229,.35);border-radius:14px;pointer-events:none;}
+.badge-lock-dim{position:absolute;inset:0;background:rgba(244,239,229,.28);border-radius:14px;pointer-events:none;}
 .best-card{flex:1;background:var(--bg-r);border-radius:10px;padding:12px 10px;text-align:center;min-width:0;}
 .best-val{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t1);line-height:1;margin-bottom:4px;}
 .best-lbl{font-family:var(--sans);font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:var(--t4);line-height:1.3;}
@@ -1593,12 +1593,17 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 <!-- BADGE EARN OVERLAY -->
 <div id="badge-overlay" style="display:none;position:fixed;inset:0;z-index:96;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:var(--pad);">
   <div id="badge-overlay-bg" style="position:absolute;inset:0;opacity:.96;"></div>
-  <div style="position:relative;z-index:1;animation:arrivalFade .6s cubic-bezier(.16,1,.3,1) both;">
-    <div id="bo-emoji" style="font-size:64px;margin-bottom:var(--s3);line-height:1;"></div>
-    <div style="font-family:var(--sans);font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--t4);margin-bottom:var(--s2);">Achievement Unlocked</div>
-    <div id="bo-name" style="font-family:var(--serif);font-size:32px;font-weight:300;color:var(--t1);margin-bottom:var(--s2);"></div>
+  <div style="position:relative;z-index:1;animation:arrivalFade .6s cubic-bezier(.16,1,.3,1) both;width:100%;max-width:320px;">
+    <div id="bo-emoji" style="font-size:56px;margin-bottom:var(--s2);line-height:1;"></div>
+    <div id="bo-unlock-label" style="font-family:var(--sans);font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--t4);margin-bottom:var(--s2);">Achievement Unlocked</div>
+    <div id="bo-name" style="font-family:var(--serif);font-size:30px;font-weight:300;color:var(--t1);margin-bottom:var(--s2);line-height:1.1;"></div>
     <div style="height:1px;width:48px;background:var(--rl);margin:0 auto var(--s3);"></div>
-    <div id="bo-desc" style="font-family:var(--serif);font-size:17px;font-weight:300;font-style:italic;color:var(--t3);line-height:1.6;"></div>
+    <div id="bo-desc" style="font-family:var(--serif);font-size:16px;font-weight:300;font-style:italic;color:var(--t3);line-height:1.6;margin-bottom:var(--s3);"></div>
+    <!-- Milestone detail -->
+    <div id="bo-milestone" style="font-family:var(--sans);font-size:11px;letter-spacing:.08em;color:var(--ac);margin-bottom:6px;"></div>
+    <div id="bo-date" style="font-family:var(--sans);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--t4);margin-bottom:var(--s4);"></div>
+    <!-- Close button — only shown for tap-to-review, not auto-flash -->
+    <button id="bo-close" onclick="closeBadgeOverlay()" style="display:none;background:none;border:1px solid var(--rl);color:var(--t3);font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;padding:10px 24px;cursor:pointer;border-radius:2px;">Close</button>
   </div>
 </div>
 
@@ -4804,173 +4809,144 @@ function updateTrainingSummary(){
 // BADGE ENGINE
 // ═══════════════════════════════════════════════
 
-// Badge SVG line-art illustrations (one per category)
+// Individual SVG art for each of the 39 badges
 const BADGE_ART = {
-  wake: `<svg viewBox="0 0 80 80" fill="none" stroke="#1B1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="40" cy="38" r="14"/>
-    <line x1="40" y1="8" x2="40" y2="14"/>
-    <line x1="40" y1="62" x2="40" y2="68"/>
-    <line x1="10" y1="38" x2="16" y2="38"/>
-    <line x1="64" y1="38" x2="70" y2="38"/>
-    <line x1="20" y1="18" x2="24" y2="22"/>
-    <line x1="56" y1="54" x2="60" y2="58"/>
-    <line x1="60" y1="18" x2="56" y2="22"/>
-    <line x1="24" y1="54" x2="20" y2="58"/>
-    <path d="M28 60 Q40 52 52 60" stroke-width="1"/>
-  </svg>`,
-  angamardana: `<svg viewBox="0 0 80 80" fill="none" stroke="#1B1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="40" cy="18" r="6"/>
-    <line x1="40" y1="24" x2="40" y2="44"/>
-    <line x1="40" y1="32" x2="24" y2="26"/>
-    <line x1="40" y1="32" x2="56" y2="26"/>
-    <line x1="40" y1="44" x2="30" y2="62"/>
-    <line x1="40" y1="44" x2="50" y2="62"/>
-    <path d="M22 24 Q16 34 20 44" stroke-width="1"/>
-    <path d="M58 24 Q64 34 60 44" stroke-width="1"/>
-  </svg>`,
-  kriya: `<svg viewBox="0 0 80 80" fill="none" stroke="#1B1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M40 14 C40 14 54 26 54 40 C54 54 40 66 40 66 C40 66 26 54 26 40 C26 26 40 14 40 14Z"/>
-    <path d="M34 40 C34 40 40 34 46 40 C40 46 34 40 34 40Z" stroke-width="1"/>
-    <line x1="40" y1="14" x2="40" y2="10"/>
-    <line x1="40" y1="66" x2="40" y2="70"/>
-  </svg>`,
-  steps: `<svg viewBox="0 0 80 80" fill="none" stroke="#1B1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M16 58 Q28 42 40 46 Q52 50 64 28"/>
-    <ellipse cx="30" cy="30" rx="5" ry="7" transform="rotate(-15 30 30)"/>
-    <ellipse cx="50" cy="22" rx="4" ry="6" transform="rotate(-10 50 22)"/>
-    <path d="M25 37 L22 52 L30 54 L34 42" stroke-width="1.2"/>
-    <path d="M45 28 L43 43 L51 44 L53 32" stroke-width="1.2"/>
-  </svg>`,
-  dumbbell: `<svg viewBox="0 0 80 80" fill="none" stroke="#1B1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-    <line x1="20" y1="40" x2="60" y2="40"/>
-    <rect x="10" y="32" width="10" height="16" rx="2"/>
-    <rect x="60" y="32" width="10" height="16" rx="2"/>
-    <rect x="16" y="35" width="6" height="10" rx="1"/>
-    <rect x="58" y="35" width="6" height="10" rx="1"/>
-  </svg>`,
-  weight: `<svg viewBox="0 0 80 80" fill="none" stroke="#1B1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M40 18 L40 58"/>
-    <path d="M40 18 C40 18 52 26 52 38 C52 50 40 58 40 58 C40 58 28 50 28 38 C28 26 40 18 40 18Z"/>
-    <path d="M36 44 L40 30 L44 44" stroke-width="1.2"/>
-    <line x1="35" y1="41" x2="45" y2="41" stroke-width="1"/>
-  </svg>`,
-  discipline: `<svg viewBox="0 0 80 80" fill="none" stroke="#1B1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="40" cy="40" r="22"/>
-    <circle cx="40" cy="40" r="14"/>
-    <circle cx="40" cy="40" r="5"/>
-    <line x1="40" y1="10" x2="40" y2="18"/>
-    <line x1="40" y1="62" x2="40" y2="70"/>
-    <line x1="10" y1="40" x2="18" y2="40"/>
-    <line x1="62" y1="40" x2="70" y2="40"/>
-  </svg>`,
-  deficit: `<svg viewBox="0 0 80 80" fill="none" stroke="#1B1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M14 54 L26 42 L34 48 L46 30 L60 36 L68 22"/>
-    <path d="M58 22 L68 22 L68 32"/>
-    <line x1="14" y1="60" x2="68" y2="60" stroke-width="1" stroke-dasharray="2 3"/>
-  </svg>`,
-  mission: `<svg viewBox="0 0 80 80" fill="none" stroke="#1B1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M40 14 L52 48 L40 42 L28 48 Z"/>
-    <path d="M40 14 L40 70"/>
-    <path d="M28 48 L20 62"/>
-    <path d="M52 48 L60 62"/>
-    <line x1="20" y1="62" x2="60" y2="62"/>
-  </svg>`,
+  w1:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M40 54 A18 18 0 0 1 22 40" stroke-width="2.2"/><line x1="40" y1="16" x2="40" y2="23"/><line x1="58" y1="22" x2="53" y2="27"/><line x1="64" y1="40" x2="57" y2="40"/><line x1="16" y1="56" x2="64" y2="56"/><path d="M22 56 Q40 42 58 56"/></svg>`,
+  w2:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="40" cy="36" r="16"/><line x1="40" y1="12" x2="40" y2="20"/><line x1="40" y1="52" x2="40" y2="60"/><line x1="16" y1="36" x2="24" y2="36"/><line x1="56" y1="36" x2="64" y2="36"/><line x1="40" y1="32" x2="40" y2="38" stroke-width="2.4"/><line x1="40" y1="38" x2="47" y2="42" stroke-width="2"/><line x1="30" y1="11" x2="34" y2="16"/><line x1="50" y1="11" x2="46" y2="16"/></svg>`,
+  w3:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M52 40 A14 14 0 1 1 38 26" stroke-width="2.2"/><circle cx="57" cy="27" r="11" stroke-width="1.6"/><line x1="57" y1="13" x2="57" y2="18"/><line x1="57" y1="36" x2="57" y2="41"/><line x1="43" y1="27" x2="48" y2="27"/><line x1="66" y1="27" x2="71" y2="27"/></svg>`,
+  w4:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16" y1="54" x2="64" y2="54"/><path d="M20 54 Q40 32 60 54"/><circle cx="30" cy="26" r="2.5" fill="currentColor" stroke="none"/><circle cx="40" cy="20" r="2.5" fill="currentColor" stroke="none"/><circle cx="50" cy="24" r="2.5" fill="currentColor" stroke="none"/><circle cx="22" cy="36" r="1.8" fill="currentColor" stroke="none"/><circle cx="58" cy="32" r="1.8" fill="currentColor" stroke="none"/><circle cx="33" cy="28" r="1.2" fill="currentColor" stroke="none"/><circle cx="47" cy="22" r="1.2" fill="currentColor" stroke="none"/></svg>`,
+  w5:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M40 60 C40 60 26 50 24 38 C22 28 30 20 40 20 C50 20 58 28 56 38 C54 50 40 60 40 60Z"/><line x1="40" y1="20" x2="40" y2="14"/><path d="M32 34 Q40 28 48 34 Q40 44 32 34Z" stroke-width="1.2"/><line x1="28" y1="24" x2="24" y2="20"/><line x1="52" y1="24" x2="56" y2="20"/></svg>`,
+  a1:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="40" cy="17" r="6"/><line x1="40" y1="23" x2="40" y2="44"/><path d="M40 32 C36 30 26 27 22 33"/><path d="M40 32 C44 30 54 27 58 33"/><path d="M40 44 L33 60"/><path d="M40 44 L47 60"/></svg>`,
+  a2:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="40" cy="16" r="6"/><line x1="40" y1="22" x2="40" y2="42"/><path d="M40 32 L24 26"/><path d="M40 32 L56 26"/><path d="M40 42 L32 60"/><path d="M40 42 L48 60"/><path d="M24 26 L18 36"/><path d="M56 26 L62 36"/></svg>`,
+  a3:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="40" cy="14" r="6"/><line x1="40" y1="20" x2="40" y2="38"/><path d="M40 28 L20 22"/><path d="M40 28 L60 22"/><path d="M40 38 L28 58"/><path d="M40 38 L52 58"/><path d="M20 22 L14 34"/><path d="M60 22 L66 34"/></svg>`,
+  a4:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M34 56 Q26 44 28 32 Q30 18 40 16 Q50 18 52 32 Q54 44 46 56"/><path d="M28 42 Q16 38 18 26"/><path d="M52 42 Q64 38 62 26"/><path d="M32 58 L28 66"/><path d="M48 58 L52 66"/><circle cx="40" cy="16" r="5"/></svg>`,
+  a5:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 62 L40 20 L66 62"/><path d="M22 62 L40 30 L58 62"/><path d="M30 62 L40 42 L50 62"/><line x1="14" y1="62" x2="66" y2="62"/><circle cx="40" cy="17" r="4" fill="currentColor" stroke="none"/></svg>`,
+  k1:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 40 Q26 28 36 40 Q46 52 56 40 Q62 32 66 40"/></svg>`,
+  k2:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M40 18 Q48 28 44 36 Q40 44 40 54"/><path d="M40 18 Q32 28 36 36 Q40 44 40 54"/><path d="M32 28 Q22 32 24 42"/><path d="M48 28 Q58 32 56 42"/><path d="M36 52 Q30 58 32 64"/><path d="M44 52 Q50 58 48 64"/></svg>`,
+  k3:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="40" cy="40" r="22" stroke-width="1.2"/><circle cx="40" cy="40" r="13" stroke-width="1.2"/><circle cx="40" cy="40" r="5"/><line x1="40" y1="18" x2="40" y2="27"/><line x1="40" y1="53" x2="40" y2="62"/><line x1="18" y1="40" x2="27" y2="40"/><line x1="53" y1="40" x2="62" y2="40"/></svg>`,
+  k4:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 40 Q18 22 26 32 Q34 42 40 22 Q46 2 54 32 Q62 62 68 40"/><line x1="12" y1="52" x2="68" y2="52" stroke-width="0.8" stroke-dasharray="2 4"/></svg>`,
+  k5:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 44 C22 44 28 22 40 22 C52 22 58 44 58 44 C58 44 52 66 40 66 C28 66 22 44 22 44Z"/><path d="M31 40 C31 40 35 32 40 32 C45 32 49 40 49 40 C49 40 45 48 40 48 C35 48 31 40 31 40Z" stroke-width="1.2"/><circle cx="40" cy="40" r="3.5" fill="currentColor" stroke="none"/></svg>`,
+  s1:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M32 50 C32 50 28 44 30 38 C32 32 38 32 40 37 C42 42 38 50 38 50Z"/><path d="M44 38 C44 38 42 31 44 26 C46 21 52 23 52 28 C52 33 48 38 48 38Z" stroke-width="1.4"/><path d="M32 50 Q32 57 35 62 L40 62 Q43 57 38 50"/><path d="M44 38 Q44 46 47 50 L52 50 Q55 46 48 38" stroke-width="1.2"/></svg>`,
+  s2:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M28 48 C28 48 24 42 26 36 C28 30 34 30 36 35 C38 40 34 48 34 48Z"/><path d="M44 42 C44 42 42 35 44 28 C46 21 52 23 52 29 C52 35 48 42 48 42Z"/><path d="M28 48 Q28 55 31 60 L36 60 Q39 55 34 48"/><path d="M44 42 Q44 50 47 55 L52 55 Q55 50 48 42"/></svg>`,
+  s3:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 52 Q22 44 32 48 Q42 52 52 42 Q60 34 70 38"/><line x1="10" y1="62" x2="70" y2="62"/><path d="M18 52 Q25 46 32 48"/><circle cx="22" cy="50" r="2.5" fill="currentColor" stroke="none"/><circle cx="58" cy="40" r="2.5" fill="currentColor" stroke="none"/><path d="M24 62 Q24 56 28 54"/><path d="M48 62 Q48 54 52 50"/></svg>`,
+  s4:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="40" cy="40" r="22"/><path d="M40 18 L40 22"/><path d="M40 58 L40 62"/><path d="M18 40 L22 40"/><path d="M58 40 L62 40"/><path d="M40 40 L40 26" stroke-width="2.2"/><path d="M40 40 L52 47" stroke-width="1.8"/><circle cx="40" cy="40" r="2.5" fill="currentColor" stroke="none"/></svg>`,
+  s5:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 60 Q22 50 26 42 Q30 34 35 36 Q40 38 42 30 Q44 22 50 24 Q56 26 62 16"/><circle cx="62" cy="16" r="3.5" fill="currentColor" stroke="none"/><line x1="12" y1="66" x2="68" y2="66"/><path d="M54 56 L62 46 L70 56"/><line x1="62" y1="46" x2="62" y2="66"/></svg>`,
+  d1:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="40" x2="62" y2="40"/><rect x="8" y="31" width="11" height="18" rx="2.5"/><rect x="61" y="31" width="11" height="18" rx="2.5"/><rect x="14" y="34" width="7" height="12" rx="2"/><rect x="59" y="34" width="7" height="12" rx="2"/></svg>`,
+  d2:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="28" y1="30" x2="28" y2="50"/><line x1="52" y1="30" x2="52" y2="50"/><rect x="18" y="22" width="10" height="16" rx="2"/><rect x="18" y="42" width="10" height="16" rx="2"/><rect x="52" y="22" width="10" height="16" rx="2"/><rect x="52" y="42" width="10" height="16" rx="2"/><line x1="28" y1="38" x2="52" y2="38"/><rect x="36" y="34" width="8" height="8" rx="1.5"/></svg>`,
+  d3:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="14" y1="40" x2="66" y2="40"/><rect x="6" y="28" width="12" height="24" rx="2.5"/><rect x="62" y="28" width="12" height="24" rx="2.5"/><rect x="12" y="32" width="9" height="16" rx="2"/><rect x="59" y="32" width="9" height="16" rx="2"/><rect x="18" y="35" width="7" height="10" rx="1.5"/><rect x="55" y="35" width="7" height="10" rx="1.5"/></svg>`,
+  d4:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="22" width="48" height="38" rx="3"/><line x1="16" y1="33" x2="64" y2="33"/><line x1="16" y1="44" x2="64" y2="44"/><line x1="29" y1="22" x2="29" y2="60"/><line x1="40" y1="22" x2="40" y2="60"/><line x1="51" y1="22" x2="51" y2="60"/><circle cx="23" cy="38" r="2.5" fill="currentColor" stroke="none"/><circle cx="35" cy="50" r="2.5" fill="currentColor" stroke="none"/><circle cx="45" cy="28" r="2.5" fill="currentColor" stroke="none"/><circle cx="57" cy="50" r="2.5" fill="currentColor" stroke="none"/></svg>`,
+  d5:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 56 L22 44 L40 34 L58 44 L58 56"/><line x1="16" y1="56" x2="64" y2="56"/><path d="M22 44 L40 52 L58 44"/><line x1="40" y1="34" x2="40" y2="18"/><path d="M30 20 L40 18 L50 20"/><circle cx="40" cy="18" r="3.5" fill="currentColor" stroke="none"/></svg>`,
+  wl1:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M28 50 L40 24 L52 50"/><line x1="26" y1="50" x2="54" y2="50"/><line x1="40" y1="50" x2="40" y2="60"/><path d="M28 60 L52 60"/><circle cx="40" cy="20" r="4.5"/></svg>`,
+  wl2:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="40" y1="16" x2="40" y2="64"/><path d="M26 30 L16 40 L26 50" stroke-width="1.6"/><path d="M54 30 L64 40 L54 50" stroke-width="1.6"/><circle cx="40" cy="40" r="7"/><line x1="40" y1="23" x2="40" y2="33"/><line x1="40" y1="47" x2="40" y2="57"/></svg>`,
+  wl3:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 62 L24 46 L34 52 L44 32 L54 40 L64 20"/><circle cx="64" cy="20" r="4" fill="currentColor" stroke="none"/><path d="M56 60 L64 50 L72 60"/><line x1="64" y1="50" x2="64" y2="64"/><line x1="12" y1="66" x2="66" y2="66"/></svg>`,
+  wl4:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="40" cy="34" r="18"/><line x1="40" y1="8" x2="40" y2="16"/><line x1="26" y1="11" x2="30" y2="18"/><line x1="54" y1="11" x2="50" y2="18"/><line x1="40" y1="52" x2="40" y2="60"/><line x1="40" y1="60" x2="28" y2="68"/><line x1="40" y1="60" x2="52" y2="68"/><path d="M30 34 L40 24 L50 34" stroke-width="1.6"/></svg>`,
+  wl5:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M40 16 L45 32 L62 32 L48 42 L53 58 L40 48 L27 58 L32 42 L18 32 L35 32 Z"/></svg>`,
+  od1:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="40" cy="40" r="22"/><polyline points="28,40 37,49 54,30" stroke-width="2.2"/></svg>`,
+  od2:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="40" cy="40" r="22"/><circle cx="40" cy="40" r="11"/><polyline points="31,40 38,47 51,33" stroke-width="1.6"/></svg>`,
+  od3:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="40" cy="40" r="22"/><circle cx="40" cy="40" r="13"/><circle cx="40" cy="40" r="4.5" fill="currentColor" stroke="none"/><line x1="40" y1="18" x2="40" y2="27"/><line x1="40" y1="53" x2="40" y2="62"/><line x1="18" y1="40" x2="27" y2="40"/><line x1="53" y1="40" x2="62" y2="40"/></svg>`,
+  od4:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="40,14 51,32 68,34 55,47 58,64 40,55 22,64 25,47 12,34 29,32"/><circle cx="40" cy="40" r="8"/></svg>`,
+  od5:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="40,12 51,32 70,34 56,48 60,68 40,57 20,68 24,48 10,34 29,32"/><polygon points="40,22 48,34 60,36 51,45 53,58 40,51 27,58 29,45 20,36 32,34" stroke-width="1.2"/><circle cx="40" cy="40" r="5" fill="currentColor" stroke="none"/></svg>`,
+  cd1:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M40 60 C34 54 20 46 20 34 C20 24 28 18 40 24 C52 18 60 24 60 34 C60 46 46 54 40 60Z"/><path d="M40 50 C36 44 28 40 28 34 C28 30 33 28 40 32 C47 28 52 30 52 34 C52 40 44 44 40 50Z" stroke-width="1.2"/></svg>`,
+  cd2:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="40" y1="14" x2="40" y2="28"/><line x1="20" y1="28" x2="60" y2="28"/><path d="M20 28 L16 50 L28 50"/><path d="M60 28 L64 50 L52 50"/><path d="M28 50 C28 56 32 60 40 60 C48 60 52 56 52 50"/><line x1="28" y1="50" x2="52" y2="50"/></svg>`,
+  cd3:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="20" width="48" height="40" rx="3"/><line x1="16" y1="32" x2="64" y2="32"/><line x1="28" y1="20" x2="28" y2="32"/><line x1="52" y1="20" x2="52" y2="32"/><line x1="16" y1="44" x2="64" y2="44"/><circle cx="28" cy="38" r="3" fill="currentColor" stroke="none"/><circle cx="40" cy="38" r="3" fill="currentColor" stroke="none"/><circle cx="28" cy="52" r="3" fill="currentColor" stroke="none"/><circle cx="40" cy="52" r="3" fill="currentColor" stroke="none"/><circle cx="52" cy="52" r="3" fill="currentColor" stroke="none"/></svg>`,
+  cd4:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M40 16 L46 30 L62 32 L50 44 L53 60 L40 53 L27 60 L30 44 L18 32 L34 30 Z"/><path d="M40 24 L44 32 L52 33 L46 39 L47 47 L40 43 L33 47 L34 39 L28 33 L36 32 Z" stroke-width="1.2"/><circle cx="40" cy="40" r="3.5" fill="currentColor" stroke="none"/></svg>`,
 };
+
 
 const BADGES = [
   // ── WAKE
-  {id:'w1', cat:'wake', emoji:'🌅', name:'First Light', desc:'The alarm was answered.', art:BADGE_ART.wake,
+  {id:'w1', cat:'wake', emoji:'🌅', name:'First Light', desc:'The alarm was answered.', art:BADGE_ART.w1,
     check:()=>completionDays('d1') >= 1, prog:()=>({cur:Math.min(1,completionDays('d1')),max:1})},
-  {id:'w2', cat:'wake', emoji:'☀️', name:'Rising Rhythm', desc:'The body learns before the mind does.', art:BADGE_ART.wake,
+  {id:'w2', cat:'wake', emoji:'☀️', name:'Rising Rhythm', desc:'The body learns before the mind does.', art:BADGE_ART.w2,
     check:()=>maxConsecutiveDays('d1') >= 7, prog:()=>({cur:Math.min(7,maxConsecutiveDays('d1')),max:7})},
-  {id:'w3', cat:'wake', emoji:'🕊', name:'Dawn Keeper', desc:'Waking early is no longer a decision.', art:BADGE_ART.wake,
+  {id:'w3', cat:'wake', emoji:'🕊', name:'Dawn Keeper', desc:'Waking early is no longer a decision.', art:BADGE_ART.w3,
     check:()=>maxConsecutiveDays('d1') >= 21, prog:()=>({cur:Math.min(21,maxConsecutiveDays('d1')),max:21})},
-  {id:'w4', cat:'wake', emoji:'🌄', name:'The Early Hours', desc:'The final resistance breaks.', art:BADGE_ART.wake,
+  {id:'w4', cat:'wake', emoji:'🌄', name:'The Early Hours', desc:'The final resistance breaks.', art:BADGE_ART.w4,
     check:()=>completionDays('d1') >= 50, prog:()=>({cur:Math.min(50,completionDays('d1')),max:50})},
-  {id:'w5', cat:'wake', emoji:'🏔', name:'Brahma Muhurta', desc:'The final hour is claimed.', art:BADGE_ART.mission,
+  {id:'w5', cat:'wake', emoji:'🏔', name:'Brahma Muhurta', desc:'The final hour is claimed.', art:BADGE_ART.w5,
     check:()=>getWakeTarget().reached, prog:()=>({cur:missionDay(),max:46})},
 
   // ── ANGAMARDANA
-  {id:'a1', cat:'angamardana', emoji:'🕉', name:'First Bend', desc:'Body enters the process.', art:BADGE_ART.angamardana,
+  {id:'a1', cat:'angamardana', emoji:'🕉', name:'First Bend', desc:'Body enters the process.', art:BADGE_ART.a1,
     check:()=>completionDays('d2') >= 1, prog:()=>({cur:Math.min(1,completionDays('d2')),max:1})},
-  {id:'a2', cat:'angamardana', emoji:'⚔️', name:'Forging the Body', desc:'Discipline enters muscle memory.', art:BADGE_ART.angamardana,
+  {id:'a2', cat:'angamardana', emoji:'⚔️', name:'Forging the Body', desc:'Discipline enters muscle memory.', art:BADGE_ART.a2,
     check:()=>completionDays('d2') >= 7, prog:()=>({cur:Math.min(7,completionDays('d2')),max:7})},
-  {id:'a3', cat:'angamardana', emoji:'🦅', name:'Anga Siddhi', desc:'The body begins responding willingly.', art:BADGE_ART.angamardana,
+  {id:'a3', cat:'angamardana', emoji:'🦅', name:'Anga Siddhi', desc:'The body begins responding willingly.', art:BADGE_ART.a3,
     check:()=>completionDays('d2') >= 21, prog:()=>({cur:Math.min(21,completionDays('d2')),max:21})},
-  {id:'a4', cat:'angamardana', emoji:'🔥', name:'Fire in the Limbs', desc:'Consistency becomes strength.', art:BADGE_ART.angamardana,
+  {id:'a4', cat:'angamardana', emoji:'🔥', name:'Fire in the Limbs', desc:'Consistency becomes strength.', art:BADGE_ART.a4,
     check:()=>completionDays('d2') >= 50, prog:()=>({cur:Math.min(50,completionDays('d2')),max:50})},
-  {id:'a5', cat:'angamardana', emoji:'🏔', name:'Master of the Body', desc:'Angamardana completed across the mission.', art:BADGE_ART.mission,
+  {id:'a5', cat:'angamardana', emoji:'🏔', name:'Master of the Body', desc:'Angamardana completed across the mission.', art:BADGE_ART.a5,
     check:()=>completionDays('d2') >= missionTotalDays() * 0.8, prog:()=>({cur:completionDays('d2'),max:missionTotalDays()})},
 
   // ── KRIYA
-  {id:'k1', cat:'kriya', emoji:'🌙', name:'First Stillness', desc:'The mind experiences a pause.', art:BADGE_ART.kriya,
+  {id:'k1', cat:'kriya', emoji:'🌙', name:'First Stillness', desc:'The mind experiences a pause.', art:BADGE_ART.k1,
     check:()=>completionDays('d4') >= 1, prog:()=>({cur:Math.min(1,completionDays('d4')),max:1})},
-  {id:'k2', cat:'kriya', emoji:'🕊', name:'Settling Dust', desc:'Inner noise begins settling.', art:BADGE_ART.kriya,
+  {id:'k2', cat:'kriya', emoji:'🕊', name:'Settling Dust', desc:'Inner noise begins settling.', art:BADGE_ART.k2,
     check:()=>completionDays('d4') >= 7, prog:()=>({cur:Math.min(7,completionDays('d4')),max:7})},
-  {id:'k3', cat:'kriya', emoji:'🪷', name:'Inner Space', desc:'Consistency in Kriya established.', art:BADGE_ART.kriya,
+  {id:'k3', cat:'kriya', emoji:'🪷', name:'Inner Space', desc:'Consistency in Kriya established.', art:BADGE_ART.k3,
     check:()=>completionDays('d4') >= 21, prog:()=>({cur:Math.min(21,completionDays('d4')),max:21})},
-  {id:'k4', cat:'kriya', emoji:'✨', name:'Silent Current', desc:'The process continues effortlessly.', art:BADGE_ART.kriya,
+  {id:'k4', cat:'kriya', emoji:'✨', name:'Silent Current', desc:'The process continues effortlessly.', art:BADGE_ART.k4,
     check:()=>completionDays('d4') >= 50, prog:()=>({cur:Math.min(50,completionDays('d4')),max:50})},
-  {id:'k5', cat:'kriya', emoji:'🏔', name:'Keeper of Stillness', desc:'Kriya sustained through the mission.', art:BADGE_ART.mission,
+  {id:'k5', cat:'kriya', emoji:'🏔', name:'Keeper of Stillness', desc:'Kriya sustained through the mission.', art:BADGE_ART.k5,
     check:()=>completionDays('d4') >= missionTotalDays() * 0.8, prog:()=>({cur:completionDays('d4'),max:missionTotalDays()})},
 
   // ── STEPS
-  {id:'s1', cat:'steps', emoji:'👣', name:'The First Mile', desc:'Movement begins.', art:BADGE_ART.steps,
+  {id:'s1', cat:'steps', emoji:'👣', name:'The First Mile', desc:'Movement begins.', art:BADGE_ART.s1,
     check:()=>Object.values(records).some(r=>r.steps >= 10000), prog:()=>({cur:Math.min(10000,Math.max(...Object.values(records).map(r=>r.steps||0),0)),max:10000})},
-  {id:'s2', cat:'steps', emoji:'🌊', name:'Steady Flow', desc:'Movement becomes part of life.', art:BADGE_ART.steps,
+  {id:'s2', cat:'steps', emoji:'🌊', name:'Steady Flow', desc:'Movement becomes part of life.', art:BADGE_ART.s2,
     check:()=>completionDays('d3') >= 7, prog:()=>({cur:Math.min(7,completionDays('d3')),max:7})},
-  {id:'s3', cat:'steps', emoji:'🏝', name:'Payyambalam Walker', desc:'A tribute to your beach.', art:BADGE_ART.steps,
+  {id:'s3', cat:'steps', emoji:'🏝', name:'Payyambalam Walker', desc:'A tribute to your beach.', art:BADGE_ART.s3,
     check:()=>weeklySteps() >= 70000, prog:()=>({cur:Math.min(70000,weeklySteps()),max:70000})},
-  {id:'s4', cat:'steps', emoji:'🌍', name:'Earth Underfoot', desc:'The journey accumulates.', art:BADGE_ART.steps,
+  {id:'s4', cat:'steps', emoji:'🌍', name:'Earth Underfoot', desc:'The journey accumulates.', art:BADGE_ART.s4,
     check:()=>totalSteps() >= 500000, prog:()=>({cur:Math.min(500000,totalSteps()),max:500000})},
-  {id:'s5', cat:'steps', emoji:'🏔', name:'Path Maker', desc:'The path was walked.', art:BADGE_ART.mission,
+  {id:'s5', cat:'steps', emoji:'🏔', name:'Path Maker', desc:'The path was walked.', art:BADGE_ART.s5,
     check:()=>completionDays('d3') >= missionTotalDays() * 0.8, prog:()=>({cur:completionDays('d3'),max:missionTotalDays()})},
 
   // ── DUMBBELL
-  {id:'d1b', cat:'dumbbell', emoji:'🏋️', name:'First Lift', desc:'Strength enters the mission.', art:BADGE_ART.dumbbell,
+  {id:'d1b', cat:'dumbbell', emoji:'🏋️', name:'First Lift', desc:'Strength enters the mission.', art:BADGE_ART.d1,
     check:()=>completionDays('d5') >= 1, prog:()=>({cur:Math.min(1,completionDays('d5')),max:1})},
-  {id:'d2b', cat:'dumbbell', emoji:'⚒', name:'Forging Iron', desc:'The body adapts.', art:BADGE_ART.dumbbell,
+  {id:'d2b', cat:'dumbbell', emoji:'⚒', name:'Forging Iron', desc:'The body adapts.', art:BADGE_ART.d2,
     check:()=>completionDays('d5') >= 7, prog:()=>({cur:Math.min(7,completionDays('d5')),max:7})},
-  {id:'d3b', cat:'dumbbell', emoji:'🦍', name:'Steady Strength', desc:'Strength is becoming a habit.', art:BADGE_ART.dumbbell,
+  {id:'d3b', cat:'dumbbell', emoji:'🦍', name:'Steady Strength', desc:'Strength is becoming a habit.', art:BADGE_ART.d3,
     check:()=>completionDays('d5') >= 21, prog:()=>({cur:Math.min(21,completionDays('d5')),max:21})},
-  {id:'d4b', cat:'dumbbell', emoji:'🔥', name:'Unshakable', desc:'Consistency over motivation.', art:BADGE_ART.dumbbell,
+  {id:'d4b', cat:'dumbbell', emoji:'🔥', name:'Unshakable', desc:'Consistency over motivation.', art:BADGE_ART.d4,
     check:()=>completionDays('d5') >= 50, prog:()=>({cur:Math.min(50,completionDays('d5')),max:50})},
-  {id:'d5b', cat:'dumbbell', emoji:'🏔', name:'Bearer of Strength', desc:'The discipline was honored.', art:BADGE_ART.mission,
+  {id:'d5b', cat:'dumbbell', emoji:'🏔', name:'Bearer of Strength', desc:'The discipline was honored.', art:BADGE_ART.d5,
     check:()=>completionDays('d5') >= missionTotalDays() * 0.8, prog:()=>({cur:completionDays('d5'),max:missionTotalDays()})},
 
   // ── WEIGHT LOSS
-  {id:'wl1', cat:'weight', emoji:'🍂', name:'The First Fall', desc:'This is actually a beautiful name.', art:BADGE_ART.weight,
+  {id:'wl1', cat:'weight', emoji:'🍂', name:'The First Fall', desc:'This is actually a beautiful name.', art:BADGE_ART.wl1,
     check:()=>weightLost() >= 1, prog:()=>({cur:Math.min(1,weightLost()),max:1})},
-  {id:'wl2', cat:'weight', emoji:'🌿', name:'Lightening', desc:'The burden begins reducing.', art:BADGE_ART.weight,
+  {id:'wl2', cat:'weight', emoji:'🌿', name:'Lightening', desc:'The burden begins reducing.', art:BADGE_ART.wl2,
     check:()=>weightLost() >= 3, prog:()=>({cur:Math.min(3,weightLost()),max:3})},
-  {id:'wl3', cat:'weight', emoji:'🪶', name:'Half the Load', desc:'Halfway to transformation.', art:BADGE_ART.weight,
+  {id:'wl3', cat:'weight', emoji:'🪶', name:'Half the Load', desc:'Halfway to transformation.', art:BADGE_ART.wl3,
     check:()=>weightLost() >= (mission.startWeight - mission.targetWeight) / 2, prog:()=>({cur:Math.min((mission.startWeight-mission.targetWeight)/2,weightLost()),max:(mission.startWeight-mission.targetWeight)/2})},
-  {id:'wl4', cat:'weight', emoji:'🌬', name:'The Shedding', desc:'Old weight leaves.', art:BADGE_ART.weight,
+  {id:'wl4', cat:'weight', emoji:'🌬', name:'The Shedding', desc:'Old weight leaves.', art:BADGE_ART.wl4,
     check:()=>weightLost() >= 7, prog:()=>({cur:Math.min(7,weightLost()),max:7})},
-  {id:'wl5', cat:'weight', emoji:'🏔', name:'The Re-entry Begins', desc:'You have entered a new phase.', art:BADGE_ART.mission,
+  {id:'wl5', cat:'weight', emoji:'🏔', name:'The Re-entry Begins', desc:'You have entered a new phase.', art:BADGE_ART.wl5,
     check:()=>weightLost() >= (mission.startWeight - mission.targetWeight), prog:()=>({cur:Math.min(mission.startWeight-mission.targetWeight,weightLost()),max:mission.startWeight-mission.targetWeight})},
 
   // ── OVERALL DISCIPLINE
-  {id:'od1', cat:'discipline', emoji:'⭐', name:'Alignment', desc:'Everything worked together.', art:BADGE_ART.discipline,
+  {id:'od1', cat:'discipline', emoji:'⭐', name:'Alignment', desc:'Everything worked together.', art:BADGE_ART.od1,
     check:()=>Object.values(records).some(r=>(r.disciplines||[]).filter(d=>d&&d.done).length === DISCIPLINES.length),
     prog:()=>({cur:Math.min(DISCIPLINES.length,Math.max(...Object.values(records).map(r=>(r.disciplines||[]).filter(d=>d&&d.done).length),0)),max:DISCIPLINES.length})},
-  {id:'od2', cat:'discipline', emoji:'🕉', name:'Sadhana Week', desc:'The process stabilizes.', art:BADGE_ART.discipline,
+  {id:'od2', cat:'discipline', emoji:'🕉', name:'Sadhana Week', desc:'The process stabilizes.', art:BADGE_ART.od2,
     check:()=>maxOverallConsecutive() >= 7, prog:()=>({cur:Math.min(7,maxOverallConsecutive()),max:7})},
-  {id:'od3', cat:'discipline', emoji:'🔥', name:'Unbroken', desc:'Commitment remains uninterrupted.', art:BADGE_ART.discipline,
+  {id:'od3', cat:'discipline', emoji:'🔥', name:'Unbroken', desc:'Commitment remains uninterrupted.', art:BADGE_ART.od3,
     check:()=>maxOverallConsecutive() >= 21, prog:()=>({cur:Math.min(21,maxOverallConsecutive()),max:21})},
-  {id:'od4', cat:'discipline', emoji:'⚔️', name:'The Steadfast', desc:'Discipline becomes identity.', art:BADGE_ART.discipline,
+  {id:'od4', cat:'discipline', emoji:'⚔️', name:'The Steadfast', desc:'Discipline becomes identity.', art:BADGE_ART.od4,
     check:()=>maxOverallConsecutive() >= 50, prog:()=>({cur:Math.min(50,maxOverallConsecutive()),max:50})},
-  {id:'od5', cat:'discipline', emoji:'🏔', name:'Consecrated Effort', desc:'Nothing dramatic. You simply showed up every day.', art:BADGE_ART.mission,
+  {id:'od5', cat:'discipline', emoji:'🏔', name:'Consecrated Effort', desc:'Nothing dramatic. You simply showed up every day.', art:BADGE_ART.od5,
     check:()=>maxOverallConsecutive() >= missionTotalDays() * 0.8, prog:()=>({cur:Math.min(missionTotalDays(),maxOverallConsecutive()),max:missionTotalDays()})},
 
   // ── CALORIE / DEFICIT
-  {id:'c1', cat:'deficit', emoji:'🍃', name:'Balance', desc:'Three days of intention.', art:BADGE_ART.deficit,
+  {id:'c1', cat:'deficit', emoji:'🍃', name:'Balance', desc:'Three days of intention.', art:BADGE_ART.cd1,
     check:()=>deficitStreakMax() >= 3, prog:()=>({cur:Math.min(3,deficitStreakMax()),max:3})},
-  {id:'c2', cat:'deficit', emoji:'🌿', name:'Steady Course', desc:'The week held.', art:BADGE_ART.deficit,
+  {id:'c2', cat:'deficit', emoji:'🌿', name:'Steady Course', desc:'The week held.', art:BADGE_ART.cd2,
     check:()=>deficitStreakMax() >= 7, prog:()=>({cur:Math.min(7,deficitStreakMax()),max:7})},
-  {id:'c3', cat:'deficit', emoji:'🔥', name:'On Pace', desc:'21 days without deviation.', art:BADGE_ART.deficit,
+  {id:'c3', cat:'deficit', emoji:'🔥', name:'On Pace', desc:'21 days without deviation.', art:BADGE_ART.cd3,
     check:()=>deficitStreakMax() >= 21, prog:()=>({cur:Math.min(21,deficitStreakMax()),max:21})},
-  {id:'c4', cat:'deficit', emoji:'🏔', name:'Keeper of the Course', desc:'The mission was honored through the plate.', art:BADGE_ART.mission,
+  {id:'c4', cat:'deficit', emoji:'🏔', name:'Keeper of the Course', desc:'The mission was honored through the plate.', art:BADGE_ART.cd4,
     check:()=>deficitStreakMax() >= 60, prog:()=>({cur:Math.min(60,deficitStreakMax()),max:60})},
 ];
 
@@ -5078,38 +5054,110 @@ function checkAllBadges(){
   return newlyEarned;
 }
 
-function showBadgeEarned(badge){
+function closeBadgeOverlay(){
   const overlay = document.getElementById('badge-overlay');
-  const bg = document.getElementById('badge-overlay-bg');
-  const emojiEl = document.getElementById('bo-emoji');
-  const nameEl = document.getElementById('bo-name');
-  const descEl = document.getElementById('bo-desc');
+  if(!overlay) return;
+  overlay.style.transition = 'opacity .2s';
+  overlay.style.opacity = '0';
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    overlay.style.opacity = '';
+    overlay.style.transition = '';
+  }, 200);
+}
+
+function showBadgeEarned(badge, review = false){
+  const overlay   = document.getElementById('badge-overlay');
+  const bg        = document.getElementById('badge-overlay-bg');
+  const emojiEl   = document.getElementById('bo-emoji');
+  const unlockLbl = document.getElementById('bo-unlock-label');
+  const nameEl    = document.getElementById('bo-name');
+  const descEl    = document.getElementById('bo-desc');
+  const milestone = document.getElementById('bo-milestone');
+  const dateEl    = document.getElementById('bo-date');
+  const closeBtn  = document.getElementById('bo-close');
   if(!overlay) return;
 
   bg.style.background = 'linear-gradient(160deg,#EDE7DB 0%,#E0D8C8 100%)';
   emojiEl.textContent = badge.emoji;
-  nameEl.textContent = badge.name;
-  descEl.textContent = badge.desc;
+  nameEl.textContent  = badge.name;
+  descEl.textContent  = badge.desc;
+
+  // Milestone detail
+  let milestoneText = '';
+  try {
+    const p = badge.prog();
+    const max = p.max;
+    // Build human-readable milestone from badge category and threshold
+    if(badge.cat === 'wake'){
+      if(max === 1)  milestoneText = 'Woke early for the first time';
+      else if(max === 7)  milestoneText = '7 consecutive early wake-ups';
+      else if(max === 21) milestoneText = '21 consecutive early wake-ups';
+      else if(max === 50) milestoneText = '50 total early wake-ups';
+      else milestoneText = 'Wake target of 4:30 am reached';
+    } else if(badge.cat === 'angamardana'){
+      if(max === 1)  milestoneText = 'First Angamardana session completed';
+      else if(max === 7)  milestoneText = '7 total Angamardana sessions';
+      else if(max === 21) milestoneText = '21 total Angamardana sessions';
+      else if(max === 50) milestoneText = '50 total Angamardana sessions';
+      else milestoneText = 'Angamardana completed on 80% of mission days';
+    } else if(badge.cat === 'kriya'){
+      if(max === 1)  milestoneText = 'First Kriya session completed';
+      else if(max === 7)  milestoneText = '7 total Kriya sessions';
+      else if(max === 21) milestoneText = '21 total Kriya sessions';
+      else if(max === 50) milestoneText = '50 total Kriya sessions';
+      else milestoneText = 'Kriya sustained through 80% of mission';
+    } else if(badge.cat === 'steps'){
+      if(max === 10000)  milestoneText = 'First day hitting 10,000 steps';
+      else if(max === 7)  milestoneText = '7 days of 10,000+ steps';
+      else if(max === 70000) milestoneText = '70,000 steps in a single week';
+      else if(max === 500000) milestoneText = '500,000 total steps on the mission';
+      else milestoneText = '10,000 steps hit on 80% of mission days';
+    } else if(badge.cat === 'dumbbell'){
+      if(max === 1)  milestoneText = 'First dumbbell training session';
+      else if(max === 5)  milestoneText = '5 training sessions completed';
+      else if(max === 15) milestoneText = '15 training sessions completed';
+      else if(max === 30) milestoneText = '30 training sessions completed';
+      else milestoneText = 'Training sustained through 80% of mission';
+    } else if(badge.cat === 'weight'){
+      milestoneText = max + ' kg lost from starting weight';
+    } else if(badge.cat === 'discipline'){
+      milestoneText = max + ' perfect discipline days';
+    } else if(badge.cat === 'deficit'){
+      milestoneText = max + ' days in calorie deficit';
+    } else {
+      milestoneText = 'Milestone: ' + max;
+    }
+  } catch(e){}
+
+  if(milestone) milestone.textContent = milestoneText;
+
+  // Earned date
+  const earnedDate = getBadgeEarned(badge.id);
+  if(dateEl && earnedDate){
+    const d = new Date(earnedDate + 'T00:00:00');
+    dateEl.textContent = 'Earned ' + d.toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+  } else if(dateEl){
+    dateEl.textContent = '';
+  }
+
+  // Mode: review (persistent) vs earn flash (auto-dismiss)
+  if(unlockLbl) unlockLbl.textContent = review ? 'Badge Earned' : 'Achievement Unlocked';
+  if(closeBtn)  closeBtn.style.display = review ? 'inline-block' : 'none';
 
   overlay.style.display = 'flex';
-  setTimeout(() => {
-    overlay.style.transition = 'opacity .4s';
-    overlay.style.opacity = '0';
-    setTimeout(() => {
-      overlay.style.display = 'none';
-      overlay.style.opacity = '';
-      overlay.style.transition = '';
-    }, 400);
-  }, 3000);
-  overlay.onclick = () => {
-    overlay.style.transition = 'opacity .2s';
-    overlay.style.opacity = '0';
-    setTimeout(() => {
-      overlay.style.display = 'none';
-      overlay.style.opacity = '';
-      overlay.style.transition = '';
-    }, 200);
-  };
+  overlay.style.opacity = '1';
+
+  if(!review){
+    // Auto-dismiss after 3s
+    setTimeout(() => closeBadgeOverlay(), 3000);
+    overlay.onclick = () => closeBadgeOverlay();
+  } else {
+    // Tap background to close
+    overlay.onclick = (e) => {
+      if(e.target === overlay || e.target.id === 'badge-overlay-bg') closeBadgeOverlay();
+    };
+  }
 }
 
 function showBadgesSequentially(badges, idx=0){
@@ -5202,7 +5250,7 @@ function renderBadgeCategories(){
 
       const card = document.createElement('div');
       card.className = 'badge-card' + (earned ? ' earned' : '');
-      card.onclick = () => { if(earned) showBadgeEarned(badge); };
+      card.onclick = () => { if(earned) showBadgeEarned(badge, true); };
 
       const fmtNum = n => typeof n === 'number' ? (n % 1 === 0 ? n : n.toFixed(1)) : n;
       const progCur = prog ? fmtNum(prog.cur) : 0;
@@ -5212,10 +5260,7 @@ function renderBadgeCategories(){
         : '';
 
       // Determine SVG art key from cat, fall back to mission for cat 5 badges
-      const artKey = (badge.cat === 'discipline') ? 'discipline'
-        : (badge.cat === 'deficit') ? 'deficit'
-        : badge.cat;
-      const artSvg = BADGE_ART[artKey] || BADGE_ART.mission;
+      const artSvg = BADGE_ART[badge.id] || BADGE_ART.od1;
 
       card.innerHTML = `
         <div class="badge-card-inner">
@@ -6698,7 +6743,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v29';
+const CACHE = 'mission-os-v31';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
