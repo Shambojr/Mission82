@@ -5465,12 +5465,33 @@ let gfitToken = null;
 
 // Load saved token on init
 function initGoogleFit(){
+  // ── Handle redirect flow (WebView blocks popups, Google redirects main window) ──
+  const hash = window.location.hash;
+  if(hash && hash.includes('access_token')){
+    const params = new URLSearchParams(hash.substring(1));
+    const token = params.get('access_token');
+    const expiresIn = parseInt(params.get('expires_in') || '3600');
+    if(token){
+      gfitToken = token;
+      localStorage.setItem('gfit_token', token);
+      localStorage.setItem('gfit_token_expiry', Date.now() + (expiresIn - 120) * 1000);
+      // Clean the URL so token doesn't stay in address bar
+      history.replaceState(null, '', window.location.pathname);
+      // Fetch steps after a short delay to let the app finish init
+      setTimeout(() => {
+        updateGfitUI(true);
+        fetchStepsFromFit();
+      }, 800);
+      return;
+    }
+  }
+
+  // ── Normal load — restore saved token if still valid ──
   const saved = localStorage.getItem('gfit_token');
   const expiry = localStorage.getItem('gfit_token_expiry');
   if(saved && expiry && Date.now() < parseInt(expiry)){
     gfitToken = saved;
   }
-  // Always update UI on load — will show disconnect if connected
   setTimeout(() => updateGfitUI(!!gfitToken), 300);
 }
 
@@ -5496,12 +5517,10 @@ function authGoogleFit(forceConsent = false){
   const btn = document.getElementById('gfit-btn');
   const status = document.getElementById('gfit-status');
   if(btn) btn.textContent = 'Connecting…';
-  if(status) status.textContent = 'Opening Google sign-in…';
+  if(status) status.textContent = 'Redirecting to Google…';
 
   const redirectUri = encodeURIComponent('https://shambojr.github.io/Mission82');
   const scope = encodeURIComponent(GFIT_SCOPE);
-  // Only show consent screen on first auth or explicit disconnect
-  // Omit prompt entirely for silent re-auth — Google will use existing session
   const promptParam = forceConsent ? '&prompt=consent&select_account' : '';
   const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
     `client_id=${GFIT_CLIENT_ID}` +
@@ -5511,36 +5530,9 @@ function authGoogleFit(forceConsent = false){
     `&login_hint=anirudhcheriyath91%40gmail.com` +
     promptParam;
 
-  const popup = window.open(authUrl, 'gfit_auth', 'width=500,height=600,left=100,top=100');
-
-  const poll = setInterval(() => {
-    try {
-      if(popup.closed){
-        clearInterval(poll);
-        if(btn) btn.textContent = 'Sync →';
-        if(status) status.textContent = 'Tap to sync from Google Fit';
-        return;
-      }
-      const hash = popup.location.hash;
-      if(hash && hash.includes('access_token')){
-        clearInterval(poll);
-        popup.close();
-        const params = new URLSearchParams(hash.substring(1));
-        const token = params.get('access_token');
-        const expiresIn = parseInt(params.get('expires_in') || '3600');
-        if(token){
-          gfitToken = token;
-          // Store with a small buffer so we re-auth before actual expiry
-          localStorage.setItem('gfit_token', token);
-          localStorage.setItem('gfit_token_expiry', Date.now() + (expiresIn - 120) * 1000);
-          updateGfitUI(true);
-          fetchStepsFromFit();
-        }
-      }
-    } catch(e){
-      // Cross-origin — popup not yet redirected back
-    }
-  }, 500);
+  // Use redirect instead of popup — WebView blocks popups reliably
+  // Token will be in URL hash on return, caught by initGoogleFit
+  window.location.href = authUrl;
 }
 
 async function fetchStepsFromFit(){
@@ -6653,7 +6645,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v21';
+const CACHE = 'mission-os-v22';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
