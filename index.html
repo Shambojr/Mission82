@@ -6553,17 +6553,16 @@ function renderLunar(){
 const WHEEL_COLORS = [
   { disc: 0, name: 'Wake',        fill: '#C4714A', faint: '#F2DDD4' },
   { disc: 1, name: 'Angamardana', fill: '#6B7B3A', faint: '#D8DECC' },
-  { disc: 2, name: 'Kriya',       fill: '#5B7A8A', faint: '#CDD8DC' },
-  { disc: 3, name: 'Steps',       fill: '#C49A3A', faint: '#F0E5C8' },
+  { disc: 2, name: 'Steps',       fill: '#C49A3A', faint: '#F0E5C8' },
+  { disc: 3, name: 'Kriya',       fill: '#5B7A8A', faint: '#CDD8DC' },
   { disc: 4, name: 'Dumbbell',    fill: '#8A4A5B', faint: '#DDD0D4' },
 ];
 
-// Dark mode overrides — slightly lighter
 const WHEEL_COLORS_DK = [
   { disc: 0, name: 'Wake',        fill: '#D98A62', faint: '#3A2218' },
   { disc: 1, name: 'Angamardana', fill: '#8A9E50', faint: '#222A14' },
-  { disc: 2, name: 'Kriya',       fill: '#7A9EAE', faint: '#182428' },
-  { disc: 3, name: 'Steps',       fill: '#D4B050', faint: '#3A2E10' },
+  { disc: 2, name: 'Steps',       fill: '#D4B050', faint: '#3A2E10' },
+  { disc: 3, name: 'Kriya',       fill: '#7A9EAE', faint: '#182428' },
   { disc: 4, name: 'Dumbbell',    fill: '#A86278', faint: '#2A1820' },
 ];
 
@@ -6699,7 +6698,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v28';
+const CACHE = 'mission-os-v29';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
