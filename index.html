@@ -1440,7 +1440,7 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
     </div>
     <!-- Sodium bar -->
     <div class="nutrient-bar-row" id="sodium-bar-row" style="display:none;">
-      <span class="nutrient-bar-label">Sodium</span>
+      <span class="nutrient-bar-label">Sodium · stay below 1500mg</span>
       <span class="nutrient-bar-val" id="sodium-bar-val">0 / 2000mg</span>
     </div>
     <div class="nutrient-bar-track" id="sodium-bar-track" style="display:none;">
@@ -3360,11 +3360,15 @@ function renderDbBrowser(){
     const isTG = item.tgFriendly;
     const isOmega = (item.tags||[]).includes('Omega3');
     const isSelected = selectedIds.has(item.id);
+    const color = getFoodColor(item);
     const div = document.createElement('div');
     div.className = 'db-result' + (isSelected ? ' db-result-selected' : '');
     div.innerHTML = `
       <div class="db-result-left">
-        <div class="db-result-name">${item.name}${isSelected ? ' <span style="color:var(--ac);font-size:11px;">✓ Added</span>' : ''}</div>
+        <div class="db-result-name" style="display:flex;align-items:center;gap:7px;">
+          <span class="food-dot ${color}" style="flex-shrink:0;width:8px;height:8px;"></span>
+          <span>${item.name}${isSelected ? ' <span style="color:var(--ac);font-size:11px;">✓</span>' : ''}</span>
+        </div>
         <div class="db-result-meta">${item.servingSize} · P:${item.protein}g C:${item.carbs}g F:${item.fat}g</div>
         <div class="db-result-tags">
           ${isTG ? '<span class="db-result-tag tg">TG ✓</span>' : ''}
@@ -5702,7 +5706,7 @@ function updateFabVisibility(tab){
 // NUTRITION CONSTANTS
 // ═══════════════════════════════════════════════
 const PROTEIN_FLOOR_G = 140;    // minimum daily protein for muscle preservation at ~99kg
-const SODIUM_LIMIT_MG = 2000;   // WHO recommendation, tighter given BP 140/90
+const SODIUM_LIMIT_MG = 1500;   // tighter limit given BP 140/90 — WHO says 2000, cardiology says 1500 for hypertension
 const STEP_KCAL_PER_KG = 0.00055; // 0.055 kcal/step per 100kg → adjusted for body weight
 
 // Food color classification
@@ -7080,7 +7084,7 @@ function renderNutrientBars(){
     const sPct = Math.min(100, Math.round((sodium / SODIUM_LIMIT_MG) * 100));
     sodiumFill.style.width = sPct + '%';
     sodiumFill.style.background = sPct >= 100 ? 'var(--risk-at)' : sPct >= 75 ? '#C49A3A' : 'var(--risk-on)';
-    sodiumVal.textContent = `${sodium.toLocaleString()}mg / ${SODIUM_LIMIT_MG.toLocaleString()}mg`;
+    sodiumVal.textContent = `${sodium.toLocaleString()}mg · limit ${SODIUM_LIMIT_MG.toLocaleString()}mg`;
     sodiumVal.style.color = sPct >= 100 ? 'var(--risk-at)' : 'var(--t2)';
   } else if(sodiumRow){
     sodiumRow.style.display = 'none';
@@ -7349,7 +7353,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v44';
+const CACHE = 'mission-os-v46';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
