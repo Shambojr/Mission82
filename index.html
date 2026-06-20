@@ -3827,7 +3827,26 @@ function openMealPlanImage(canvas){
   const dataUrl = canvas.toDataURL('image/png');
   const w = window.open('');
   if(!w){ alert('Pop-up blocked. Please allow pop-ups for this app.'); return; }
-  w.document.write('<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Meal Plan</title><style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#111;}img{width:100%;display:block;}</style></head><body><img src="' + dataUrl + '" alt="Meal Plan"></body></html>');
+  const html = [
+    '<!DOCTYPE html><html><head>',
+    '<meta name="viewport" content="width=device-width,initial-scale=1">',
+    '<title>Meal Plan</title>',
+    '<style>',
+    '*{margin:0;padding:0;box-sizing:border-box;}',
+    'body{background:#111;font-family:Arial,sans-serif;}',
+    '.bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;background:#1B1814;padding:14px 20px;border-bottom:1px solid #3A3530;}',
+    '.bar-back{color:#B8924A;font-size:16px;cursor:pointer;padding:8px 4px;}',
+    '.bar-hint{color:#8C857B;font-size:12px;letter-spacing:.06em;text-align:right;line-height:1.5;}',
+    'img{width:100%;display:block;}',
+    '</style></head><body>',
+    '<div class="bar">',
+    '<span class="bar-back" onclick="window.close()">&#8592; Close</span>',
+    '<span class="bar-hint">Long-press image<br>to Save / Share</span>',
+    '</div>',
+    '<img src="' + dataUrl + '" alt="Meal Plan">',
+    '</body></html>'
+  ].join('');
+  w.document.write(html);
   w.document.close();
 }
 
@@ -7467,7 +7486,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v55';
+const CACHE = 'mission-os-v56';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
