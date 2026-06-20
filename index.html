@@ -1219,7 +1219,7 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 .am-slot-cal{font-family:var(--serif);font-size:16px;font-weight:300;color:var(--t2);}
 .am-slot-edit{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);margin-top:3px;}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 </head>
 <body>
 <div class="phone" id="phone">
@@ -1351,7 +1351,7 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
   <div class="ov-top">
     <span class="ov-back" onclick="closeMealPlanner()">←</span>
     <span class="ov-title">Meal Planner</span>
-    <span class="ov-action" onclick="shareMealPlanPdf()">PDF</span>
+    <span class="ov-action" onclick="shareMealPlanPdf()">Image</span>
   </div>
 
   <!-- Date & target -->
@@ -1389,7 +1389,7 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 
   <!-- Share PDF -->
   <div style="padding:0 var(--pad) var(--s4);">
-    <button class="btn-primary" onclick="shareMealPlanPdf()">Share as PDF</button>
+    <button class="btn-primary" onclick="shareMealPlanPdf()">Save as Image</button>
   </div>
 </div>
 
@@ -1775,7 +1775,7 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
   <div id="md-slots"></div>
   <div class="md-total" id="md-total"></div>
   <div class="md-share">
-    <button class="btn-ghost" onclick="shareMealPDF()">Share as PDF →</button>
+    <button class="btn-ghost" onclick="shareMealPDF()">Save as Image →</button>
   </div>
   <div style="height:40px;"></div>
 </div>
@@ -3526,322 +3526,374 @@ function renderCalendar(){
 }
 
 // ═══════════════════════════════════════════════
-// PDF EXPORT — pure jsPDF text (no html2canvas)
+// IMAGE EXPORT — Canvas-based meal plan card
 // ═══════════════════════════════════════════════
 
-function loadScript(src){
-  return new Promise((resolve, reject) => {
-    if(document.querySelector(`script[src="${src}"]`)){ resolve(); return; }
-    const s = document.createElement('script');
-    s.src = src; s.onload = resolve; s.onerror = reject;
-    document.head.appendChild(s);
-  });
-}
+function buildMealPlanImage(slots, dateStr, target){
+  // ── Constants
+  const W    = 1080;
+  const BG   = '#F4EFE5';
+  const GOLD = '#9A7B3C';
+  const INK  = '#1B1814';
+  const SUB  = '#8C857B';
+  const RULE = '#C8BFB0';
+  const PAD  = 72;
+  const CW   = W - PAD * 2;
 
-async function ensureJsPDF(){
-  if(typeof window.jspdf === 'undefined'){
-    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+  // Font helpers — use system fonts that render on Android canvas
+  const F_SERIF_LABEL = '600 28px Georgia, serif';
+  const F_SERIF_DATE  = 'italic 32px Georgia, serif';
+  const F_SERIF_NAME  = '400 46px Georgia, serif';
+  const F_SERIF_BIG   = '700 110px Georgia, serif';
+  const F_SERIF_LOGO  = '700 120px Georgia, serif';
+  const F_SERIF_CAL   = '400 36px Georgia, serif';
+  const F_SERIF_SUMM  = '400 34px Georgia, serif';
+  const F_SANS_LABEL  = '400 22px Arial, sans-serif';
+  const F_SANS_SMALL  = '400 20px Arial, sans-serif';
+  const F_SANS_MACRO  = '400 24px Arial, sans-serif';
+
+  function dotColor(item){
+    if(!item) return SUB;
+    if(item.tags && (item.tags.includes('TreatMeal') || item.tags.includes('Junk'))) return '#B94040';
+    if(item.tgFriendly === true && item.weightLossFriendly === true) return '#3A6B3A';
+    return '#A07820';
   }
-}
 
-function downloadPdfBlob(pdf, filename){
-  const blob = pdf.output('blob');
-  const url = URL.createObjectURL(new Blob([blob], {type:'application/pdf'}));
-  const a = document.createElement('a');
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click();
-  setTimeout(() => { URL.revokeObjectURL(url); document.body.removeChild(a); }, 2000);
-}
+  // ── Create canvas (measure pass first)
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = W;
 
-function buildMealPlanPDF(slots, dateStr, target){
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF({orientation:'portrait', unit:'mm', format:'a5'});
-  const W = pdf.internal.pageSize.getWidth();   // 148mm
-  const H = pdf.internal.pageSize.getHeight();  // 210mm
-  const PAD = 16;
-  const RIGHT = W - PAD;
-  const MID = W / 2;
-  let y = 0;
+  function wrapText(text, maxW, font){
+    ctx.font = font;
+    const words = text.split(' ');
+    const lines = [];
+    let line = '';
+    for(const w of words){
+      const test = line ? line + ' ' + w : w;
+      if(ctx.measureText(test).width > maxW && line){ lines.push(line); line = w; }
+      else line = test;
+    }
+    if(line) lines.push(line);
+    return lines;
+  }
 
-  // ── Background tint
-  pdf.setFillColor(244, 239, 229); // #F4EFE5
-  pdf.rect(0, 0, W, H, 'F');
+  // ── Compute total height
+  const LINE_NAME = 56;
+  const LINE_RULE = 48;
+  let H = 0;
+  H += 56;   // top pad
+  H += 4;    // top rule
+  H += 60;   // after rule
+  H += 130;  // 89.9 logo
+  H += 44;   // subtitle
+  H += 30;   // tagline
+  H += 40;   // short rule
+  H += 44;   // date
+  H += 32;   // MEAL PLAN label
+  H += 40;   // full rule
+  H += 52;   // DAILY TARGET
+  H += 40;   // rule
 
-  // ── Top thin rule
-  pdf.setDrawColor(154, 123, 60);
-  pdf.setLineWidth(0.6);
-  pdf.line(PAD, 10, RIGHT, 10);
+  slots.forEach(s => {
+    if(!s.item) return;
+    H += 36;  // slot label row
+    H += 12;
+    const lines = wrapText(s.item.name, CW - 40, F_SERIF_NAME);
+    H += lines.length * LINE_NAME + 8;
+    H += 36;  // macro row
+    H += LINE_RULE;
+  });
 
-  y = 18;
+  H += 40;   // NUTRITIONAL SUMMARY label
+  H += 3 * 52;
+  H += 50;   // thick rule
+  H += 52;   // TOTAL CALORIES label
+  H += 120;  // big number
+  H += 40;   // remaining
+  H += 60;   // footer gap
+  H += 32;   // MISSION OS
+  H += 28;   // generated date
+  H += 56;   // bottom pad + rule
 
-  // ── "M" monogram
-  pdf.setFont('times','bold');
-  pdf.setFontSize(52);
-  pdf.setTextColor(27, 24, 20);
-  pdf.text('M', MID, y, {align:'center'});
-  y += 4;
+  canvas.height = H;
 
-  // ── Mission OS · The Re-entry
-  pdf.setFont('times','italic');
-  pdf.setFontSize(9);
-  pdf.setTextColor(154, 123, 60);
-  pdf.text('Mission OS · The Re-entry', MID, y, {align:'center'});
-  y += 5;
+  // ── Draw background
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, W, H);
 
-  // ── Subtitle
-  pdf.setFont('helvetica','normal');
-  pdf.setFontSize(6.5);
-  pdf.setTextColor(140, 133, 123);
-  pdf.text('A PERSONAL HEALTH JOURNAL', MID, y, {align:'center', charSpace:1.5});
-  y += 6;
+  let y = 56;
 
-  // ── Gold rule
-  pdf.setDrawColor(154, 123, 60);
-  pdf.setLineWidth(0.4);
-  pdf.line(PAD + 20, y, RIGHT - 20, y);
-  y += 5;
+  // ── Top rule
+  ctx.strokeStyle = GOLD; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(PAD, y); ctx.lineTo(W - PAD, y); ctx.stroke();
+  y += 60;
+
+  // ── 89.9 logo
+  ctx.fillStyle = INK;
+  ctx.font = F_SERIF_LOGO;
+  ctx.textAlign = 'center';
+  ctx.fillText('89.9', W / 2, y);
+  y += 130;
+
+  // ── Mission OS subtitle
+  ctx.fillStyle = GOLD;
+  ctx.font = F_SERIF_DATE;
+  ctx.fillText('Mission OS \u00B7 The Re-entry', W / 2, y);
+  y += 44;
+
+  // ── Tagline
+  ctx.fillStyle = SUB;
+  ctx.font = F_SANS_LABEL;
+  ctx.fillText('A  P E R S O N A L  H E A L T H  J O U R N A L', W / 2, y);
+  y += 30;
+
+  // ── Short gold rule
+  ctx.strokeStyle = GOLD; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(W/2 - 160, y); ctx.lineTo(W/2 + 160, y); ctx.stroke();
+  y += 40;
 
   // ── Date
-  pdf.setFont('times','italic');
-  pdf.setFontSize(9);
-  pdf.setTextColor(60, 55, 48);
-  pdf.text(dateStr, MID, y, {align:'center'});
-  y += 4;
+  ctx.fillStyle = '#3C3730';
+  ctx.font = F_SERIF_DATE;
+  ctx.fillText(dateStr, W / 2, y);
+  y += 44;
 
-  // ── "Meal Plan" label
-  pdf.setFont('helvetica','normal');
-  pdf.setFontSize(6);
-  pdf.setTextColor(140, 133, 123);
-  pdf.text('MEAL PLAN', MID, y, {align:'center', charSpace:2});
-  y += 7;
+  // ── MEAL PLAN label
+  ctx.fillStyle = SUB;
+  ctx.font = F_SANS_SMALL;
+  ctx.fillText('M E A L  P L A N', W / 2, y);
+  y += 32;
 
   // ── Full rule
-  pdf.setDrawColor(200, 191, 176);
-  pdf.setLineWidth(0.2);
-  pdf.line(PAD, y, RIGHT, y);
-  y += 5;
+  ctx.strokeStyle = RULE; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(PAD, y); ctx.lineTo(W - PAD, y); ctx.stroke();
+  y += 40;
 
-  // ── Calorie target row
-  pdf.setFont('helvetica','normal');
-  pdf.setFontSize(6.5);
-  pdf.setTextColor(140, 133, 123);
-  pdf.text('DAILY TARGET', PAD, y, {charSpace:1});
-  pdf.setFont('times','bold');
-  pdf.setFontSize(11);
-  pdf.setTextColor(154, 123, 60);
-  pdf.text(`${target.toLocaleString()} kcal`, RIGHT, y, {align:'right'});
-  y += 5;
+  // ── DAILY TARGET
+  ctx.textAlign = 'left';
+  ctx.fillStyle = SUB;
+  ctx.font = F_SANS_LABEL;
+  ctx.fillText('D A I L Y  T A R G E T', PAD, y);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = GOLD;
+  ctx.font = F_SERIF_LABEL;
+  ctx.fillText(target.toLocaleString() + ' kcal', W - PAD, y);
+  y += 52;
 
-  pdf.setDrawColor(200, 191, 176);
-  pdf.setLineWidth(0.2);
-  pdf.line(PAD, y, RIGHT, y);
-  y += 6;
+  // ── Full rule
+  ctx.strokeStyle = RULE; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(PAD, y); ctx.lineTo(W - PAD, y); ctx.stroke();
+  y += 40;
 
   // ── Meal slots
   let totalCal = 0, totalPro = 0, totalCarb = 0, totalFat = 0;
 
-  slots.forEach((slot, idx) => {
+  slots.forEach(slot => {
     if(!slot.item) return;
     const item = slot.item;
     const cal  = item.cal  || 0;
-    const pro  = item.pro  || 0;
-    const carb = item.carb || 0;
-    const fat  = item.fat  || 0;
-    totalCal  += cal;
-    totalPro  += pro;
-    totalCarb += carb;
-    totalFat  += fat;
+    const pro  = Math.round(item.pro  || 0);
+    const carb = Math.round(item.carb || 0);
+    const fat  = Math.round(item.fat  || 0);
+    totalCal += cal; totalPro += pro; totalCarb += carb; totalFat += fat;
 
-    // Slot label
-    pdf.setFont('helvetica','normal');
-    pdf.setFontSize(6);
-    pdf.setTextColor(154, 123, 60);
-    pdf.text(slot.label.toUpperCase(), PAD, y, {charSpace:1.5});
+    // Row 1: SLOT LABEL left, kcal right
+    ctx.textAlign = 'left';
+    ctx.fillStyle = GOLD;
+    ctx.font = F_SANS_LABEL;
+    ctx.fillText(slot.label.toUpperCase(), PAD, y);
 
-    // Calories right
-    pdf.setFont('times','bold');
-    pdf.setFontSize(10);
-    pdf.setTextColor(27, 24, 20);
-    pdf.text(`${cal}`, RIGHT, y, {align:'right'});
-    pdf.setFont('helvetica','normal');
-    pdf.setFontSize(6);
-    pdf.setTextColor(140, 133, 123);
-    pdf.text('kcal', RIGHT - pdf.getTextWidth(`${cal}`) - 1, y, {align:'right'});
+    ctx.textAlign = 'right';
+    ctx.fillStyle = SUB;
+    ctx.font = F_SANS_SMALL;
+    const calStr = cal + ' kcal';
+    ctx.fillText(calStr, W - PAD, y);
+    y += 12;
 
-    y += 5;
+    // Row 2: dot + dish name
+    const dc = dotColor(item);
+    const dotX = PAD + 14;
+    const dotY = y + 26;
+    ctx.beginPath();
+    ctx.arc(dotX, dotY, 9, 0, Math.PI * 2);
+    ctx.fillStyle = dc;
+    ctx.fill();
 
-    // Dish name
-    pdf.setFont('times','normal');
-    pdf.setFontSize(11);
-    pdf.setTextColor(27, 24, 20);
-    const nameLines = pdf.splitTextToSize(item.name, RIGHT - PAD - 2);
-    pdf.text(nameLines, PAD, y);
-    y += nameLines.length * 5;
+    ctx.textAlign = 'left';
+    ctx.fillStyle = INK;
+    ctx.font = F_SERIF_NAME;
+    const nameLines = wrapText(item.name, CW - 40, F_SERIF_NAME);
+    nameLines.forEach((line, i) => {
+      ctx.fillText(line, PAD + 32, y + (i * LINE_NAME) + 36);
+    });
+    y += nameLines.length * LINE_NAME + 8;
 
-    // Portion description
-    if(item.portion || item.servingSize){
-      pdf.setFont('helvetica','italic');
-      pdf.setFontSize(7);
-      pdf.setTextColor(140, 133, 123);
-      const portion = item.portion || item.servingSize || '';
-      const portionLines = pdf.splitTextToSize(portion, RIGHT - PAD - 2);
-      pdf.text(portionLines, PAD, y);
-      y += portionLines.length * 4;
-    }
+    // Row 3: macros
+    ctx.fillStyle = SUB;
+    ctx.font = F_SANS_MACRO;
+    ctx.textAlign = 'left';
+    ctx.fillText('P ' + pro + 'g', PAD + 32, y);
+    ctx.fillText('C ' + carb + 'g', PAD + 32 + 140, y);
+    ctx.fillText('F ' + fat + 'g', PAD + 32 + 280, y);
+    y += 36;
 
-    // Macro row
-    pdf.setFont('helvetica','normal');
-    pdf.setFontSize(6.5);
-    pdf.setTextColor(140, 133, 123);
-    pdf.text(`P ${pro}g`, PAD, y);
-    pdf.text(`C ${carb}g`, PAD + 18, y);
-    pdf.text(`F ${fat}g`, PAD + 36, y);
-    y += 5;
-
-    // Divider (not after last)
-    pdf.setDrawColor(200, 191, 176);
-    pdf.setLineWidth(0.2);
-    pdf.line(PAD, y, RIGHT, y);
-    y += 5;
+    // Divider
+    ctx.strokeStyle = RULE; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(PAD, y); ctx.lineTo(W - PAD, y); ctx.stroke();
+    y += LINE_RULE;
   });
 
-  // ── Nutritional Summary
-  pdf.setFont('helvetica','normal');
-  pdf.setFontSize(6);
-  pdf.setTextColor(140, 133, 123);
-  pdf.text('NUTRITIONAL SUMMARY', PAD, y, {charSpace:1.5});
-  y += 5;
+  // ── NUTRITIONAL SUMMARY
+  ctx.textAlign = 'left';
+  ctx.fillStyle = SUB;
+  ctx.font = F_SANS_LABEL;
+  ctx.fillText('N U T R I T I O N A L  S U M M A R Y', PAD, y);
+  y += 16;
 
-  // Summary rows
-  const summaryRows = [
-    ['Protein',        `${totalPro}g`],
-    ['Carbohydrates',  `${totalCarb}g`],
-    ['Fat',            `${totalFat}g`],
-  ];
-  summaryRows.forEach(([lbl, val]) => {
-    pdf.setFont('times','normal');
-    pdf.setFontSize(9);
-    pdf.setTextColor(60, 55, 48);
-    pdf.text(lbl, PAD, y);
-    pdf.setFont('times','bold');
-    pdf.setTextColor(27, 24, 20);
-    pdf.text(val, RIGHT, y, {align:'right'});
-    y += 5;
-    pdf.setDrawColor(220, 213, 203);
-    pdf.setLineWidth(0.15);
-    pdf.line(PAD, y - 1, RIGHT, y - 1);
+  [['Protein', totalPro + 'g'], ['Carbohydrates', totalCarb + 'g'], ['Fat', totalFat + 'g']].forEach(([lbl, val]) => {
+    y += 36;
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#3C3730';
+    ctx.font = F_SERIF_SUMM;
+    ctx.fillText(lbl, PAD, y);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = INK;
+    ctx.font = '600 34px Georgia, serif';
+    ctx.fillText(val, W - PAD, y);
+    y += 8;
+    ctx.strokeStyle = '#DDD8CF'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(PAD, y); ctx.lineTo(W - PAD, y); ctx.stroke();
+    y += 8;
   });
 
-  y += 3;
+  y += 42;
 
-  // ── Total calories — large
-  pdf.setDrawColor(27, 24, 20);
-  pdf.setLineWidth(0.5);
-  pdf.line(PAD, y, RIGHT, y);
-  y += 6;
+  // ── Thick rule
+  ctx.strokeStyle = INK; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(PAD, y); ctx.lineTo(W - PAD, y); ctx.stroke();
+  y += 52;
 
-  pdf.setFont('helvetica','normal');
-  pdf.setFontSize(6.5);
-  pdf.setTextColor(140, 133, 123);
-  pdf.text('TOTAL CALORIES', PAD, y, {charSpace:1});
+  // ── TOTAL CALORIES label
+  ctx.textAlign = 'left';
+  ctx.fillStyle = SUB;
+  ctx.font = F_SANS_LABEL;
+  ctx.fillText('T O T A L  C A L O R I E S', PAD, y);
+  y += 12;
 
-  pdf.setFont('times','bold');
-  pdf.setFontSize(22);
-  pdf.setTextColor(27, 24, 20);
-  pdf.text(`${totalCal.toLocaleString()}`, RIGHT, y + 6, {align:'right'});
-  pdf.setFont('times','normal');
-  pdf.setFontSize(9);
-  pdf.setTextColor(140, 133, 123);
-  pdf.text('kcal', RIGHT, y + 11, {align:'right'});
+  // ── Big number + kcal
+  ctx.textAlign = 'right';
+  ctx.fillStyle = INK;
+  ctx.font = F_SERIF_BIG;
+  ctx.fillText(totalCal.toLocaleString(), W - PAD, y + 100);
+  ctx.fillStyle = SUB;
+  ctx.font = F_SANS_MACRO;
+  ctx.fillText('kcal', W - PAD, y + 128);
 
-  // Remaining
+  // ── Remaining (left, aligned to big number vertically)
   const rem = target - totalCal;
-  const remC = rem < 0 ? [122,58,26] : rem <= 100 ? [46,92,46] : [60,55,48];
-  pdf.setFont('times','italic');
-  pdf.setFontSize(8);
-  pdf.setTextColor(...remC);
-  pdf.text(rem >= 0 ? `${rem.toLocaleString()} kcal remaining` : `${Math.abs(rem).toLocaleString()} kcal over target`, PAD, y + 10);
+  ctx.textAlign = 'left';
+  ctx.fillStyle = rem < 0 ? '#8B3A1A' : '#3A5C3A';
+  ctx.font = 'italic 30px Georgia, serif';
+  ctx.fillText(rem >= 0 ? rem.toLocaleString() + ' kcal remaining' : Math.abs(rem).toLocaleString() + ' kcal over target', PAD, y + 100);
+  y += 160;
 
-  y += 18;
-
-  // ── Bottom gold rule
-  pdf.setDrawColor(154, 123, 60);
-  pdf.setLineWidth(0.4);
-  pdf.line(PAD + 20, y, RIGHT - 20, y);
-  y += 5;
+  // ── Short gold rule
+  ctx.strokeStyle = GOLD; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(W/2 - 160, y); ctx.lineTo(W/2 + 160, y); ctx.stroke();
+  y += 32;
 
   // ── Footer
-  pdf.setFont('helvetica','normal');
-  pdf.setFontSize(6);
-  pdf.setTextColor(154, 123, 60);
-  pdf.text('Mission OS', MID, y, {align:'center', charSpace:1});
-  y += 4;
-  pdf.setTextColor(180, 174, 166);
-  pdf.text(`Generated ${new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}`, MID, y, {align:'center'});
+  ctx.textAlign = 'center';
+  ctx.fillStyle = GOLD;
+  ctx.font = F_SANS_LABEL;
+  ctx.fillText('M I S S I O N  O S', W / 2, y);
+  y += 28;
+  ctx.fillStyle = '#B4AEA6';
+  ctx.font = F_SANS_SMALL;
+  const tod = new Date();
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  ctx.fillText('Generated ' + tod.getDate() + ' ' + MONTHS[tod.getMonth()] + ' ' + tod.getFullYear(), W / 2, y);
+  y += 56;
 
-  // ── Bottom thin rule
-  pdf.setDrawColor(154, 123, 60);
-  pdf.setLineWidth(0.6);
-  pdf.line(PAD, H - 8, RIGHT, H - 8);
+  // ── Bottom rule
+  ctx.strokeStyle = GOLD; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(PAD, y); ctx.lineTo(W - PAD, y); ctx.stroke();
 
-  return pdf;
+  return canvas;
 }
 
-async function shareMealPDF(){
-  try {
-    await ensureJsPDF();
-  } catch(e) {
-    alert('Could not load PDF library. Check internet connection.'); return;
-  }
+function openMealPlanImage(canvas){
+  const dataUrl = canvas.toDataURL('image/png');
+  const w = window.open('');
+  if(!w){ alert('Pop-up blocked. Please allow pop-ups for this app.'); return; }
+  w.document.write('<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Meal Plan</title><style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#111;}img{width:100%;display:block;}</style></head><body><img src="' + dataUrl + '" alt="Meal Plan"></body></html>');
+  w.document.close();
+}
+
+function shareMealPDF(){
   const key = keyForOffset(mealDayOffset || 0);
   const d = keyToDate(key);
   const dateStr = DOW[d.getDay()] + ', ' + d.getDate() + ' ' + MO[d.getMonth()] + ' ' + d.getFullYear();
   const plan = getMealPlan(key);
   const target = dailyTarget(currentWeight());
-  const lunchCal = (plan.lunch_fish?.cal||0) + (plan.lunch_rice?.cal||0);
-  const lunchName = plan.lunch_rice ? `Rice + ${plan.lunch_fish?.name||''}` : (plan.lunch_fish?.name||'');
+  const lunchParts = [plan.lunch_rice, plan.lunch_fish].filter(Boolean);
+  const lunchItem = lunchParts.length ? {
+    name: lunchParts.map(p => p.name).join(' + '),
+    cal:  lunchParts.reduce((s,p) => s + (p.cal||0), 0),
+    pro:  lunchParts.reduce((s,p) => s + (p.pro||0), 0),
+    carb: lunchParts.reduce((s,p) => s + (p.carb||0), 0),
+    fat:  lunchParts.reduce((s,p) => s + (p.fat||0), 0),
+    tgFriendly: lunchParts.every(p => p.tgFriendly !== false),
+    weightLossFriendly: lunchParts.every(p => p.weightLossFriendly !== false),
+  } : null;
   const slots = [
     {label:'Breakfast', item: plan.breakfast},
-    {label:'Lunch',     item: lunchName ? {name:lunchName, cal:lunchCal} : null},
+    {label:'Lunch',     item: lunchItem},
     {label:'Dinner',    item: plan.dinner_millet},
     {label:'Snack',     item: plan.snack},
   ];
   try {
-    const pdf = buildMealPlanPDF(slots, dateStr, target);
-    downloadPdfBlob(pdf, `meal-plan-${key}.pdf`);
+    const canvas = buildMealPlanImage(slots, dateStr, target);
+    openMealPlanImage(canvas);
   } catch(err) {
-    console.error('PDF error:', err);
-    alert('PDF generation failed: ' + err.message);
+    console.error('Image error:', err);
+    alert('Image generation failed: ' + err.message);
   }
 }
 
-async function shareMealPlanPdf(){
-  try {
-    await ensureJsPDF();
-  } catch(e) {
-    alert('Could not load PDF library. Check internet connection.'); return;
-  }
+function shareMealPlanPdf(){
   const key = keyForOffset(1);
   const d = keyToDate(key);
   const dateStr = DOW[d.getDay()] + ', ' + d.getDate() + ' ' + MO[d.getMonth()] + ' ' + d.getFullYear();
   const target = dailyTarget(currentWeight());
+  // Build lunch composite with color flags from mpPlan
+  const lunchParts = [mpPlan.lunch_rice, mpPlan.lunch_fish].filter(Boolean);
+  const lunchItem = lunchParts.length ? {
+    name: lunchParts.map(p => p.name).join(' + '),
+    cal:  lunchParts.reduce((s,p) => s + (p.cal||0), 0),
+    pro:  lunchParts.reduce((s,p) => s + (p.pro||0), 0),
+    carb: lunchParts.reduce((s,p) => s + (p.carb||0), 0),
+    fat:  lunchParts.reduce((s,p) => s + (p.fat||0), 0),
+    tgFriendly: lunchParts.every(p => p.tgFriendly !== false),
+    weightLossFriendly: lunchParts.every(p => p.weightLossFriendly !== false),
+  } : (mpPlan.lunch_fish || mpPlan.lunch_rice || null);
   const slots = [
     {label:'Breakfast', item: mpPlan.breakfast},
-    {label:'Lunch',     item: mpPlan.lunch_fish || mpPlan.lunch_rice},
+    {label:'Lunch',     item: lunchItem},
     {label:'Dinner',    item: mpPlan.dinner_millet},
     {label:'Snack',     item: mpPlan.snack},
   ];
-
-  const pdfBtn = document.querySelector('#meal-planner-overlay .btn-primary');
-  if(pdfBtn) pdfBtn.textContent = 'Generating…';
+  const imgBtn = document.querySelector('#meal-planner-overlay .btn-primary');
+  if(imgBtn) imgBtn.textContent = 'Generating…';
   try {
-    const pdf = buildMealPlanPDF(slots, dateStr, target);
-    downloadPdfBlob(pdf, `meal-plan-${key}.pdf`);
+    const canvas = buildMealPlanImage(slots, dateStr, target);
+    openMealPlanImage(canvas);
   } catch(err) {
-    console.error('PDF error:', err);
-    alert('PDF generation failed: ' + err.message);
+    console.error('Image error:', err);
+    alert('Image generation failed: ' + err.message);
   } finally {
-    if(pdfBtn) pdfBtn.textContent = 'Share as PDF';
+    if(imgBtn) imgBtn.textContent = 'Save as Image';
   }
 }
 
@@ -7415,7 +7467,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v53';
+const CACHE = 'mission-os-v55';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
