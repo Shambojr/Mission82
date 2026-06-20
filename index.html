@@ -3844,12 +3844,34 @@ function openMealPlanImage(canvas){
   closeBtn.style.cssText = 'background:none;border:none;color:#B8924A;font-size:17px;cursor:pointer;padding:8px 4px;font-family:Arial,sans-serif;';
   closeBtn.onclick = () => overlay.remove();
 
-  const hint = document.createElement('span');
-  hint.style.cssText = 'color:#8C857B;font-size:12px;letter-spacing:.06em;text-align:right;line-height:1.5;font-family:Arial,sans-serif;';
-  hint.innerHTML = 'Hold image to<br>Save / Share';
+  // Share button — uses Web Share API (native Android share sheet)
+  const shareBtn = document.createElement('button');
+  shareBtn.textContent = 'Share ↗';
+  shareBtn.style.cssText = 'background:#B8924A;border:none;color:#1B1814;font-size:15px;font-weight:600;cursor:pointer;padding:10px 18px;border-radius:6px;font-family:Arial,sans-serif;';
+  shareBtn.onclick = async () => {
+    try {
+      // Convert dataUrl to Blob then File
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+      const file = new File([blob], 'meal-plan.png', {type:'image/png'});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({files:[file], title:'Meal Plan — 89.9'});
+      } else if(navigator.share){
+        await navigator.share({title:'Meal Plan — 89.9', text:'My meal plan for tomorrow.'});
+      } else {
+        // Fallback: trigger download
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = 'meal-plan.png';
+        a.click();
+      }
+    } catch(e){
+      if(e.name !== 'AbortError') alert('Share failed: ' + e.message);
+    }
+  };
 
   bar.appendChild(closeBtn);
-  bar.appendChild(hint);
+  bar.appendChild(shareBtn);
 
   // Scrollable image area
   const scroll = document.createElement('div');
@@ -7502,7 +7524,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v57';
+const CACHE = 'mission-os-v58';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
