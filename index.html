@@ -3039,7 +3039,7 @@ function renderDbTray(){
   itemsEl.innerHTML = '';
   dbTrayItems.forEach((item, idx) => {
     const qty = item.qty || 1;
-    const itemCal = item.calories * qty;
+    const itemCal = Math.round(item.calories * qty);
     const row = document.createElement('div');
     row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;';
     row.innerHTML = `
@@ -3048,7 +3048,7 @@ function renderDbTray(){
         <span style="font-size:9px;color:var(--t3);min-width:52px;text-align:right;">${itemCal} kcal</span>
         <div style="display:flex;align-items:center;border:1px solid var(--rls);">
           <span style="font-size:16px;color:var(--t2);padding:2px 10px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;" onclick="changeQty(${idx},-1)">−</span>
-          <span style="font-family:var(--serif);font-size:15px;font-weight:300;color:var(--t1);padding:2px 8px;min-width:22px;text-align:center;">${qty}</span>
+          <span style="font-family:var(--serif);font-size:14px;font-weight:300;color:var(--t1);padding:2px 8px;min-width:28px;text-align:center;">×${fmtQty(qty)}</span>
           <span style="font-size:16px;color:var(--t2);padding:2px 10px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;" onclick="changeQty(${idx},1)">+</span>
         </div>
         <span style="font-size:10px;color:var(--risk-at);cursor:pointer;padding:4px;" onclick="removeDbTrayItem(${idx})">✕</span>
@@ -3064,9 +3064,12 @@ function renderDbTray(){
 
 function changeQty(idx, delta){
   if(!dbTrayItems[idx]) return;
-  dbTrayItems[idx].qty = Math.max(1, (dbTrayItems[idx].qty||1) + delta);
+  const cur = dbTrayItems[idx].qty || 1;
+  dbTrayItems[idx].qty = Math.max(0.5, Math.round((cur + delta * 0.5) * 2) / 2);
   renderDbTray();
 }
+
+function fmtQty(q){ return q % 1 === 0 ? String(q) : q.toFixed(1); }
 
 function removeDbTrayItem(idx){
   dbTrayItems.splice(idx, 1);
@@ -3112,27 +3115,27 @@ function buildCombinedItem(items){
     const qty = item.qty || 1;
     return {
       id: item.id,
-      name: qty > 1 ? `${item.name} ×${qty}` : item.name,
+      name: qty !== 1 ? `${item.name} ×${fmtQty(qty)}` : item.name,
       ml: '',
-      cal:  item.calories * qty,
-      pro:  item.protein  * qty,
-      carb: item.carbs    * qty,
-      fat:  item.fat      * qty,
+      cal:  Math.round(item.calories * qty),
+      pro:  Math.round(item.protein  * qty * 10) / 10,
+      carb: Math.round(item.carbs    * qty * 10) / 10,
+      fat:  Math.round(item.fat      * qty * 10) / 10,
       cat:  item.category,
-      portion: qty > 1 ? `${qty} × ${item.servingSize}` : item.servingSize,
+      portion: qty !== 1 ? `${fmtQty(qty)} × ${item.servingSize}` : item.servingSize,
       tgFriendly: item.tgFriendly,
     };
   }
   return {
     id: items.map(i => i.id).join('+'),
-    name: items.map(i => { const q=i.qty||1; return q>1?`${i.name} ×${q}`:i.name; }).join(' + '),
+    name: items.map(i => { const q=i.qty||1; return q!==1?`${i.name} ×${fmtQty(q)}`:i.name; }).join(' + '),
     ml: '',
-    cal:  items.reduce((s,i) => s + i.calories*(i.qty||1), 0),
-    pro:  items.reduce((s,i) => s + i.protein *(i.qty||1), 0),
-    carb: items.reduce((s,i) => s + i.carbs   *(i.qty||1), 0),
-    fat:  items.reduce((s,i) => s + i.fat     *(i.qty||1), 0),
+    cal:  Math.round(items.reduce((s,i) => s + i.calories*(i.qty||1), 0)),
+    pro:  Math.round(items.reduce((s,i) => s + i.protein *(i.qty||1), 0) * 10) / 10,
+    carb: Math.round(items.reduce((s,i) => s + i.carbs   *(i.qty||1), 0) * 10) / 10,
+    fat:  Math.round(items.reduce((s,i) => s + i.fat     *(i.qty||1), 0) * 10) / 10,
     cat:  items[0].category,
-    portion: items.map(i => { const q=i.qty||1; return q>1?`${q} × ${i.servingSize}`:i.servingSize; }).join(' + '),
+    portion: items.map(i => { const q=i.qty||1; return q!==1?`${fmtQty(q)} × ${i.servingSize}`:i.servingSize; }).join(' + '),
     tgFriendly: items.every(i => i.tgFriendly),
   };
 }
@@ -6743,7 +6746,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v31';
+const CACHE = 'mission-os-v32';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
