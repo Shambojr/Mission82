@@ -5569,7 +5569,17 @@ function openMealPlanner(){
     meals[key] = generateMeal(key, travelMode);
     save();
   }
-  mpPlan = {...meals[key]};
+  // Only carry planner-managed slots into mpPlan — not the full plan
+  const fullPlan = meals[key];
+  mpPlan = {
+    breakfast:     fullPlan.breakfast     || null,
+    lunch_rice:    fullPlan.lunch_rice    || null,
+    lunch_fish:    fullPlan.lunch_fish    || null,
+    dinner_millet: fullPlan.dinner_millet || null,
+    snack:         fullPlan.snack         || null,
+    locked:        fullPlan.locked        || {},
+    travel:        fullPlan.travel        || false,
+  };
 
   // Date label
   const dateEl = document.getElementById('mp-date-label');
@@ -5622,17 +5632,23 @@ function renderMpSlots(){
 function getMpSlotItem(slotKey){
   if(slotKey === 'breakfast') return mpPlan.breakfast || null;
   if(slotKey === 'lunch'){
-    // Build combined item for display — carry green status from all sub-items
-    const subItems = [mpPlan.lunch_rice, mpPlan.lunch_fish, mpPlan.lunch_thoran,
-                      mpPlan.lunch_sprouts, mpPlan.lunch_moru, mpPlan.lunch_sweet].filter(Boolean);
-    if(!subItems.length) return null;
-    const cal = subItems.reduce((s,i) => s+(i.cal||0), 0);
-    const pro = subItems.reduce((s,i) => s+(i.pro||0), 0);
+    // Planner overlay only manages lunch_fish and lunch_rice
+    const fish = mpPlan.lunch_fish;
+    const rice = mpPlan.lunch_rice;
+    if(!fish && !rice) return null;
+    const subItems = [rice, fish].filter(Boolean);
+    if(subItems.length === 1) return {
+      ...subItems[0],
+      tgFriendly: subItems[0].tgFriendly !== false,
+      weightLossFriendly: subItems[0].weightLossFriendly !== false,
+    };
+    const cal  = subItems.reduce((s,i) => s+(i.cal||0), 0);
+    const pro  = subItems.reduce((s,i) => s+(i.pro||0), 0);
     const carb = subItems.reduce((s,i) => s+(i.carb||0), 0);
     const fat  = subItems.reduce((s,i) => s+(i.fat||0), 0);
-    const name = subItems.map(i => i.name).join(' + ');
     return {
-      name, cal, pro, carb, fat,
+      name: subItems.map(i => i.name).join(' + '),
+      cal, pro, carb, fat,
       tgFriendly: subItems.every(i => i.tgFriendly !== false),
       weightLossFriendly: subItems.every(i => i.weightLossFriendly !== false),
     };
@@ -5661,10 +5677,11 @@ function openMpSlotEdit(slotKey){
 }
 
 function saveMpSlotItem(slotKey, item){
-  if(slotKey === 'breakfast') mpPlan.breakfast = {name:item.name, cal:item.cal, pro:item.pro, carb:item.carb, fat:item.fat};
-  if(slotKey === 'lunch') mpPlan.lunch_fish = {name:item.name, cal:item.cal, pro:item.pro, carb:item.carb, fat:item.fat};
-  if(slotKey === 'dinner') mpPlan.dinner_millet = {name:item.name, cal:item.cal, pro:item.pro, carb:item.carb, fat:item.fat};
-  if(slotKey === 'snack') mpPlan.snack = {name:item.name, cal:item.cal, pro:item.pro, carb:item.carb, fat:item.fat};
+  const base = {name:item.name, cal:item.cal, pro:item.pro, carb:item.carb, fat:item.fat, tgFriendly:item.tgFriendly===true, weightLossFriendly:item.weightLossFriendly===true};
+  if(slotKey === 'breakfast') mpPlan.breakfast = base;
+  if(slotKey === 'lunch') mpPlan.lunch_fish = base;
+  if(slotKey === 'dinner') mpPlan.dinner_millet = base;
+  if(slotKey === 'snack') mpPlan.snack = base;
   saveMpPlan();
   renderMpSlots();
 }
@@ -5727,10 +5744,34 @@ const SODIUM_LIMIT_MG = 1500;   // tighter limit given BP 140/90 — WHO says 20
 const STEP_KCAL_PER_KG = 0.00055; // 0.055 kcal/step per 100kg → adjusted for body weight
 
 // Food color classification
+function getLiveColor(item){
+  // Look up current tgFriendly from FOOD_DB or MASTER_DB by id — don't trust stored value
+  if(!item) return {tgFriendly:false, weightLossFriendly:false};
+  const id = item.id;
+  if(id){
+    // Check FOOD_DB flat items
+    for(const key of Object.keys(FOOD_DB)){
+      const pool = FOOD_DB[key];
+      if(Array.isArray(pool)){
+        const found = pool.find(i => i.id === id);
+        if(found) return {tgFriendly: found.tgFriendly === true, weightLossFriendly: found.weightLossFriendly === true};
+      } else if(pool && pool.id === id){
+        return {tgFriendly: pool.tgFriendly === true, weightLossFriendly: pool.weightLossFriendly === true};
+      }
+    }
+    // Check MASTER_DB
+    const master = MASTER_DB.find(i => i.id === id);
+    if(master) return {tgFriendly: master.tgFriendly === true, weightLossFriendly: master.weightLossFriendly === true};
+  }
+  // Fall back to stored value
+  return {tgFriendly: item.tgFriendly === true, weightLossFriendly: item.weightLossFriendly === true};
+}
+
 function getFoodColor(item){
   if(!item) return 'yellow';
-  if(item.tgFriendly && item.weightLossFriendly) return 'green';
   if(item.tags && (item.tags.includes('TreatMeal') || item.tags.includes('Junk'))) return 'red';
+  const {tgFriendly, weightLossFriendly} = getLiveColor(item);
+  if(tgFriendly && weightLossFriendly) return 'green';
   return 'yellow';
 }
 
@@ -6181,6 +6222,8 @@ function getActualSlotItem(dateKey, slotKey){
         pro:  parts.reduce((s,p) => s + (p.pro||0), 0),
         carb: parts.reduce((s,p) => s + (p.carb||0), 0),
         fat:  parts.reduce((s,p) => s + (p.fat||0), 0),
+        tgFriendly: parts.every(p => p.tgFriendly !== false),
+        weightLossFriendly: parts.every(p => p.weightLossFriendly !== false),
       };
     }
   }
@@ -6193,6 +6236,8 @@ function getActualSlotItem(dateKey, slotKey){
         pro:  parts.reduce((s,p) => s + (p.pro||0), 0),
         carb: parts.reduce((s,p) => s + (p.carb||0), 0),
         fat:  parts.reduce((s,p) => s + (p.fat||0), 0),
+        tgFriendly: parts.every(p => p.tgFriendly !== false),
+        weightLossFriendly: parts.every(p => p.weightLossFriendly !== false),
       };
     }
   }
@@ -7370,7 +7415,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v50';
+const CACHE = 'mission-os-v53';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
