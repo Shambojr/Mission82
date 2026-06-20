@@ -857,7 +857,45 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 .tod-ekadashi.visible{opacity:1;}
 
 /* Change 7 — September 1 arrival */
-/* ═══ WHEEL OF HABITS ═══ */
+/* ═══ FOOD COLOR SYSTEM ═══ */
+.food-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;flex-shrink:0;vertical-align:middle;}
+.food-dot.green{background:#5C8C5C;}
+.food-dot.yellow{background:#C49A3A;}
+.food-dot.red{background:#B85C5C;}
+.food-color-bar{display:flex;gap:12px;padding:10px 28px;border-bottom:1px solid var(--rl);flex-wrap:wrap;}
+.food-color-pill{display:flex;align-items:center;font-family:var(--sans);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);}
+
+/* ═══ SODIUM BAR ═══ */
+.sodium-bar-wrap{padding:12px 28px 0;}
+.sodium-bar-label{display:flex;justify-content:space-between;font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t4);margin-bottom:5px;}
+.sodium-bar-track{height:4px;background:var(--bg-s);border-radius:2px;overflow:hidden;}
+.sodium-bar-fill{height:100%;border-radius:2px;transition:width .4s;}
+
+/* ═══ PROTEIN ALERT ═══ */
+.protein-alert{margin:12px 28px 0;padding:10px 14px;border-radius:6px;border-left:3px solid #5B7A8A;background:rgba(91,122,138,.08);font-family:var(--serif);font-size:13px;font-weight:300;font-style:italic;color:var(--t2);line-height:1.5;display:none;}
+.protein-alert.visible{display:block;}
+
+/* ═══ COACH VOICE ═══ */
+.coach-card{margin:16px 28px 0;padding:14px 16px;border-radius:8px;background:var(--bg-r);border:1px solid var(--rl);position:relative;}
+.coach-card-label{font-family:var(--sans);font-size:7.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--t4);margin-bottom:6px;}
+.coach-card-text{font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--t2);line-height:1.6;}
+.coach-card-dismiss{position:absolute;top:10px;right:12px;font-size:10px;color:var(--t4);cursor:pointer;padding:4px;}
+
+/* ═══ WEEKLY CHECK-IN ═══ */
+.checkin-screen{position:fixed;inset:0;z-index:94;background:var(--bg);display:none;flex-direction:column;overflow-y:auto;padding:var(--s4) var(--pad);padding-bottom:60px;}
+.checkin-screen.open{display:flex;}
+.checkin-title{font-family:var(--serif);font-size:36px;font-weight:300;color:var(--t1);margin-bottom:6px;}
+.checkin-sub{font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--t4);margin-bottom:var(--s4);}
+.checkin-q{font-family:var(--sans);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;}
+.checkin-ta{width:100%;background:none;border:none;border-bottom:1px solid var(--rl);outline:none;font-family:var(--serif);font-size:16px;font-weight:300;color:var(--t1);line-height:1.7;resize:none;padding-bottom:8px;margin-bottom:var(--s3);}
+.checkin-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:var(--s4);}
+.checkin-stat{text-align:center;padding:14px 8px;background:var(--bg-r);border-radius:8px;}
+.checkin-stat-val{font-family:var(--serif);font-size:28px;font-weight:300;color:var(--t1);line-height:1;}
+.checkin-stat-lbl{font-family:var(--sans);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--t4);margin-top:4px;}
+.checkin-save-btn{width:100%;padding:16px;background:var(--t1);color:var(--bg);font-family:var(--sans);font-size:10px;letter-spacing:.22em;text-transform:uppercase;border:none;cursor:pointer;border-radius:2px;margin-top:var(--s2);}
+
+/* ═══ SHARE CARD ═══ */
+.share-btn{display:flex;align-items:center;gap:6px;background:none;border:1px solid var(--rl);color:var(--t2);font-family:var(--sans);font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:8px 14px;cursor:pointer;border-radius:2px;}
 .wheel-section{padding:var(--s4) var(--pad) var(--s4);}
 .wheel-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:var(--s2);}
 .wheel-title{font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t1);line-height:1.1;}
@@ -1255,6 +1293,13 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
   <!-- Ekadashi sentence — appears only on Dashami or Ekadashi -->
   <div class="tod-ekadashi" id="tod-ekadashi"></div>
 
+  <!-- Coach voice card -->
+  <div class="coach-card" id="coach-card" style="display:none;">
+    <div class="coach-card-label">Today's note</div>
+    <div class="coach-card-text" id="coach-card-text"></div>
+    <span class="coach-card-dismiss" onclick="dismissCoachCard()">✕</span>
+  </div>
+
   <div style="height:80px;"></div>
 </div>
 
@@ -1323,9 +1368,14 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
       <span style="font-family:var(--sans);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);">Total</span>
       <span style="font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t1);" id="mp-total">0 kcal</span>
     </div>
-    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--s1);">
       <span style="font-family:var(--sans);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);">Remaining</span>
       <span style="font-family:var(--serif);font-size:28px;font-weight:300;" id="mp-remaining">— kcal</span>
+    </div>
+    <!-- Green score -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--rl);">
+      <span style="font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--t4);">Metabolic Quality</span>
+      <span id="mp-green-score" style="font-family:var(--serif);font-size:15px;font-weight:300;color:#5C8C5C;">—</span>
     </div>
   </div>
 
@@ -1369,6 +1419,20 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
     <div id="r-actual-slots"></div>
     <div id="r-actual-summary"></div>
   </div>
+
+  <!-- Sodium bar -->
+  <div class="sodium-bar-wrap" id="sodium-wrap" style="display:none;">
+    <div class="sodium-bar-label">
+      <span>Sodium</span>
+      <span id="sodium-val">0 / 2000 mg</span>
+    </div>
+    <div class="sodium-bar-track">
+      <div class="sodium-bar-fill" id="sodium-fill" style="width:0%;background:var(--risk-on);"></div>
+    </div>
+  </div>
+
+  <!-- Protein alert -->
+  <div class="protein-alert" id="protein-alert"></div>
 
   <!-- Steps — Google Fit -->
   <div class="rec-section" style="padding-bottom:0;">
@@ -1473,12 +1537,64 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
   <!-- Edit link -->
   <div class="ms-edit-link" onclick="openMissionSheet()">Edit Mission →</div>
 
+  <!-- Weekly check-in + share -->
+  <div style="display:flex;gap:10px;padding:0 28px;margin-top:16px;">
+    <button class="share-btn" onclick="openWeeklyCheckin()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Weekly Check-in
+    </button>
+    <button class="share-btn" onclick="shareWeeklySummary()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      Share Week
+    </button>
+  </div>
+
   <!-- Thin rule -->
   <div style="margin:32px 28px 0;height:1px;background:var(--rl);"></div>
 
   <!-- Wheel of Habits — replaces Discipline Ascent mountain -->
   <div id="m-ascent" style="padding:8px 28px 40px;"></div>
 
+</div>
+
+<!-- WEEKLY CHECK-IN OVERLAY -->
+<div class="checkin-screen" id="weekly-checkin">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s3);">
+    <div>
+      <div class="checkin-title">This Week</div>
+      <div class="checkin-sub">Honest review · Sunday ritual</div>
+    </div>
+    <button onclick="closeWeeklyCheckin()" style="background:none;border:none;font-size:20px;color:var(--t3);cursor:pointer;padding:8px;">✕</button>
+  </div>
+
+  <!-- Week stats -->
+  <div class="checkin-stats">
+    <div class="checkin-stat">
+      <div class="checkin-stat-val" id="ci-steps">—</div>
+      <div class="checkin-stat-lbl">10K Step Days</div>
+    </div>
+    <div class="checkin-stat">
+      <div class="checkin-stat-val" id="ci-discs">—</div>
+      <div class="checkin-stat-lbl">Full Disc Days</div>
+    </div>
+    <div class="checkin-stat">
+      <div class="checkin-stat-val" id="ci-logs">—</div>
+      <div class="checkin-stat-lbl">Days Logged</div>
+    </div>
+  </div>
+
+  <div style="height:1px;background:var(--rl);margin-bottom:var(--s3);"></div>
+
+  <div class="checkin-q">What was the biggest challenge this week?</div>
+  <textarea class="checkin-ta" id="ci-challenge" rows="3" placeholder="Be honest."></textarea>
+
+  <div class="checkin-q">What went well?</div>
+  <textarea class="checkin-ta" id="ci-win" rows="3" placeholder="Name one thing."></textarea>
+
+  <div class="checkin-q">One thing to change next week?</div>
+  <textarea class="checkin-ta" id="ci-tmrw" rows="3" placeholder="Specific, not vague."></textarea>
+
+  <button class="checkin-save-btn" onclick="saveWeeklyCheckin()">Save Reflection →</button>
 </div>
 
 <!-- MISSION EDIT SHEET -->
@@ -1726,169 +1842,169 @@ const DISCIPLINES = [
 const FOOD_DB = {
 
   breakfast: [
-    {id:'b01', name:'Puttu + Kadala Curry',       ml:'പുട്ട് + കടല കറി',    cal:420, pro:14, carb:68, fat:9,  cat:'puttu',      portion:'2 puttu + 1 bowl kadala',               travel:true},
-    {id:'b02', name:'Puttu + Banana',              ml:'പുട്ട് + വാഴപ്പഴം',   cal:340, pro:5,  carb:72, fat:4,  cat:'puttu',      portion:'2 puttu + 1 nendran banana',            travel:false},
-    {id:'b03', name:'Idli + Sambar + Chutney',     ml:'ഇഡ്ഡലി + സാമ്പാർ',   cal:290, pro:9,  carb:54, fat:4,  cat:'idli',       portion:'3 idli + 1 bowl sambar + chutney',      travel:true},
-    {id:'b04', name:'Idiyappam + Egg Roast',       ml:'ഇടിയപ്പം + മുട്ട റോസ്റ്റ്', cal:410, pro:16, carb:58, fat:12, cat:'idiyappam',  portion:'3 idiyappam + 1 egg roast',             travel:false},
-    {id:'b05', name:'Idiyappam + Coconut Milk',    ml:'ഇടിയപ്പം + തേങ്ങ പാൽ', cal:360, pro:6,  carb:62, fat:10, cat:'idiyappam',  portion:'3 idiyappam + sweetened coconut milk',  travel:false},
-    {id:'b06', name:'Appam + Egg Roast',           ml:'അപ്പം + മുട്ട',        cal:400, pro:14, carb:56, fat:13, cat:'appam',      portion:'2 appam + 1 egg roast',                 travel:false},
-    {id:'b07', name:'Appam + Vegetable Stew',      ml:'അപ്പം + ഇഷ്ടു',       cal:390, pro:7,  carb:62, fat:11, cat:'appam',      portion:'2 appam + coconut stew',                travel:false},
-    {id:'b08', name:'Dosa + Sambar + Chutney',     ml:'ദോശ + സാമ്പാർ',       cal:310, pro:8,  carb:55, fat:8,  cat:'dosa',       portion:'2 dosa + sambar + chutney',             travel:true},
-    {id:'b09', name:'Pathiri + Egg Curry',         ml:'പത്തിരി + മുട്ട',     cal:440, pro:17, carb:58, fat:14, cat:'pathiri',    portion:'2 pathiri + egg curry',                 travel:false},
-    {id:'b10', name:'Pazhamkanji + Pickle',        ml:'പഴംകഞ്ഞി + അച്ചാർ',   cal:220, pro:4,  carb:48, fat:1,  cat:'kanji',      portion:'1 bowl fermented kanji + mango pickle', travel:false},
-    {id:'b11', name:'Vellayappam + Kadala Curry',  ml:'വെള്ളയപ്പം + കടല',   cal:400, pro:12, carb:66, fat:8,  cat:'vellayappam', portion:'2 vellayappam + kadala curry',          travel:false},
-    {id:'b12', name:'Ragi Puttu + Kadala Curry',   ml:'റാഗി പുട്ട് + കടല',  cal:390, pro:13, carb:64, fat:7,  cat:'puttu',      portion:'2 ragi puttu + kadala curry',           travel:false},
+    {id:'b01', name:'Puttu + Kadala Curry',       ml:'പുട്ട് + കടല കറി',    cal:420, pro:14, carb:68, fat:9,  cat:'puttu',      portion:'2 puttu + 1 bowl kadala',               travel:true, tgFriendly:false, weightLossFriendly:false},
+    {id:'b02', name:'Puttu + Banana',              ml:'പുട്ട് + വാഴപ്പഴം',   cal:340, pro:5,  carb:72, fat:4,  cat:'puttu',      portion:'2 puttu + 1 nendran banana',            travel:false, tgFriendly:false, weightLossFriendly:false},
+    {id:'b03', name:'Idli + Sambar + Chutney',     ml:'ഇഡ്ഡലി + സാമ്പാർ',   cal:290, pro:9,  carb:54, fat:4,  cat:'idli',       portion:'3 idli + 1 bowl sambar + chutney',      travel:true, tgFriendly:false, weightLossFriendly:false},
+    {id:'b04', name:'Idiyappam + Egg Roast',       ml:'ഇടിയപ്പം + മുട്ട റോസ്റ്റ്', cal:410, pro:16, carb:58, fat:12, cat:'idiyappam',  portion:'3 idiyappam + 1 egg roast',             travel:false, tgFriendly:false, weightLossFriendly:false},
+    {id:'b05', name:'Idiyappam + Coconut Milk',    ml:'ഇടിയപ്പം + തേങ്ങ പാൽ', cal:360, pro:6,  carb:62, fat:10, cat:'idiyappam',  portion:'3 idiyappam + sweetened coconut milk',  travel:false, tgFriendly:false, weightLossFriendly:false},
+    {id:'b06', name:'Appam + Egg Roast',           ml:'അപ്പം + മുട്ട',        cal:400, pro:14, carb:56, fat:13, cat:'appam',      portion:'2 appam + 1 egg roast',                 travel:false, tgFriendly:false, weightLossFriendly:false},
+    {id:'b07', name:'Appam + Vegetable Stew',      ml:'അപ്പം + ഇഷ്ടു',       cal:390, pro:7,  carb:62, fat:11, cat:'appam',      portion:'2 appam + coconut stew',                travel:false, tgFriendly:false, weightLossFriendly:false},
+    {id:'b08', name:'Dosa + Sambar + Chutney',     ml:'ദോശ + സാമ്പാർ',       cal:310, pro:8,  carb:55, fat:8,  cat:'dosa',       portion:'2 dosa + sambar + chutney',             travel:true, tgFriendly:false, weightLossFriendly:false},
+    {id:'b09', name:'Pathiri + Egg Curry',         ml:'പത്തിരി + മുട്ട',     cal:440, pro:17, carb:58, fat:14, cat:'pathiri',    portion:'2 pathiri + egg curry',                 travel:false, tgFriendly:false, weightLossFriendly:false},
+    {id:'b10', name:'Pazhamkanji + Pickle',        ml:'പഴംകഞ്ഞി + അച്ചാർ',   cal:220, pro:4,  carb:48, fat:1,  cat:'kanji',      portion:'1 bowl fermented kanji + mango pickle', travel:false, tgFriendly:true, weightLossFriendly:true},
+    {id:'b11', name:'Vellayappam + Kadala Curry',  ml:'വെള്ളയപ്പം + കടല',   cal:400, pro:12, carb:66, fat:8,  cat:'vellayappam', portion:'2 vellayappam + kadala curry',          travel:false, tgFriendly:false, weightLossFriendly:false},
+    {id:'b12', name:'Ragi Puttu + Kadala Curry',   ml:'റാഗി പുട്ട് + കടല',  cal:390, pro:13, carb:64, fat:7,  cat:'puttu',      portion:'2 ragi puttu + kadala curry',           travel:false, tgFriendly:true, weightLossFriendly:true},
   ],
 
   lunch_fish: [
-    {id:'lf01', name:'Sardine Curry (no coconut)', ml:'മത്തി കറി',           cal:180, pro:22, carb:4,  fat:9,  cat:'mathi',   portion:'3 sardines + light gravy, flesh-first',  travel:false},
-    {id:'lf02', name:'Mackerel Fry',               ml:'അയല ഫ്രൈ',           cal:220, pro:20, carb:3,  fat:14, cat:'ayala',   portion:'2 pieces mackerel fry',                  travel:false},
-    {id:'lf03', name:'Anchovy Curry (no coconut)', ml:'നത്തൽ കറി',          cal:160, pro:20, carb:3,  fat:8,  cat:'natholi', portion:'Full portion anchovies, light gravy',     travel:false},
-    {id:'lf04', name:'Sardine Fry',                ml:'മത്തി ഫ്രൈ',         cal:240, pro:21, carb:4,  fat:16, cat:'mathi',   portion:'3 sardines fried',                       travel:false},
-    {id:'lf05', name:'Mackerel Curry (no coconut)',ml:'അയല കറി',            cal:190, pro:21, carb:4,  fat:10, cat:'ayala',   portion:'1 mackerel + light gravy',               travel:false},
-    {id:'lf06', name:'Sardine Curry (coconut)',    ml:'മത്തി കറി (തേങ്ങ)',  cal:260, pro:20, carb:6,  fat:16, cat:'mathi',   portion:'3 sardines + coconut gravy (weekend)',   travel:false},
-    {id:'lf07', name:'Fish Molly',                 ml:'മീൻ മോളി',           cal:230, pro:18, carb:5,  fat:14, cat:'molly',   portion:'1 serving fish molly',                   travel:false},
-    {id:'lf08', name:'Anchovy Fry',                ml:'നത്തൽ ഫ്രൈ',         cal:200, pro:19, carb:3,  fat:13, cat:'natholi', portion:'Full portion anchovies fried',            travel:false},
+    {id:'lf01', name:'Sardine Curry (no coconut)', ml:'മത്തി കറി',           cal:180, pro:22, carb:4,  fat:9,  cat:'mathi',   portion:'3 sardines + light gravy, flesh-first',  travel:false, tgFriendly:true, weightLossFriendly:true},
+    {id:'lf02', name:'Mackerel Fry',               ml:'അയല ഫ്രൈ',           cal:220, pro:20, carb:3,  fat:14, cat:'ayala',   portion:'2 pieces mackerel fry',                  travel:false, tgFriendly:true, weightLossFriendly:true},
+    {id:'lf03', name:'Anchovy Curry (no coconut)', ml:'നത്തൽ കറി',          cal:160, pro:20, carb:3,  fat:8,  cat:'natholi', portion:'Full portion anchovies, light gravy',     travel:false, tgFriendly:true, weightLossFriendly:true},
+    {id:'lf04', name:'Sardine Fry',                ml:'മത്തി ഫ്രൈ',         cal:240, pro:21, carb:4,  fat:16, cat:'mathi',   portion:'3 sardines fried',                       travel:false, tgFriendly:true, weightLossFriendly:true},
+    {id:'lf05', name:'Mackerel Curry (no coconut)',ml:'അയല കറി',            cal:190, pro:21, carb:4,  fat:10, cat:'ayala',   portion:'1 mackerel + light gravy',               travel:false, tgFriendly:true, weightLossFriendly:true},
+    {id:'lf06', name:'Sardine Curry (coconut)',    ml:'മത്തി കറി (തേങ്ങ)',  cal:260, pro:20, carb:6,  fat:16, cat:'mathi',   portion:'3 sardines + coconut gravy (weekend)',   travel:false, tgFriendly:false, weightLossFriendly:false},
+    {id:'lf07', name:'Fish Molly',                 ml:'മീൻ മോളി',           cal:230, pro:18, carb:5,  fat:14, cat:'molly',   portion:'1 serving fish molly',                   travel:false, tgFriendly:false, weightLossFriendly:false},
+    {id:'lf08', name:'Anchovy Fry',                ml:'നത്തൽ ഫ്രൈ',         cal:200, pro:19, carb:3,  fat:13, cat:'natholi', portion:'Full portion anchovies fried',            travel:false, tgFriendly:true, weightLossFriendly:true},
   ],
 
   lunch_thoran: [
-    {id:'lt01', name:'Cabbage Thoran',     ml:'കാബേജ് തോരൻ',     cal:90,  pro:3, carb:9,  fat:5,  cat:'cabbage',   portion:'1 serving cabbage thoran'},
-    {id:'lt02', name:'Beans Thoran',       ml:'ബീൻസ് തോരൻ',      cal:85,  pro:3, carb:10, fat:4,  cat:'beans',     portion:'1 serving beans thoran'},
-    {id:'lt03', name:'Achinga Thoran',     ml:'അചിങ്ങ തോരൻ',     cal:80,  pro:4, carb:8,  fat:4,  cat:'achinga',   portion:'1 serving achinga thoran'},
-    {id:'lt04', name:'Cherupayar Thoran',  ml:'ചെറുപയർ തോരൻ',   cal:110, pro:6, carb:12, fat:4,  cat:'cherupayar',portion:'1 serving cherupayar thoran'},
-    {id:'lt05', name:'Ethakka Thoran',     ml:'ഏത്തക്ക തോരൻ',    cal:120, pro:2, carb:22, fat:4,  cat:'ethakka',   portion:'1 serving raw banana thoran'},
-    {id:'lt06', name:'Kaya Thoran',        ml:'കായ തോരൻ',        cal:115, pro:2, carb:20, fat:4,  cat:'kaya',      portion:'1 serving raw plantain thoran'},
-    {id:'lt07', name:'Chembu Thoran',      ml:'ചേമ്പ് തോരൻ',     cal:100, pro:2, carb:18, fat:3,  cat:'chembu',    portion:'1 serving taro thoran'},
-    {id:'lt08', name:'Beetroot Thoran',    ml:'ബീറ്റ്റൂട്ട് തോരൻ',cal:95,  pro:2, carb:14, fat:4,  cat:'beetroot',  portion:'1 serving beetroot thoran'},
-    {id:'lt09', name:'Carrot Thoran',      ml:'കാരറ്റ് തോരൻ',    cal:85,  pro:2, carb:12, fat:4,  cat:'carrot',    portion:'1 serving carrot thoran'},
+    {id:'lt01', name:'Cabbage Thoran',     ml:'കാബേജ് തോരൻ',     cal:90,  pro:3, carb:9,  fat:5,  cat:'cabbage',   portion:'1 serving cabbage thoran', tgFriendly:true, weightLossFriendly:true},
+    {id:'lt02', name:'Beans Thoran',       ml:'ബീൻസ് തോരൻ',      cal:85,  pro:3, carb:10, fat:4,  cat:'beans',     portion:'1 serving beans thoran', tgFriendly:true, weightLossFriendly:true},
+    {id:'lt03', name:'Achinga Thoran',     ml:'അചിങ്ങ തോരൻ',     cal:80,  pro:4, carb:8,  fat:4,  cat:'achinga',   portion:'1 serving achinga thoran', tgFriendly:true, weightLossFriendly:true},
+    {id:'lt04', name:'Cherupayar Thoran',  ml:'ചെറുപയർ തോരൻ',   cal:110, pro:6, carb:12, fat:4,  cat:'cherupayar',portion:'1 serving cherupayar thoran', tgFriendly:true, weightLossFriendly:true},
+    {id:'lt05', name:'Ethakka Thoran',     ml:'ഏത്തക്ക തോരൻ',    cal:120, pro:2, carb:22, fat:4,  cat:'ethakka',   portion:'1 serving raw banana thoran', tgFriendly:true, weightLossFriendly:true},
+    {id:'lt06', name:'Kaya Thoran',        ml:'കായ തോരൻ',        cal:115, pro:2, carb:20, fat:4,  cat:'kaya',      portion:'1 serving raw plantain thoran', tgFriendly:true, weightLossFriendly:true},
+    {id:'lt07', name:'Chembu Thoran',      ml:'ചേമ്പ് തോരൻ',     cal:100, pro:2, carb:18, fat:3,  cat:'chembu',    portion:'1 serving taro thoran', tgFriendly:true, weightLossFriendly:true},
+    {id:'lt08', name:'Beetroot Thoran',    ml:'ബീറ്റ്റൂട്ട് തോരൻ',cal:95,  pro:2, carb:14, fat:4,  cat:'beetroot',  portion:'1 serving beetroot thoran', tgFriendly:true, weightLossFriendly:true},
+    {id:'lt09', name:'Carrot Thoran',      ml:'കാരറ്റ് തോരൻ',    cal:85,  pro:2, carb:12, fat:4,  cat:'carrot',    portion:'1 serving carrot thoran', tgFriendly:true, weightLossFriendly:true},
   ],
 
   lunch_sprouts: [
-    {id:'ls01', name:'Sprouted Green Gram',  ml:'മുളപ്പിച്ച ചെറുപയർ', cal:80,  pro:6,  carb:12, fat:1, cat:'cherupayar', portion:'1 small bowl sprouted cherupayar (soak overnight)'},
-    {id:'ls02', name:'Boiled Kadala',        ml:'കടല',                 cal:110, pro:7,  carb:18, fat:2, cat:'kadala',     portion:'1 small bowl boiled black chickpea'},
-    {id:'ls03', name:'Sprouted Cowpea',      ml:'വൺപയർ',              cal:85,  pro:6,  carb:13, fat:1, cat:'cowpea',     portion:'1 small bowl sprouted cowpea'},
-    {id:'ls04', name:'Boiled Cherupayar',    ml:'ചെറുപയർ',            cal:90,  pro:6,  carb:14, fat:1, cat:'cherupayar', portion:'1 small bowl boiled green gram'},
-    {id:'ls05', name:'Lentil Sprouts',       ml:'പയർ',                 cal:75,  pro:5,  carb:11, fat:1, cat:'lentil',     portion:'1 small bowl lentil sprouts'},
+    {id:'ls01', name:'Sprouted Green Gram',  ml:'മുളപ്പിച്ച ചെറുപയർ', cal:80,  pro:6,  carb:12, fat:1, cat:'cherupayar', portion:'1 small bowl sprouted cherupayar (soak overnight)', tgFriendly:true, weightLossFriendly:true},
+    {id:'ls02', name:'Boiled Kadala',        ml:'കടല',                 cal:110, pro:7,  carb:18, fat:2, cat:'kadala',     portion:'1 small bowl boiled black chickpea', tgFriendly:true, weightLossFriendly:true},
+    {id:'ls03', name:'Sprouted Cowpea',      ml:'വൺപയർ',              cal:85,  pro:6,  carb:13, fat:1, cat:'cowpea',     portion:'1 small bowl sprouted cowpea', tgFriendly:true, weightLossFriendly:true},
+    {id:'ls04', name:'Boiled Cherupayar',    ml:'ചെറുപയർ',            cal:90,  pro:6,  carb:14, fat:1, cat:'cherupayar', portion:'1 small bowl boiled green gram', tgFriendly:true, weightLossFriendly:true},
+    {id:'ls05', name:'Lentil Sprouts',       ml:'പയർ',                 cal:75,  pro:5,  carb:11, fat:1, cat:'lentil',     portion:'1 small bowl lentil sprouts', tgFriendly:true, weightLossFriendly:true},
   ],
 
   lunch_sweet: [
-    {id:'lsw01', name:'2 Dates',          ml:'2 ഈന്തപ്പഴം',  cal:60,  pro:0, carb:16, fat:0, cat:'dates',  portion:'2 medjool dates post-meal'},
-    {id:'lsw02', name:'1 Banana',         ml:'1 വാഴപ്പഴം',   cal:90,  pro:1, carb:22, fat:0, cat:'banana', portion:'1 small banana post-meal'},
-    {id:'lsw03', name:'Seasonal Fruit',   ml:'പഴം',           cal:70,  pro:1, carb:16, fat:0, cat:'fruit',  portion:'1 serving seasonal fruit'},
-    {id:'lsw04', name:'Small Mango',      ml:'ചെറിയ മാങ്ങ',  cal:80,  pro:1, carb:20, fat:0, cat:'mango',  portion:'1 small mango'},
+    {id:'lsw01', name:'2 Dates',          ml:'2 ഈന്തപ്പഴം',  cal:60,  pro:0, carb:16, fat:0, cat:'dates',  portion:'2 medjool dates post-meal', tgFriendly:true, weightLossFriendly:true},
+    {id:'lsw02', name:'1 Banana',         ml:'1 വാഴപ്പഴം',   cal:90,  pro:1, carb:22, fat:0, cat:'banana', portion:'1 small banana post-meal', tgFriendly:true, weightLossFriendly:true},
+    {id:'lsw03', name:'Seasonal Fruit',   ml:'പഴം',           cal:70,  pro:1, carb:16, fat:0, cat:'fruit',  portion:'1 serving seasonal fruit', tgFriendly:true, weightLossFriendly:true},
+    {id:'lsw04', name:'Small Mango',      ml:'ചെറിയ മാങ്ങ',  cal:80,  pro:1, carb:20, fat:0, cat:'mango',  portion:'1 small mango', tgFriendly:true, weightLossFriendly:true},
   ],
 
   dinner_millet: [
-    {id:'dm01', name:'Ragi Puttu + Egg Roast',      ml:'റാഗി പുട്ട്',        cal:380, pro:18, carb:48, fat:13, cat:'ragi',       portion:'2 ragi puttu + 2 egg roast',           travel:false},
-    {id:'dm02', name:'Millet Kanji + Egg Roast',    ml:'മുത്താരി കഞ്ഞി',    cal:360, pro:16, carb:52, fat:10, cat:'mutta-kanji', portion:'1 bowl mutta-kanji + 2 boiled eggs',   travel:false},
-    {id:'dm03', name:'Little Millet Upma + Eggs',   ml:'ചെറിയ തിന ഉപ്മ',   cal:400, pro:17, carb:54, fat:13, cat:'millet-upma', portion:'1 cup millet upma + 2 boiled eggs',    travel:false},
-    {id:'dm04', name:'Ragi Roti + Egg Curry',       ml:'റാഗി റൊട്ടി',       cal:390, pro:18, carb:50, fat:13, cat:'ragi-roti',   portion:'2 ragi roti + 2 egg curry',            travel:false},
-    {id:'dm05', name:'Kodo Millet Rice + Egg Roast',ml:'കോഡോ അരി',          cal:370, pro:16, carb:56, fat:10, cat:'kodo',        portion:'1 cup kodo millet + 2 egg roast',       travel:false},
-    {id:'dm06', name:'Chapati + Egg Roast',         ml:'ചപ്പാത്തി + മുട്ട', cal:380, pro:16, carb:52, fat:12, cat:'chapati',     portion:'2 chapati + 2 egg roast (occasional)',  travel:true},
+    {id:'dm01', name:'Ragi Puttu + Egg Roast',      ml:'റാഗി പുട്ട്',        cal:380, pro:18, carb:48, fat:13, cat:'ragi',       portion:'2 ragi puttu + 2 egg roast',           travel:false, tgFriendly:true, weightLossFriendly:true},
+    {id:'dm02', name:'Millet Kanji + Egg Roast',    ml:'മുത്താരി കഞ്ഞി',    cal:360, pro:16, carb:52, fat:10, cat:'mutta-kanji', portion:'1 bowl mutta-kanji + 2 boiled eggs',   travel:false, tgFriendly:true, weightLossFriendly:true},
+    {id:'dm03', name:'Little Millet Upma + Eggs',   ml:'ചെറിയ തിന ഉപ്മ',   cal:400, pro:17, carb:54, fat:13, cat:'millet-upma', portion:'1 cup millet upma + 2 boiled eggs',    travel:false, tgFriendly:true, weightLossFriendly:true},
+    {id:'dm04', name:'Ragi Roti + Egg Curry',       ml:'റാഗി റൊട്ടി',       cal:390, pro:18, carb:50, fat:13, cat:'ragi-roti',   portion:'2 ragi roti + 2 egg curry',            travel:false, tgFriendly:true, weightLossFriendly:true},
+    {id:'dm05', name:'Kodo Millet Rice + Egg Roast',ml:'കോഡോ അരി',          cal:370, pro:16, carb:56, fat:10, cat:'kodo',        portion:'1 cup kodo millet + 2 egg roast',       travel:false, tgFriendly:true, weightLossFriendly:true},
+    {id:'dm06', name:'Chapati + Egg Roast',         ml:'ചപ്പാത്തി + മുട്ട', cal:380, pro:16, carb:52, fat:12, cat:'chapati',     portion:'2 chapati + 2 egg roast (occasional)',  travel:true, tgFriendly:true, weightLossFriendly:true},
   ],
 
   dinner_salad: [
-    {id:'ds01', name:'Cucumber + Onion + Lime',     ml:'വെള്ളരി + ഉള്ളി',    cal:30, pro:1, carb:6,  fat:0, cat:'cucumber', portion:'1 bowl cucumber, onion, green chilli, lime'},
-    {id:'ds02', name:'Tomato + Shallot + Coriander',ml:'തക്കാളി + ഉള്ളി',    cal:35, pro:1, carb:7,  fat:0, cat:'tomato',   portion:'1 bowl tomato, shallot, coriander'},
-    {id:'ds03', name:'Carrot + Beetroot Grated',    ml:'കാരറ്റ് + ബീറ്റ്',   cal:55, pro:2, carb:11, fat:0, cat:'carrot',   portion:'1 bowl grated carrot and beetroot'},
-    {id:'ds04', name:'Raw Papaya Salad',            ml:'പച്ച പപ്പായ',          cal:40, pro:1, carb:8,  fat:0, cat:'papaya',   portion:'1 bowl grated raw papaya + lime'},
-    {id:'ds05', name:'Cabbage + Carrot Slaw',       ml:'കാബേജ് + കാരറ്റ്',  cal:45, pro:2, carb:8,  fat:1, cat:'cabbage',  portion:'1 bowl cabbage carrot slaw, lime + salt'},
-    {id:'ds06', name:'Onion + Tomato + Chilli',     ml:'ഉള്ളി + തക്കാളി',    cal:30, pro:1, carb:6,  fat:0, cat:'onion',    portion:'1 bowl onion, tomato, green chilli'},
+    {id:'ds01', name:'Cucumber + Onion + Lime',     ml:'വെള്ളരി + ഉള്ളി',    cal:30, pro:1, carb:6,  fat:0, cat:'cucumber', portion:'1 bowl cucumber, onion, green chilli, lime', tgFriendly:true, weightLossFriendly:true},
+    {id:'ds02', name:'Tomato + Shallot + Coriander',ml:'തക്കാളി + ഉള്ളി',    cal:35, pro:1, carb:7,  fat:0, cat:'tomato',   portion:'1 bowl tomato, shallot, coriander', tgFriendly:true, weightLossFriendly:true},
+    {id:'ds03', name:'Carrot + Beetroot Grated',    ml:'കാരറ്റ് + ബീറ്റ്',   cal:55, pro:2, carb:11, fat:0, cat:'carrot',   portion:'1 bowl grated carrot and beetroot', tgFriendly:true, weightLossFriendly:true},
+    {id:'ds04', name:'Raw Papaya Salad',            ml:'പച്ച പപ്പായ',          cal:40, pro:1, carb:8,  fat:0, cat:'papaya',   portion:'1 bowl grated raw papaya + lime', tgFriendly:true, weightLossFriendly:true},
+    {id:'ds05', name:'Cabbage + Carrot Slaw',       ml:'കാബേജ് + കാരറ്റ്',  cal:45, pro:2, carb:8,  fat:1, cat:'cabbage',  portion:'1 bowl cabbage carrot slaw, lime + salt', tgFriendly:true, weightLossFriendly:true},
+    {id:'ds06', name:'Onion + Tomato + Chilli',     ml:'ഉള്ളി + തക്കാളി',    cal:30, pro:1, carb:6,  fat:0, cat:'onion',    portion:'1 bowl onion, tomato, green chilli', tgFriendly:false, weightLossFriendly:false},
   ],
 
   snack: [
-    {id:'sn01', name:'Banana + Tea (half sugar)',   ml:'വാഴപ്പഴം + ചായ',    cal:170, pro:1, carb:38, fat:1, cat:'banana', portion:'1 banana + 1 cup tea (half sugar)', travel:true},
-    {id:'sn02', name:'Banana + Black Coffee',       ml:'വാഴപ്പഴം + കാപ്പി',  cal:95,  pro:1, carb:22, fat:0, cat:'banana', portion:'1 banana + black coffee',           travel:true},
-    {id:'sn03', name:'Seasonal Fruit',              ml:'പഴം',                 cal:80,  pro:1, carb:18, fat:0, cat:'fruit',  portion:'1 serving seasonal fruit',          travel:true},
-    {id:'sn04', name:'3 Dates + Water',             ml:'3 ഈന്തപ്പഴം',        cal:90,  pro:1, carb:24, fat:0, cat:'dates',  portion:'3 dates + water',                   travel:true},
+    {id:'sn01', name:'Banana + Tea (half sugar)',   ml:'വാഴപ്പഴം + ചായ',    cal:170, pro:1, carb:38, fat:1, cat:'banana', portion:'1 banana + 1 cup tea (half sugar)', travel:true, tgFriendly:true, weightLossFriendly:true},
+    {id:'sn02', name:'Banana + Black Coffee',       ml:'വാഴപ്പഴം + കാപ്പി',  cal:95,  pro:1, carb:22, fat:0, cat:'banana', portion:'1 banana + black coffee',           travel:true, tgFriendly:true, weightLossFriendly:true},
+    {id:'sn03', name:'Seasonal Fruit',              ml:'പഴം',                 cal:80,  pro:1, carb:18, fat:0, cat:'fruit',  portion:'1 serving seasonal fruit',          travel:true, tgFriendly:false, weightLossFriendly:false},
+    {id:'sn04', name:'3 Dates + Water',             ml:'3 ഈന്തപ്പഴം',        cal:90,  pro:1, carb:24, fat:0, cat:'dates',  portion:'3 dates + water',                   travel:true, tgFriendly:false, weightLossFriendly:false},
   ],
 
   // Travel / Arabic options
   travel_meals: [
-    {id:'tr01', name:'Al Faham + Salad + 1 Khubz', ml:'അൽ ഫഹം',            cal:480, pro:34, carb:28, fat:22, cat:'alfaham',  portion:'Quarter grilled chicken + salad (no mayo) + 1 khubz', travel:true},
-    {id:'tr02', name:'Shawarma (no mayo)',           ml:'ഷവർമ്മ',            cal:420, pro:28, carb:38, fat:14, cat:'shawarma', portion:'1 chicken shawarma wrap, no mayo, no fries',           travel:true},
-    {id:'tr03', name:'Mandi (small portion)',        ml:'മന്ദി',              cal:520, pro:32, carb:48, fat:18, cat:'mandi',    portion:'Small mandi plate, focus on meat over rice',           travel:true},
-    {id:'tr04', name:'Hummus + Khubz',              ml:'ഹമ്മൂസ്',            cal:280, pro:10, carb:36, fat:11, cat:'hummus',   portion:'1 bowl hummus + 1 khubz',                              travel:true},
-    {id:'tr05', name:'Fattoush Salad',              ml:'ഫത്തൂഷ്',            cal:120, pro:3,  carb:18, fat:5,  cat:'fattoush', portion:'1 large fattoush salad',                               travel:true},
-    {id:'tr06', name:'Lentil Soup + Khubz',         ml:'ലെൻ്റിൽ സൂപ്പ്',    cal:240, pro:12, carb:36, fat:5,  cat:'soup',     portion:'1 bowl lentil soup + 1 khubz',                         travel:true},
-    {id:'tr07', name:'Grilled Fish',                ml:'ഗ്രിൽഡ് മീൻ',       cal:300, pro:38, carb:2,  fat:14, cat:'grilled',  portion:'1 serving grilled fish (hammour/seer)',                 travel:true},
-    {id:'tr08', name:'Hotel Breakfast (safe)',       ml:'',                   cal:380, pro:16, carb:42, fat:14, cat:'hotel',    portion:'2 boiled eggs + bread + fruit, skip butter/mayo',       travel:true},
+    {id:'tr01', name:'Al Faham + Salad + 1 Khubz', ml:'അൽ ഫഹം',            cal:480, pro:34, carb:28, fat:22, cat:'alfaham',  portion:'Quarter grilled chicken + salad (no mayo) + 1 khubz', travel:true, tgFriendly:true, weightLossFriendly:true},
+    {id:'tr02', name:'Shawarma (no mayo)',           ml:'ഷവർമ്മ',            cal:420, pro:28, carb:38, fat:14, cat:'shawarma', portion:'1 chicken shawarma wrap, no mayo, no fries',           travel:true, tgFriendly:false, weightLossFriendly:false},
+    {id:'tr03', name:'Mandi (small portion)',        ml:'മന്ദി',              cal:520, pro:32, carb:48, fat:18, cat:'mandi',    portion:'Small mandi plate, focus on meat over rice',           travel:true, tgFriendly:false, weightLossFriendly:false},
+    {id:'tr04', name:'Hummus + Khubz',              ml:'ഹമ്മൂസ്',            cal:280, pro:10, carb:36, fat:11, cat:'hummus',   portion:'1 bowl hummus + 1 khubz',                              travel:true, tgFriendly:false, weightLossFriendly:false},
+    {id:'tr05', name:'Fattoush Salad',              ml:'ഫത്തൂഷ്',            cal:120, pro:3,  carb:18, fat:5,  cat:'fattoush', portion:'1 large fattoush salad',                               travel:true, tgFriendly:true, weightLossFriendly:true},
+    {id:'tr06', name:'Lentil Soup + Khubz',         ml:'ലെൻ്റിൽ സൂപ്പ്',    cal:240, pro:12, carb:36, fat:5,  cat:'soup',     portion:'1 bowl lentil soup + 1 khubz',                         travel:true, tgFriendly:false, weightLossFriendly:false},
+    {id:'tr07', name:'Grilled Fish',                ml:'ഗ്രിൽഡ് മീൻ',       cal:300, pro:38, carb:2,  fat:14, cat:'grilled',  portion:'1 serving grilled fish (hammour/seer)',                 travel:true, tgFriendly:false, weightLossFriendly:false},
+    {id:'tr08', name:'Hotel Breakfast (safe)',       ml:'',                   cal:380, pro:16, carb:42, fat:14, cat:'hotel',    portion:'2 boiled eggs + bread + fruit, skip butter/mayo',       travel:true, tgFriendly:false, weightLossFriendly:false},
   ],
 
-  lunch_moru: {id:'moru', name:'Moru / Curd', ml:'മോര്', cal:40, pro:2, carb:4, fat:2, portion:'1 glass moru or small curd bowl — daily, non-negotiable'},
-  lunch_rice: {id:'rice', name:'Small Rice',  ml:'ചോറ്',  cal:200, pro:4, carb:44, fat:0, portion:'1 cup cooked rice (not heaped) — always'},
+  lunch_moru: {id:'moru', name:'Moru / Curd', ml:'മോര്', cal:40, pro:2, carb:4, fat:2, portion:'1 glass moru or small curd bowl — daily, non-negotiable', tgFriendly:false, weightLossFriendly:false},
+  lunch_rice: {id:'rice', name:'Small Rice',  ml:'ചോറ്',  cal:200, pro:4, carb:44, fat:0, portion:'1 cup cooked rice (not heaped) — always', tgFriendly:false, weightLossFriendly:false},
 
   // ── SOUPS ──────────────────────────────────────────────────────────────────
   soups: [
-    {id:'sp01', name:'Seafood Chowder',          cal:220, pro:14, carb:18, fat:9,  cat:'soup', portion:'1 bowl (~300ml) restaurant seafood chowder'},
-    {id:'sp02', name:'Tomato Soup',               cal:110, pro:3,  carb:16, fat:4,  cat:'soup', portion:'1 bowl (~300ml) cream tomato soup'},
-    {id:'sp03', name:'Sweet Corn Chicken Soup',   cal:140, pro:10, carb:18, fat:3,  cat:'soup', portion:'1 bowl (~300ml) sweet corn chicken soup'},
-    {id:'sp04', name:'Hot & Sour Soup',           cal:100, pro:6,  carb:14, fat:2,  cat:'soup', portion:'1 bowl (~300ml) hot and sour soup'},
-    {id:'sp05', name:'Manchow Soup',              cal:120, pro:7,  carb:16, fat:3,  cat:'soup', portion:'1 bowl (~300ml) manchow soup'},
-    {id:'sp06', name:'Chicken Clear Soup',        cal:80,  pro:10, carb:4,  fat:2,  cat:'soup', portion:'1 bowl (~300ml) chicken clear soup'},
-    {id:'sp07', name:'Lentil Soup (Dal Shorba)',  cal:180, pro:10, carb:26, fat:4,  cat:'soup', portion:'1 bowl (~300ml) dal shorba'},
-    {id:'sp08', name:'Cream of Mushroom Soup',    cal:160, pro:4,  carb:14, fat:10, cat:'soup', portion:'1 bowl (~300ml) cream of mushroom'},
-    {id:'sp09', name:'Vegetable Clear Soup',      cal:60,  pro:2,  carb:10, fat:1,  cat:'soup', portion:'1 bowl (~300ml) vegetable clear soup'},
-    {id:'sp10', name:'Egg Drop Soup',             cal:90,  pro:7,  carb:8,  fat:3,  cat:'soup', portion:'1 bowl (~300ml) egg drop soup'},
+    {id:'sp01', name:'Seafood Chowder',          cal:220, pro:14, carb:18, fat:9,  cat:'soup', portion:'1 bowl (~300ml) restaurant seafood chowder', tgFriendly:false, weightLossFriendly:false},
+    {id:'sp02', name:'Tomato Soup',               cal:110, pro:3,  carb:16, fat:4,  cat:'soup', portion:'1 bowl (~300ml) cream tomato soup', tgFriendly:false, weightLossFriendly:false},
+    {id:'sp03', name:'Sweet Corn Chicken Soup',   cal:140, pro:10, carb:18, fat:3,  cat:'soup', portion:'1 bowl (~300ml) sweet corn chicken soup', tgFriendly:false, weightLossFriendly:false},
+    {id:'sp04', name:'Hot & Sour Soup',           cal:100, pro:6,  carb:14, fat:2,  cat:'soup', portion:'1 bowl (~300ml) hot and sour soup', tgFriendly:false, weightLossFriendly:false},
+    {id:'sp05', name:'Manchow Soup',              cal:120, pro:7,  carb:16, fat:3,  cat:'soup', portion:'1 bowl (~300ml) manchow soup', tgFriendly:false, weightLossFriendly:false},
+    {id:'sp06', name:'Chicken Clear Soup',        cal:80,  pro:10, carb:4,  fat:2,  cat:'soup', portion:'1 bowl (~300ml) chicken clear soup', tgFriendly:false, weightLossFriendly:false},
+    {id:'sp07', name:'Lentil Soup (Dal Shorba)',  cal:180, pro:10, carb:26, fat:4,  cat:'soup', portion:'1 bowl (~300ml) dal shorba', tgFriendly:false, weightLossFriendly:false},
+    {id:'sp08', name:'Cream of Mushroom Soup',    cal:160, pro:4,  carb:14, fat:10, cat:'soup', portion:'1 bowl (~300ml) cream of mushroom', tgFriendly:false, weightLossFriendly:false},
+    {id:'sp09', name:'Vegetable Clear Soup',      cal:60,  pro:2,  carb:10, fat:1,  cat:'soup', portion:'1 bowl (~300ml) vegetable clear soup', tgFriendly:false, weightLossFriendly:false},
+    {id:'sp10', name:'Egg Drop Soup',             cal:90,  pro:7,  carb:8,  fat:3,  cat:'soup', portion:'1 bowl (~300ml) egg drop soup', tgFriendly:false, weightLossFriendly:false},
   ],
 
   // ── NORTH INDIAN ───────────────────────────────────────────────────────────
   north_indian: [
-    {id:'ni01', name:'Dal Tadka',                 cal:280, pro:12, carb:38, fat:8,  cat:'dal',     portion:'1 bowl restaurant dal tadka'},
-    {id:'ni02', name:'Dal Makhani',               cal:340, pro:13, carb:38, fat:14, cat:'dal',     portion:'1 bowl dal makhani (cream-heavy)'},
-    {id:'ni03', name:'Jeera Rice',                cal:320, pro:6,  carb:64, fat:4,  cat:'rice',    portion:'1 plate jeera rice (~200g cooked)'},
-    {id:'ni04', name:'Butter Naan',               cal:280, pro:7,  carb:44, fat:8,  cat:'bread',   portion:'1 butter naan'},
-    {id:'ni05', name:'Tandoori Roti',             cal:150, pro:5,  carb:28, fat:3,  cat:'bread',   portion:'1 tandoori roti (no butter)'},
-    {id:'ni06', name:'Murgh Tikka',               cal:380, pro:42, carb:6,  fat:20, cat:'chicken', portion:'6–7 pieces (~250g) murgh tikka'},
-    {id:'ni07', name:'Chicken Tikka Masala',      cal:420, pro:38, carb:14, fat:22, cat:'chicken', portion:'1 bowl chicken tikka masala + gravy'},
-    {id:'ni08', name:'Butter Chicken',            cal:450, pro:36, carb:16, fat:26, cat:'chicken', portion:'1 bowl butter chicken (restaurant portion)'},
-    {id:'ni09', name:'Palak Paneer',              cal:320, pro:14, carb:16, fat:22, cat:'paneer',  portion:'1 bowl palak paneer'},
-    {id:'ni10', name:'Paneer Butter Masala',      cal:380, pro:16, carb:18, fat:26, cat:'paneer',  portion:'1 bowl paneer butter masala'},
-    {id:'ni11', name:'Shahi Paneer',              cal:400, pro:15, carb:16, fat:30, cat:'paneer',  portion:'1 bowl shahi paneer (richest option)'},
-    {id:'ni12', name:'Tandoori Chicken (half)',   cal:300, pro:40, carb:4,  fat:14, cat:'chicken', portion:'Half tandoori chicken, skin removed'},
-    {id:'ni13', name:'Chicken Seekh Kebab',       cal:260, pro:28, carb:6,  fat:14, cat:'chicken', portion:'2 seekh kebabs (~120g)'},
-    {id:'ni14', name:'Raita',                     cal:60,  pro:3,  carb:6,  fat:2,  cat:'side',    portion:'1 small bowl boondi/vegetable raita'},
-    {id:'ni15', name:'Papad (2)',                 cal:60,  pro:3,  carb:8,  fat:2,  cat:'side',    portion:'2 plain papads'},
-    {id:'ni16', name:'Chole Bhature',             cal:620, pro:16, carb:80, fat:24, cat:'chole',   portion:'1 plate chole bhature (high calorie — limit)'},
-    {id:'ni17', name:'Aloo Paratha + Curd',       cal:420, pro:9,  carb:60, fat:16, cat:'paratha', portion:'1 aloo paratha + small curd'},
-    {id:'ni18', name:'Kadai Chicken',             cal:400, pro:36, carb:12, fat:22, cat:'chicken', portion:'1 bowl kadai chicken'},
-    {id:'ni19', name:'Mutton Rogan Josh',         cal:440, pro:38, carb:8,  fat:28, cat:'mutton',  portion:'1 bowl rogan josh (high fat)'},
-    {id:'ni20', name:'Biryani Raita (side)',      cal:50,  pro:2,  carb:5,  fat:2,  cat:'side',    portion:'Small bowl raita served with biryani'},
+    {id:'ni01', name:'Dal Tadka',                 cal:280, pro:12, carb:38, fat:8,  cat:'dal',     portion:'1 bowl restaurant dal tadka', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni02', name:'Dal Makhani',               cal:340, pro:13, carb:38, fat:14, cat:'dal',     portion:'1 bowl dal makhani (cream-heavy)', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni03', name:'Jeera Rice',                cal:320, pro:6,  carb:64, fat:4,  cat:'rice',    portion:'1 plate jeera rice (~200g cooked)', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni04', name:'Butter Naan',               cal:280, pro:7,  carb:44, fat:8,  cat:'bread',   portion:'1 butter naan', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni05', name:'Tandoori Roti',             cal:150, pro:5,  carb:28, fat:3,  cat:'bread',   portion:'1 tandoori roti (no butter)', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni06', name:'Murgh Tikka',               cal:380, pro:42, carb:6,  fat:20, cat:'chicken', portion:'6–7 pieces (~250g) murgh tikka', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni07', name:'Chicken Tikka Masala',      cal:420, pro:38, carb:14, fat:22, cat:'chicken', portion:'1 bowl chicken tikka masala + gravy', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni08', name:'Butter Chicken',            cal:450, pro:36, carb:16, fat:26, cat:'chicken', portion:'1 bowl butter chicken (restaurant portion)', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni09', name:'Palak Paneer',              cal:320, pro:14, carb:16, fat:22, cat:'paneer',  portion:'1 bowl palak paneer', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni10', name:'Paneer Butter Masala',      cal:380, pro:16, carb:18, fat:26, cat:'paneer',  portion:'1 bowl paneer butter masala', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni11', name:'Shahi Paneer',              cal:400, pro:15, carb:16, fat:30, cat:'paneer',  portion:'1 bowl shahi paneer (richest option)', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni12', name:'Tandoori Chicken (half)',   cal:300, pro:40, carb:4,  fat:14, cat:'chicken', portion:'Half tandoori chicken, skin removed', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni13', name:'Chicken Seekh Kebab',       cal:260, pro:28, carb:6,  fat:14, cat:'chicken', portion:'2 seekh kebabs (~120g)', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni14', name:'Raita',                     cal:60,  pro:3,  carb:6,  fat:2,  cat:'side',    portion:'1 small bowl boondi/vegetable raita', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni15', name:'Papad (2)',                 cal:60,  pro:3,  carb:8,  fat:2,  cat:'side',    portion:'2 plain papads', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni16', name:'Chole Bhature',             cal:620, pro:16, carb:80, fat:24, cat:'chole',   portion:'1 plate chole bhature (high calorie — limit)', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni17', name:'Aloo Paratha + Curd',       cal:420, pro:9,  carb:60, fat:16, cat:'paratha', portion:'1 aloo paratha + small curd', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni18', name:'Kadai Chicken',             cal:400, pro:36, carb:12, fat:22, cat:'chicken', portion:'1 bowl kadai chicken', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni19', name:'Mutton Rogan Josh',         cal:440, pro:38, carb:8,  fat:28, cat:'mutton',  portion:'1 bowl rogan josh (high fat)', tgFriendly:false, weightLossFriendly:false},
+    {id:'ni20', name:'Biryani Raita (side)',      cal:50,  pro:2,  carb:5,  fat:2,  cat:'side',    portion:'Small bowl raita served with biryani', tgFriendly:false, weightLossFriendly:false},
   ],
 
   // ── CHINESE / INDO-CHINESE ─────────────────────────────────────────────────
   chinese: [
-    {id:'ch01', name:'Chicken Fried Rice',        cal:440, pro:22, carb:58, fat:12, cat:'rice',    portion:'1 plate chicken fried rice (~300g)'},
-    {id:'ch02', name:'Veg Fried Rice',            cal:380, pro:8,  carb:62, fat:10, cat:'rice',    portion:'1 plate vegetable fried rice (~300g)'},
-    {id:'ch03', name:'Egg Fried Rice',            cal:420, pro:14, carb:58, fat:14, cat:'rice',    portion:'1 plate egg fried rice (~300g)'},
-    {id:'ch04', name:'Chicken Noodles',           cal:460, pro:24, carb:54, fat:14, cat:'noodles', portion:'1 plate chicken hakka noodles'},
-    {id:'ch05', name:'Veg Noodles',               cal:380, pro:8,  carb:58, fat:10, cat:'noodles', portion:'1 plate vegetable hakka noodles'},
-    {id:'ch06', name:'Chicken Manchurian (dry)',  cal:320, pro:28, carb:18, fat:14, cat:'chicken', portion:'1 plate dry chicken manchurian'},
-    {id:'ch07', name:'Chicken Manchurian (gravy)',cal:280, pro:24, carb:20, fat:10, cat:'chicken', portion:'1 bowl chicken manchurian gravy'},
-    {id:'ch08', name:'Gobi Manchurian (dry)',     cal:280, pro:6,  carb:34, fat:13, cat:'veg',     portion:'1 plate gobi manchurian dry'},
-    {id:'ch09', name:'Chilli Chicken (dry)',      cal:340, pro:30, carb:16, fat:16, cat:'chicken', portion:'1 plate chilli chicken dry'},
-    {id:'ch10', name:'Chilli Chicken (gravy)',    cal:300, pro:26, carb:18, fat:12, cat:'chicken', portion:'1 bowl chilli chicken gravy'},
-    {id:'ch11', name:'Spring Rolls (2)',          cal:220, pro:6,  carb:26, fat:10, cat:'starter', portion:'2 vegetable spring rolls, fried'},
-    {id:'ch12', name:'Chicken Spring Rolls (2)',  cal:260, pro:14, carb:24, fat:12, cat:'starter', portion:'2 chicken spring rolls, fried'},
-    {id:'ch13', name:'Prawn Fried Rice',          cal:420, pro:22, carb:56, fat:12, cat:'rice',    portion:'1 plate prawn fried rice'},
-    {id:'ch14', name:'Schezwan Fried Rice',       cal:460, pro:10, carb:66, fat:14, cat:'rice',    portion:'1 plate schezwan fried rice (spicy)'},
-    {id:'ch15', name:'Kung Pao Chicken',          cal:360, pro:30, carb:18, fat:18, cat:'chicken', portion:'1 bowl kung pao chicken'},
+    {id:'ch01', name:'Chicken Fried Rice',        cal:440, pro:22, carb:58, fat:12, cat:'rice',    portion:'1 plate chicken fried rice (~300g)', tgFriendly:false, weightLossFriendly:false},
+    {id:'ch02', name:'Veg Fried Rice',            cal:380, pro:8,  carb:62, fat:10, cat:'rice',    portion:'1 plate vegetable fried rice (~300g)', tgFriendly:false, weightLossFriendly:false},
+    {id:'ch03', name:'Egg Fried Rice',            cal:420, pro:14, carb:58, fat:14, cat:'rice',    portion:'1 plate egg fried rice (~300g)', tgFriendly:false, weightLossFriendly:false},
+    {id:'ch04', name:'Chicken Noodles',           cal:460, pro:24, carb:54, fat:14, cat:'noodles', portion:'1 plate chicken hakka noodles', tgFriendly:false, weightLossFriendly:false},
+    {id:'ch05', name:'Veg Noodles',               cal:380, pro:8,  carb:58, fat:10, cat:'noodles', portion:'1 plate vegetable hakka noodles', tgFriendly:false, weightLossFriendly:false},
+    {id:'ch06', name:'Chicken Manchurian (dry)',  cal:320, pro:28, carb:18, fat:14, cat:'chicken', portion:'1 plate dry chicken manchurian', tgFriendly:false, weightLossFriendly:false},
+    {id:'ch07', name:'Chicken Manchurian (gravy)',cal:280, pro:24, carb:20, fat:10, cat:'chicken', portion:'1 bowl chicken manchurian gravy', tgFriendly:false, weightLossFriendly:false},
+    {id:'ch08', name:'Gobi Manchurian (dry)',     cal:280, pro:6,  carb:34, fat:13, cat:'veg',     portion:'1 plate gobi manchurian dry', tgFriendly:false, weightLossFriendly:false},
+    {id:'ch09', name:'Chilli Chicken (dry)',      cal:340, pro:30, carb:16, fat:16, cat:'chicken', portion:'1 plate chilli chicken dry', tgFriendly:false, weightLossFriendly:false},
+    {id:'ch10', name:'Chilli Chicken (gravy)',    cal:300, pro:26, carb:18, fat:12, cat:'chicken', portion:'1 bowl chilli chicken gravy', tgFriendly:false, weightLossFriendly:false},
+    {id:'ch11', name:'Spring Rolls (2)',          cal:220, pro:6,  carb:26, fat:10, cat:'starter', portion:'2 vegetable spring rolls, fried', tgFriendly:false, weightLossFriendly:false},
+    {id:'ch12', name:'Chicken Spring Rolls (2)',  cal:260, pro:14, carb:24, fat:12, cat:'starter', portion:'2 chicken spring rolls, fried', tgFriendly:false, weightLossFriendly:false},
+    {id:'ch13', name:'Prawn Fried Rice',          cal:420, pro:22, carb:56, fat:12, cat:'rice',    portion:'1 plate prawn fried rice', tgFriendly:false, weightLossFriendly:false},
+    {id:'ch14', name:'Schezwan Fried Rice',       cal:460, pro:10, carb:66, fat:14, cat:'rice',    portion:'1 plate schezwan fried rice (spicy)', tgFriendly:false, weightLossFriendly:false},
+    {id:'ch15', name:'Kung Pao Chicken',          cal:360, pro:30, carb:18, fat:18, cat:'chicken', portion:'1 bowl kung pao chicken', tgFriendly:false, weightLossFriendly:false},
   ],
 
   // ── BREAKFAST EXTRAS (almonds, eggs, coffee) ───────────────────────────────
   breakfast_extras: [
-    {id:'bx01', name:'Boiled Eggs (2)',           cal:140, pro:12, carb:1,  fat:10, cat:'egg',     portion:'2 whole boiled eggs'},
-    {id:'bx02', name:'Boiled Egg (1)',            cal:70,  pro:6,  carb:0,  fat:5,  cat:'egg',     portion:'1 whole boiled egg'},
-    {id:'bx03', name:'Almonds (handful ~20g)',    cal:115, pro:4,  carb:3,  fat:10, cat:'nuts',    portion:'~20 almonds, raw/soaked'},
-    {id:'bx04', name:'Walnuts (4 halves)',        cal:100, pro:2,  carb:2,  fat:10, cat:'nuts',    portion:'4 walnut halves (~14g)'},
-    {id:'bx05', name:'Coffee with Milk + Sugar',  cal:40,  pro:1,  carb:6,  fat:1,  cat:'bev',     portion:'1 cup coffee, ~50ml milk, 1 tsp sugar'},
-    {id:'bx06', name:'Tea with Milk + Sugar',     cal:45,  pro:1,  carb:7,  fat:1,  cat:'bev',     portion:'1 cup tea, ~50ml milk, 1 tsp sugar'},
-    {id:'bx07', name:'Black Coffee',              cal:5,   pro:0,  carb:1,  fat:0,  cat:'bev',     portion:'1 cup black coffee, no sugar'},
-    {id:'bx08', name:'Black Tea',                 cal:2,   pro:0,  carb:0,  fat:0,  cat:'bev',     portion:'1 cup black tea, no sugar'},
-    {id:'bx09', name:'Banana (1)',                cal:90,  pro:1,  carb:22, fat:0,  cat:'fruit',   portion:'1 medium banana'},
-    {id:'bx10', name:'Papaya (1 bowl)',           cal:60,  pro:1,  carb:14, fat:0,  cat:'fruit',   portion:'1 bowl papaya cubes (~200g)'},
-    {id:'bx11', name:'Oats (plain, 1 bowl)',      cal:150, pro:5,  carb:27, fat:3,  cat:'cereal',  portion:'1 bowl plain oats with water'},
-    {id:'bx12', name:'Peanut Butter (1 tbsp)',    cal:90,  pro:4,  carb:3,  fat:8,  cat:'nuts',    portion:'1 tbsp natural peanut butter'},
+    {id:'bx01', name:'Boiled Eggs (2)',           cal:140, pro:12, carb:1,  fat:10, cat:'egg',     portion:'2 whole boiled eggs', tgFriendly:false, weightLossFriendly:false},
+    {id:'bx02', name:'Boiled Egg (1)',            cal:70,  pro:6,  carb:0,  fat:5,  cat:'egg',     portion:'1 whole boiled egg', tgFriendly:false, weightLossFriendly:false},
+    {id:'bx03', name:'Almonds (handful ~20g)',    cal:115, pro:4,  carb:3,  fat:10, cat:'nuts',    portion:'~20 almonds, raw/soaked', tgFriendly:false, weightLossFriendly:false},
+    {id:'bx04', name:'Walnuts (4 halves)',        cal:100, pro:2,  carb:2,  fat:10, cat:'nuts',    portion:'4 walnut halves (~14g)', tgFriendly:false, weightLossFriendly:false},
+    {id:'bx05', name:'Coffee with Milk + Sugar',  cal:40,  pro:1,  carb:6,  fat:1,  cat:'bev',     portion:'1 cup coffee, ~50ml milk, 1 tsp sugar', tgFriendly:false, weightLossFriendly:false},
+    {id:'bx06', name:'Tea with Milk + Sugar',     cal:45,  pro:1,  carb:7,  fat:1,  cat:'bev',     portion:'1 cup tea, ~50ml milk, 1 tsp sugar', tgFriendly:false, weightLossFriendly:false},
+    {id:'bx07', name:'Black Coffee',              cal:5,   pro:0,  carb:1,  fat:0,  cat:'bev',     portion:'1 cup black coffee, no sugar', tgFriendly:false, weightLossFriendly:false},
+    {id:'bx08', name:'Black Tea',                 cal:2,   pro:0,  carb:0,  fat:0,  cat:'bev',     portion:'1 cup black tea, no sugar', tgFriendly:false, weightLossFriendly:false},
+    {id:'bx09', name:'Banana (1)',                cal:90,  pro:1,  carb:22, fat:0,  cat:'fruit',   portion:'1 medium banana', tgFriendly:false, weightLossFriendly:false},
+    {id:'bx10', name:'Papaya (1 bowl)',           cal:60,  pro:1,  carb:14, fat:0,  cat:'fruit',   portion:'1 bowl papaya cubes (~200g)', tgFriendly:false, weightLossFriendly:false},
+    {id:'bx11', name:'Oats (plain, 1 bowl)',      cal:150, pro:5,  carb:27, fat:3,  cat:'cereal',  portion:'1 bowl plain oats with water', tgFriendly:false, weightLossFriendly:false},
+    {id:'bx12', name:'Peanut Butter (1 tbsp)',    cal:90,  pro:4,  carb:3,  fat:8,  cat:'nuts',    portion:'1 tbsp natural peanut butter', tgFriendly:false, weightLossFriendly:false},
   ],
 
   // Biriyani & special rice — half portions
@@ -1909,34 +2025,34 @@ const FOOD_DB = {
 
   // Breakfast bases (standalone — for mix-and-match)
   breakfast_base: [
-    {id:'bb01', name:'Puttu (2)',        ml:'പുട്ട്',       cal:180, pro:4,  carb:36, fat:2,  cat:'puttu'},
-    {id:'bb02', name:'Ragi Puttu (2)',   ml:'റാഗി പുട്ട്', cal:160, pro:5,  carb:32, fat:2,  cat:'puttu'},
-    {id:'bb03', name:'Idli (3)',         ml:'ഇഡ്ഡലി',      cal:150, pro:5,  carb:30, fat:1,  cat:'idli'},
-    {id:'bb04', name:'Idiyappam (3)',    ml:'ഇടിയപ്പം',    cal:200, pro:4,  carb:42, fat:1,  cat:'idiyappam'},
-    {id:'bb05', name:'Appam (2)',        ml:'അപ്പം',        cal:200, pro:4,  carb:38, fat:4,  cat:'appam'},
-    {id:'bb06', name:'Dosa (2)',         ml:'ദോശ',          cal:180, pro:5,  carb:34, fat:4,  cat:'dosa'},
-    {id:'bb07', name:'Pathiri (2)',      ml:'പത്തിരി',      cal:240, pro:6,  carb:44, fat:4,  cat:'pathiri'},
-    {id:'bb08', name:'Vellayappam (2)',  ml:'വെള്ളയപ്പം',  cal:200, pro:4,  carb:40, fat:3,  cat:'vellayappam'},
-    {id:'bb09', name:'Pazhamkanji',      ml:'പഴംകഞ്ഞി',    cal:180, pro:3,  carb:40, fat:1,  cat:'kanji'},
-    {id:'bb10', name:'Chapati (2)',      ml:'ചപ്പാത്തി',   cal:200, pro:5,  carb:36, fat:4,  cat:'chapati'},
+    {id:'bb01', name:'Puttu (2)',        ml:'പുട്ട്',       cal:180, pro:4,  carb:36, fat:2,  cat:'puttu', tgFriendly:false, weightLossFriendly:false},
+    {id:'bb02', name:'Ragi Puttu (2)',   ml:'റാഗി പുട്ട്', cal:160, pro:5,  carb:32, fat:2,  cat:'puttu', tgFriendly:true, weightLossFriendly:true},
+    {id:'bb03', name:'Idli (3)',         ml:'ഇഡ്ഡലി',      cal:150, pro:5,  carb:30, fat:1,  cat:'idli', tgFriendly:false, weightLossFriendly:false},
+    {id:'bb04', name:'Idiyappam (3)',    ml:'ഇടിയപ്പം',    cal:200, pro:4,  carb:42, fat:1,  cat:'idiyappam', tgFriendly:false, weightLossFriendly:false},
+    {id:'bb05', name:'Appam (2)',        ml:'അപ്പം',        cal:200, pro:4,  carb:38, fat:4,  cat:'appam', tgFriendly:false, weightLossFriendly:false},
+    {id:'bb06', name:'Dosa (2)',         ml:'ദോശ',          cal:180, pro:5,  carb:34, fat:4,  cat:'dosa', tgFriendly:false, weightLossFriendly:false},
+    {id:'bb07', name:'Pathiri (2)',      ml:'പത്തിരി',      cal:240, pro:6,  carb:44, fat:4,  cat:'pathiri', tgFriendly:false, weightLossFriendly:false},
+    {id:'bb08', name:'Vellayappam (2)',  ml:'വെള്ളയപ്പം',  cal:200, pro:4,  carb:40, fat:3,  cat:'vellayappam', tgFriendly:false, weightLossFriendly:false},
+    {id:'bb09', name:'Pazhamkanji',      ml:'പഴംകഞ്ഞി',    cal:180, pro:3,  carb:40, fat:1,  cat:'kanji', tgFriendly:false, weightLossFriendly:false},
+    {id:'bb10', name:'Chapati (2)',      ml:'ചപ്പാത്തി',   cal:200, pro:5,  carb:36, fat:4,  cat:'chapati', tgFriendly:false, weightLossFriendly:false},
   ],
 
   // Breakfast sides/curries (for mix-and-match)
   breakfast_side: [
-    {id:'bs01', name:'Kadala Curry',        ml:'കടല കറി',          cal:240, pro:10, carb:32, fat:8,  cat:'kadala'},
-    {id:'bs02', name:'Cherupayar Curry',    ml:'ചെറുപയർ കറി',     cal:200, pro:10, carb:28, fat:6,  cat:'cherupayar'},
-    {id:'bs03', name:'Chicken Curry',       ml:'ചിക്കൻ കറി',       cal:260, pro:24, carb:6,  fat:16, cat:'chicken'},
-    {id:'bs04', name:'Egg Roast',           ml:'മുട്ട റോസ്റ്റ്',   cal:190, pro:12, carb:6,  fat:14, cat:'egg'},
-    {id:'bs05', name:'Egg Curry',           ml:'മുട്ട കറി',         cal:170, pro:12, carb:5,  fat:12, cat:'egg'},
-    {id:'bs06', name:'Fish Curry',          ml:'മീൻ കറി',           cal:200, pro:18, carb:4,  fat:12, cat:'fish'},
-    {id:'bs07', name:'Sambar',              ml:'സാമ്പാർ',           cal:80,  pro:4,  carb:12, fat:2,  cat:'sambar'},
-    {id:'bs08', name:'Coconut Chutney',     ml:'തേങ്ങ ചട്ണി',      cal:60,  pro:1,  carb:4,  fat:5,  cat:'chutney'},
-    {id:'bs09', name:'Coconut Milk (sweet)',ml:'തേങ്ങ പാൽ',        cal:140, pro:1,  carb:14, fat:9,  cat:'coconut'},
-    {id:'bs10', name:'Vegetable Stew',      ml:'ഇഷ്ടു',             cal:130, pro:3,  carb:12, fat:8,  cat:'stew'},
-    {id:'bs11', name:'Banana (1 nendran)',  ml:'വാഴപ്പഴം',         cal:140, pro:1,  carb:34, fat:0,  cat:'banana'},
-    {id:'bs12', name:'Mango Pickle',        ml:'മാങ്ങ അച്ചാർ',    cal:20,  pro:0,  carb:4,  fat:0,  cat:'pickle'},
-    {id:'bs13', name:'Mutton Curry',        ml:'മട്ടൻ കറി',         cal:290, pro:26, carb:5,  fat:18, cat:'mutton'},
-    {id:'bs14', name:'Beef Fry',            ml:'ബീഫ് ഫ്രൈ',        cal:300, pro:28, carb:3,  fat:20, cat:'beef'},
+    {id:'bs01', name:'Kadala Curry',        ml:'കടല കറി',          cal:240, pro:10, carb:32, fat:8,  cat:'kadala', tgFriendly:false, weightLossFriendly:false},
+    {id:'bs02', name:'Cherupayar Curry',    ml:'ചെറുപയർ കറി',     cal:200, pro:10, carb:28, fat:6,  cat:'cherupayar', tgFriendly:false, weightLossFriendly:false},
+    {id:'bs03', name:'Chicken Curry',       ml:'ചിക്കൻ കറി',       cal:260, pro:24, carb:6,  fat:16, cat:'chicken', tgFriendly:false, weightLossFriendly:false},
+    {id:'bs04', name:'Egg Roast',           ml:'മുട്ട റോസ്റ്റ്',   cal:190, pro:12, carb:6,  fat:14, cat:'egg', tgFriendly:false, weightLossFriendly:false},
+    {id:'bs05', name:'Egg Curry',           ml:'മുട്ട കറി',         cal:170, pro:12, carb:5,  fat:12, cat:'egg', tgFriendly:false, weightLossFriendly:false},
+    {id:'bs06', name:'Fish Curry',          ml:'മീൻ കറി',           cal:200, pro:18, carb:4,  fat:12, cat:'fish', tgFriendly:false, weightLossFriendly:false},
+    {id:'bs07', name:'Sambar',              ml:'സാമ്പാർ',           cal:80,  pro:4,  carb:12, fat:2,  cat:'sambar', tgFriendly:false, weightLossFriendly:false},
+    {id:'bs08', name:'Coconut Chutney',     ml:'തേങ്ങ ചട്ണി',      cal:60,  pro:1,  carb:4,  fat:5,  cat:'chutney', tgFriendly:false, weightLossFriendly:false},
+    {id:'bs09', name:'Coconut Milk (sweet)',ml:'തേങ്ങ പാൽ',        cal:140, pro:1,  carb:14, fat:9,  cat:'coconut', tgFriendly:false, weightLossFriendly:false},
+    {id:'bs10', name:'Vegetable Stew',      ml:'ഇഷ്ടു',             cal:130, pro:3,  carb:12, fat:8,  cat:'stew', tgFriendly:false, weightLossFriendly:false},
+    {id:'bs11', name:'Banana (1 nendran)',  ml:'വാഴപ്പഴം',         cal:140, pro:1,  carb:34, fat:0,  cat:'banana', tgFriendly:false, weightLossFriendly:false},
+    {id:'bs12', name:'Mango Pickle',        ml:'മാങ്ങ അച്ചാർ',    cal:20,  pro:0,  carb:4,  fat:0,  cat:'pickle', tgFriendly:false, weightLossFriendly:false},
+    {id:'bs13', name:'Mutton Curry',        ml:'മട്ടൻ കറി',         cal:290, pro:26, carb:5,  fat:18, cat:'mutton', tgFriendly:false, weightLossFriendly:false},
+    {id:'bs14', name:'Beef Fry',            ml:'ബീഫ് ഫ്രൈ',        cal:300, pro:28, carb:3,  fat:20, cat:'beef', tgFriendly:false, weightLossFriendly:false},
   ],
 };
 
@@ -2070,13 +2186,24 @@ function calcBMR(weightKg){
 }
 function calcTDEE(weightKg, steps, discDoneArr){
   const bmr = calcBMR(weightKg);
-  const neat = Math.round((steps || 0) * 0.04);
+  const wt = currentWeight() || 99;
+  const stepKcal = STEP_KCAL_PER_KG * wt; // ~0.054 kcal/step at 99kg vs flat 0.04
+  const neat = Math.round((steps || 0) * stepKcal);
   let ex = 0;
   DISCIPLINES.forEach((d, i) => {
-    const done = discDoneArr && discDoneArr[i] && discDoneArr[i].done;
-    if(done && d.kcalPerMin && d.defaultDur) ex += Math.round(d.kcalPerMin * d.defaultDur);
+    const discEntry = discDoneArr && discDoneArr[i];
+    const done = discEntry && discEntry.done;
+    const isRestDay = discEntry && discEntry.restDay;
+    if(done && !isRestDay && d.kcalPerMin && d.defaultDur) ex += Math.round(d.kcalPerMin * d.defaultDur);
   });
-  const tef = Math.round((bmr + neat + ex) * 0.10);
+  // Macro-weighted TEF: protein 25%, carbs 8%, fat 3%
+  const key2 = todayKey();
+  const pro  = getDailyProtein(key2);
+  const rec2 = records[key2] || {};
+  const actual = rec2.actualMeals || {};
+  let totCarb = 0, totFat = 0;
+  Object.values(actual).forEach(m => { if(m){ totCarb += (m.carb||0); totFat += (m.fat||0); } });
+  const tef = Math.round(pro * 4 * 0.25 + totCarb * 4 * 0.08 + totFat * 9 * 0.03);
   return { bmr, neat, ex, tef, tdee: bmr + neat + ex + tef };
 }
 function calcDynamicDeficit(){
@@ -2208,15 +2335,19 @@ function getRecentCategories(slot, days){
   return cats;
 }
 function pickFromPool(pool, recentCats, extra){
+  const isGreen = item => item.tgFriendly && item.weightLossFriendly;
+
   // Filter out recently used categories
   let candidates = pool.filter(item => !recentCats.includes(item.cat));
-  // Apply extra filter if provided
   if(extra) candidates = candidates.filter(extra);
-  // Fallback: if all filtered, use full pool with extra filter only
   if(!candidates.length) candidates = extra ? pool.filter(extra) : pool;
   if(!candidates.length) candidates = pool;
-  // Pick randomly from candidates
-  return candidates[Math.floor(Math.random() * candidates.length)];
+
+  // Prefer green items — only fall back to yellow/red if no green exists
+  const greenCandidates = candidates.filter(isGreen);
+  const finalPool = greenCandidates.length > 0 ? greenCandidates : candidates;
+
+  return finalPool[Math.floor(Math.random() * finalPool.length)];
 }
 function coconutCountThisWeek(dateKey){
   let count = 0;
@@ -2387,6 +2518,7 @@ function renderPaceLine(){
 }
 
 function renderDiscDots(){
+  autoCheckRestDayDumbbell(); // silently check dumbbell on rest days
   const el = document.getElementById('disc-dots');
   if(!el) return;
   const todayRec = records[todayKey()] || {};
@@ -2988,30 +3120,30 @@ const MASTER_DB = [{"id":"b001","name":"Puttu","mealSlot":"breakfast","category"
 {"id":"kl07","name":"Bonda","mealSlot":"snack","category":"breakfast_main","servingSize":"2 pieces (~100g) potato bonda, deep fried","calories":260,"protein":4,"carbs":32,"fat":12,"fiber":2,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Snack","Breakfast","Kerala","Vegetarian","TreatMeal","Fried"]},
 {"id":"kl08","name":"Parippu Vada","mealSlot":"snack","category":"breakfast_main","servingSize":"2 pieces (~90g) chana dal vada, deep fried","calories":240,"protein":9,"carbs":28,"fat":11,"fiber":4,"satietyScore":6,"proteinScore":4,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Snack","Breakfast","Kerala","Kannur","Vegetarian","TreatMeal","Fried","Dal"]},
 {"id":"kl09","name":"Irachi Pathiri (Chicken)","mealSlot":"lunch","category":"breakfast_main","servingSize":"1 piece (~150g) rice flour pathiri stuffed with spiced chicken","calories":320,"protein":18,"carbs":34,"fat":12,"fiber":2,"satietyScore":8,"proteinScore":7,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":false,"frequencyLimitPerWeek":2,"tags":["Lunch","Breakfast","Kerala","Kannur","Malabar","Chicken","TreatMeal"]},
-{"id":"ic01","name":"Ice Cream — Tender Coconut","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":167,"protein":2,"carbs":22,"fat":7,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
-{"id":"ic02","name":"Ice Cream — Mango","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":149,"protein":2,"carbs":20,"fat":6,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
-{"id":"ic03","name":"Ice Cream — Chickoo","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":167,"protein":2,"carbs":22,"fat":7,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
-{"id":"ic04","name":"Ice Cream — Watermelon","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":162,"protein":2,"carbs":22,"fat":6,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
-{"id":"ic05","name":"Ice Cream — Papaya Pineapple","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":162,"protein":2,"carbs":22,"fat":6,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
-{"id":"ic06","name":"Ice Cream — Muskmelon","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":170,"protein":2,"carbs":23,"fat":7,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
-{"id":"ic07","name":"Ice Cream — Kaju Kismis","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":184,"protein":3,"carbs":22,"fat":9,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
-{"id":"ic08","name":"Ice Cream — Kesar Pista","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":217,"protein":4,"carbs":26,"fat":10,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
-{"id":"ic09","name":"Ice Cream — Anjeer","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":183,"protein":3,"carbs":23,"fat":8,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
-{"id":"ic10","name":"Ice Cream — Roasted Almond","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":191,"protein":4,"carbs":22,"fat":9,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
-{"id":"ic11","name":"Ice Cream — Choco Cream","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":174,"protein":3,"carbs":22,"fat":8,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear","Chocolate"]},
-{"id":"ic12","name":"Ice Cream — Choco Almond","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":176,"protein":3,"carbs":21,"fat":8,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear","Chocolate"]},
-{"id":"ic13","name":"Ice Cream — Coffee Walnut","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":198,"protein":3,"carbs":24,"fat":10,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
-{"id":"ic14","name":"Ice Cream — Choco Bite","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":200,"protein":3,"carbs":25,"fat":9,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear","Chocolate"]},
-{"id":"ic15","name":"Ice Cream — Malai","mealSlot":"snack","category":"beverage","servingSize":"1 cup Round The Year medium fat ice cream","calories":220,"protein":4,"carbs":24,"fat":11,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
-{"id":"nl01","name":"Naturals Ice Cream — Sitaphal","mealSlot":"snack","category":"beverage","servingSize":"1 cup Naturals seasonal ice cream","calories":155,"protein":2,"carbs":22,"fat":6,"fiber":1,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","Naturals","Seasonal"]},
-{"id":"nl02","name":"Naturals Ice Cream — Mango","mealSlot":"snack","category":"beverage","servingSize":"1 cup Naturals seasonal ice cream","calories":149,"protein":2,"carbs":21,"fat":6,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","Naturals","Seasonal"]},
-{"id":"nl03","name":"Naturals Ice Cream — Strawberry","mealSlot":"snack","category":"beverage","servingSize":"1 cup Naturals seasonal ice cream","calories":157,"protein":2,"carbs":22,"fat":6,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","Naturals","Seasonal"]},
-{"id":"nl04","name":"Naturals Ice Cream — Peach Apricot","mealSlot":"snack","category":"beverage","servingSize":"1 cup Naturals seasonal ice cream","calories":190,"protein":3,"carbs":25,"fat":8,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","Naturals","Seasonal"]},
-{"id":"nl05","name":"Naturals Ice Cream — Black Grapes","mealSlot":"snack","category":"beverage","servingSize":"1 cup Naturals seasonal ice cream","calories":162,"protein":2,"carbs":23,"fat":6,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","Naturals","Seasonal"]},
-{"id":"nl06","name":"Naturals Ice Cream — Lychee","mealSlot":"snack","category":"beverage","servingSize":"1 cup Naturals seasonal ice cream","calories":179,"protein":2,"carbs":25,"fat":7,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","Naturals","Seasonal"]},
-{"id":"nl07","name":"Naturals Ice Cream — Kala Jamun","mealSlot":"snack","category":"beverage","servingSize":"1 cup Naturals seasonal ice cream","calories":155,"protein":2,"carbs":22,"fat":6,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","Naturals","Seasonal"]},
-{"id":"nl08","name":"Naturals Ice Cream — Jackfruit","mealSlot":"snack","category":"beverage","servingSize":"1 cup Naturals seasonal ice cream","calories":173,"protein":2,"carbs":24,"fat":7,"fiber":1,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","Naturals","Seasonal","Kerala"]},
-{"id":"nl09","name":"Naturals Ice Cream — Guava","mealSlot":"snack","category":"beverage","servingSize":"1 cup Naturals seasonal ice cream","calories":160,"protein":2,"carbs":22,"fat":6,"fiber":1,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","Naturals","Seasonal"]}];
+{"id":"ic01","name":"Tender Coconut Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":167,"protein":2,"carbs":22,"fat":7,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
+{"id":"ic02","name":"Mango Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":149,"protein":2,"carbs":20,"fat":6,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
+{"id":"ic03","name":"Chickoo Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":167,"protein":2,"carbs":22,"fat":7,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
+{"id":"ic04","name":"Watermelon Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":162,"protein":2,"carbs":22,"fat":6,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
+{"id":"ic05","name":"Papaya Pineapple Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":162,"protein":2,"carbs":22,"fat":6,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
+{"id":"ic06","name":"Muskmelon Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":170,"protein":2,"carbs":23,"fat":7,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
+{"id":"ic07","name":"Kaju Kismis Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":184,"protein":3,"carbs":22,"fat":9,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
+{"id":"ic08","name":"Kesar Pista Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":217,"protein":4,"carbs":26,"fat":10,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
+{"id":"ic09","name":"Anjeer Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":183,"protein":3,"carbs":23,"fat":8,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
+{"id":"ic10","name":"Roasted Almond Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":191,"protein":4,"carbs":22,"fat":9,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
+{"id":"ic11","name":"Choco Cream Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":174,"protein":3,"carbs":22,"fat":8,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear","Chocolate"]},
+{"id":"ic12","name":"Choco Almond Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":176,"protein":3,"carbs":21,"fat":8,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear","Chocolate"]},
+{"id":"ic13","name":"Coffee Walnut Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":198,"protein":3,"carbs":24,"fat":10,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
+{"id":"ic14","name":"Choco Bite Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 medium fat ice cream cup","calories":200,"protein":3,"carbs":25,"fat":9,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear","Chocolate"]},
+{"id":"ic15","name":"Malai Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 cup medium fat ice cream","calories":220,"protein":4,"carbs":24,"fat":11,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","RoundTheYear"]},
+{"id":"nl01","name":"Sitaphal Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 cup seasonal fruit ice cream","calories":155,"protein":2,"carbs":22,"fat":6,"fiber":1,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","Naturals","Seasonal"]},
+{"id":"nl02","name":"Mango Ice Cream (Seasonal)","mealSlot":"snack","category":"beverage","servingSize":"1 cup seasonal fruit ice cream","calories":149,"protein":2,"carbs":21,"fat":6,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","Naturals","Seasonal"]},
+{"id":"nl03","name":"Strawberry Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 cup seasonal fruit ice cream","calories":157,"protein":2,"carbs":22,"fat":6,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","Naturals","Seasonal"]},
+{"id":"nl04","name":"Peach Apricot Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 cup seasonal fruit ice cream","calories":190,"protein":3,"carbs":25,"fat":8,"fiber":0,"satietyScore":5,"proteinScore":2,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","Naturals","Seasonal"]},
+{"id":"nl05","name":"Black Grapes Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 cup seasonal fruit ice cream","calories":162,"protein":2,"carbs":23,"fat":6,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","Naturals","Seasonal"]},
+{"id":"nl06","name":"Lychee Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 cup seasonal fruit ice cream","calories":179,"protein":2,"carbs":25,"fat":7,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","Naturals","Seasonal"]},
+{"id":"nl07","name":"Kala Jamun Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 cup seasonal fruit ice cream","calories":155,"protein":2,"carbs":22,"fat":6,"fiber":0,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","Naturals","Seasonal"]},
+{"id":"nl08","name":"Jackfruit Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 cup seasonal fruit ice cream","calories":173,"protein":2,"carbs":24,"fat":7,"fiber":1,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","Naturals","Seasonal","Kerala"]},
+{"id":"nl09","name":"Guava Ice Cream","mealSlot":"snack","category":"beverage","servingSize":"1 cup seasonal fruit ice cream","calories":160,"protein":2,"carbs":22,"fat":6,"fiber":1,"satietyScore":4,"proteinScore":1,"tgFriendly":false,"weightLossFriendly":false,"travelModeEligible":true,"frequencyLimitPerWeek":1,"tags":["Snack","IceCream","Dessert","TreatMeal","Naturals","Seasonal"]}];
 
 // Category display labels
 const CAT_LABELS = {
@@ -3781,17 +3913,18 @@ function renderDeficitHero(){
   const actualDeficit = tdee - foodCal;
   const diff = actualDeficit - deficitPerDay;
   numEl.textContent = actualDeficit.toLocaleString();
+  const reframe = getDeficitReframe(actualDeficit, deficitPerDay, mission.targetDate);
   if(diff > 200){
     numEl.className = 'rd-number ahead';
-    statusEl.textContent = 'Ahead of pace · required ' + deficitPerDay.toLocaleString();
+    statusEl.textContent = reframe || ('Ahead of pace · required ' + deficitPerDay.toLocaleString());
     statusEl.className = 'rd-status ahead';
   } else if(diff < -200){
     numEl.className = 'rd-number behind';
-    statusEl.textContent = 'Behind pace · required ' + deficitPerDay.toLocaleString();
+    statusEl.textContent = reframe || ('Behind pace · required ' + deficitPerDay.toLocaleString());
     statusEl.className = 'rd-status behind';
   } else {
     numEl.className = 'rd-number';
-    statusEl.textContent = 'On pace · required ' + deficitPerDay.toLocaleString();
+    statusEl.textContent = reframe || ('On pace · required ' + deficitPerDay.toLocaleString());
     statusEl.className = 'rd-status';
   }
 }
@@ -3998,6 +4131,16 @@ function isDayEarned(dateKey){
   return count >= 4;
 }
 
+function isDayGolden(dateKey){
+  // Golden grain: 4+ disciplines AND 90%+ of logged meals are green
+  if(!isDayEarned(dateKey)) return false;
+  const actual = (records[dateKey] || {}).actualMeals || {};
+  const meals = Object.values(actual).filter(m => m !== null && m !== undefined);
+  if(meals.length === 0) return false;
+  const greenCount = meals.filter(m => getFoodColor(m) === 'green').length;
+  return (greenCount / meals.length) >= 0.9;
+}
+
 function countEarnedSeeds(){
   const start = mission.startDate;
   const today = todayKey();
@@ -4021,7 +4164,6 @@ function renderAntScene(){
   const startD = keyToDate(mission.startDate);
   const endD = keyToDate(mission.targetDate);
   const totalDays = Math.max(1, Math.round((endD - startD) / 86400000));
-  const seeds = countEarnedSeeds();
   const maxSeeds = totalDays;
 
   if(dayEl) dayEl.textContent = `Day ${day} of ${totalDays}`;
@@ -4045,6 +4187,17 @@ function renderAntScene(){
   const cp2x = 200, cp2y = 100;
   const antEndX = pileX - 24, antEndY = pileY - 12;
 
+  // Build seed list first — needed for pathProgress
+  const seedList = [];
+  let d2 = keyToDate(mission.startDate);
+  const todayD2 = keyToDate(todayKey()); todayD2.setHours(0,0,0,0);
+  while(d2 <= todayD2){
+    const k = d2.toISOString().slice(0,10);
+    if(isDayEarned(k)) seedList.push({ golden: isDayGolden(k) });
+    d2.setDate(d2.getDate()+1);
+  }
+  const seeds = seedList.length;
+
   const pathProgress = Math.min(0.96, seeds / Math.max(1, maxSeeds));
   function bezier(t, p0, p1, p2, p3){
     const u = 1-t;
@@ -4058,6 +4211,8 @@ function renderAntScene(){
   const ay2 = bezier(t2, antStartY, cp1y, cp2y, antEndY);
   const angle = Math.atan2(ay2 - antY, ax2 - antX) * 180 / Math.PI;
   const todayEarned = isDayEarned(todayKey());
+  const todayGolden = isDayGolden(todayKey());
+  const carriedGrainColor = todayGolden ? goldColor : inkColor;
 
   let out = '';
 
@@ -4070,8 +4225,15 @@ function renderAntScene(){
   // Seeds
   SEED_POSITIONS.forEach(([sx, sy], idx) => {
     if(idx < seeds){
-      out += `<ellipse cx="${sx}" cy="${sy}" rx="4.5" ry="2.2" transform="rotate(-20,${sx},${sy})" fill="${inkColor}" opacity="0.75"/>`;
+      const isGolden = seedList[idx] && seedList[idx].golden;
+      const grainColor = isGolden ? goldColor : inkColor;
+      const grainOpacity = isGolden ? '0.92' : '0.75';
+      out += `<ellipse cx="${sx}" cy="${sy}" rx="4.5" ry="2.2" transform="rotate(-20,${sx},${sy})" fill="${grainColor}" opacity="${grainOpacity}"/>`;
       out += `<line x1="${sx-2}" y1="${sy}" x2="${sx+2}" y2="${sy}" stroke="${bgColor}" stroke-width="0.5" transform="rotate(-20,${sx},${sy})" opacity="0.4"/>`;
+      if(isGolden){
+        // Subtle shimmer line on golden grain
+        out += `<line x1="${sx-1.5}" y1="${sy-0.8}" x2="${sx+1.5}" y2="${sy-0.8}" stroke="rgba(255,255,255,0.35)" stroke-width="0.5" transform="rotate(-20,${sx},${sy})"/>`;
+      }
     } else if(idx === seeds && seeds < maxSeeds){
       out += `<ellipse cx="${sx}" cy="${sy}" rx="4.5" ry="2.2" transform="rotate(-20,${sx},${sy})" fill="none" stroke="${mutedColor}" stroke-width="0.6" opacity="0.3"/>`;
     }
@@ -4097,7 +4259,7 @@ function renderAntScene(){
     <line x1="0.5" y1="-1.8" x2="0" y2="-5.5" stroke="${inkColor}" stroke-width="0.9" stroke-linecap="round" opacity="0.75"/>
     <line x1="3" y1="-1.5" x2="4.5" y2="-5" stroke="${inkColor}" stroke-width="0.9" stroke-linecap="round" opacity="0.75"/>
     ${todayEarned
-      ? `<ellipse cx="8" cy="-5.5" rx="3.8" ry="1.8" transform="rotate(-30,8,-5.5)" fill="${goldColor}" opacity="0.9"/>
+      ? `<ellipse cx="8" cy="-5.5" rx="3.8" ry="1.8" transform="rotate(-30,8,-5.5)" fill="${carriedGrainColor}" opacity="0.9"/>
          <line x1="6.5" y1="-2" x2="7.5" y2="-4" stroke="${inkColor}" stroke-width="0.7" opacity="0.6"/>`
       : ''}
   </g>`;
@@ -4787,15 +4949,33 @@ function completeTrainingSession(){
   showRewardMoment('Session', 'complete', 'The work is done.');
 }
 
-function takeRestDay(){
+function autoCheckRestDayDumbbell(){
+  const info = getNextTrainingInfo();
+  if(info.type !== 'rest') return;
   const today = todayKey();
+  const todayTr = getTrainingState(today);
+  // Only auto-check if rest hasn't been explicitly taken yet
+  // (takeRestDay handles the explicit case)
+  if(todayTr && todayTr.restDay) return;
   if(!records[today]) records[today] = {};
+  if(!records[today].disciplines) records[today].disciplines = [];
+  while(records[today].disciplines.length < 5) records[today].disciplines.push({done:false,dur:0});
+  // Only set if not already checked
+  if(!records[today].disciplines[4].done){
+    records[today].disciplines[4].done = true;
+    records[today].disciplines[4].restDay = true; // no calorie burn on rest day
+    save();
+  }
+}
+
+function takeRestDay(){
   records[today].training = {restDay:true, date:today};
 
-  // Auto-check dumbbell discipline
+  // Auto-check dumbbell discipline — rest day, no calorie burn
   if(!records[today].disciplines) records[today].disciplines = [];
   while(records[today].disciplines.length < 5) records[today].disciplines.push({done:false,dur:0});
   records[today].disciplines[4].done = true;
+  records[today].disciplines[4].restDay = true;
 
   save();
   renderDiscDots();
@@ -5359,14 +5539,21 @@ function openMealPlanner(){
   overlay.classList.add('slide-in');
   setTimeout(() => overlay.classList.remove('slide-in'), 350);
 
-  // Load tomorrow's plan
+  // Load tomorrow's plan — generate if not yet created
   const key = keyForOffset(1);
   const d = keyToDate(key);
-  mpPlan = meals[key] ? {...meals[key]} : {};
+  if(!meals[key]){
+    meals[key] = generateMeal(key, travelMode);
+    save();
+  }
+  mpPlan = {...meals[key]};
 
   // Date label
   const dateEl = document.getElementById('mp-date-label');
-  if(dateEl) dateEl.textContent = DOW[d.getDay()] + ', ' + d.getDate() + ' ' + MO[d.getMonth()];
+  if(dateEl){
+    const ist = new Date(d.getTime() + 5.5*60*60*1000);
+    dateEl.textContent = DOW[ist.getUTCDay()] + ', ' + ist.getUTCDate() + ' ' + MO[ist.getUTCMonth()];
+  }
 
   // Calorie target
   const target = dailyTarget(currentWeight());
@@ -5391,10 +5578,11 @@ function renderMpSlots(){
     div.className = 'mp-slot';
 
     const cal = item ? (item.cal || 0) : 0;
+    const colorDot = item ? `<span class="food-dot ${getFoodColor(item)}" style="margin-right:4px;"></span>` : '';
     div.innerHTML = `
       <div class="mp-slot-left" onclick="openMpSlotEdit('${slot.key}')">
         <div class="mp-slot-label">${slot.label}</div>
-        <div class="mp-slot-dish ${item ? '' : 'empty'}">${item ? item.name : 'Tap to add'}</div>
+        <div class="mp-slot-dish ${item ? '' : 'empty'}" style="display:flex;align-items:center;">${colorDot}${item ? item.name : 'Tap to add'}</div>
         <div class="mp-slot-add">${item ? 'Change →' : '+ Add dish'}</div>
       </div>
       <div class="mp-slot-right">
@@ -5460,11 +5648,26 @@ function updateMpTotals(){
 
   const totalEl = document.getElementById('mp-total');
   const remEl = document.getElementById('mp-remaining');
+  const greenScoreEl = document.getElementById('mp-green-score');
   if(totalEl) totalEl.textContent = total.toLocaleString() + ' kcal';
   if(remEl){
     remEl.textContent = remaining.toLocaleString() + ' kcal';
     remEl.style.color = Math.abs(remaining) <= 100 ? 'var(--risk-on)' :
                         remaining < 0 ? 'var(--risk-at)' : 'var(--t1)';
+  }
+  // Green score — count green items in plan
+  if(greenScoreEl){
+    const key = keyForOffset(1); // tomorrow
+    const plan = meals[key];
+    if(plan){
+      const slots = ['breakfast','lunch_fish','lunch_thoran','lunch_sprouts','dinner_millet','dinner_salad','snack'];
+      const items = slots.map(s => plan[s]).filter(Boolean);
+      const greenCount = items.filter(i => getFoodColor(i) === 'green').length;
+      const pct = items.length > 0 ? Math.round((greenCount / items.length) * 100) : 0;
+      const label = pct >= 90 ? `${pct}% green · 🌾 Golden grain eligible` : `${pct}% green · needs ${Math.ceil(items.length * 0.9) - greenCount} more green`;
+      greenScoreEl.textContent = label;
+      greenScoreEl.style.color = pct >= 90 ? '#5C8C5C' : pct >= 70 ? '#C49A3A' : 'var(--t3)';
+    }
   }
 }
 
@@ -5478,7 +5681,58 @@ function updateFabVisibility(tab){
 
 // ═══════════════════════════════════════════════
 // GRADUAL WAKE TARGET
-// 6:45am → 4:30am, advancing every 5 SUCCESSFUL wake completions at current level
+// ═══════════════════════════════════════════════
+// NUTRITION CONSTANTS
+// ═══════════════════════════════════════════════
+const PROTEIN_FLOOR_G = 140;    // minimum daily protein for muscle preservation at ~99kg
+const SODIUM_LIMIT_MG = 2000;   // WHO recommendation, tighter given BP 140/90
+const STEP_KCAL_PER_KG = 0.00055; // 0.055 kcal/step per 100kg → adjusted for body weight
+
+// Food color classification
+function getFoodColor(item){
+  if(!item) return 'yellow';
+  if(item.tgFriendly && item.weightLossFriendly) return 'green';
+  if(item.tags && (item.tags.includes('TreatMeal') || item.tags.includes('Junk'))) return 'red';
+  return 'yellow';
+}
+
+// Approximate sodium (mg) for key high-risk dishes — used in daily total
+const SODIUM_MAP = {
+  // North Indian restaurant
+  'ni01':800,'ni02':900,'ni03':400,'ni04':350,'ni05':200,
+  'ni06':600,'ni07':900,'ni08':1000,'ni09':700,'ni10':800,
+  'ni11':500,'ni12':500,'ni13':850,'ni14':200,'ni15':500,
+  // Chinese / Indo-Chinese
+  'ch01':900,'ch02':800,'ch03':850,'ch04':950,'ch05':850,
+  'ch06':1100,'ch07':950,'ch08':850,'ch09':1050,'ch10':900,
+  'ch11':700,'ch12':800,'ch13':950,'ch14':1000,'ch15':900,
+  // Arabic/Shawarma
+  'tx01':900,'tx02':1100,'tx03':80,
+  // Kerala
+  'kl01':200,'kl02':150,'kl03':100,'kl04':80,'kl05':80,
+  'kl06':60,'kl07':300,'kl08':280,'kl09':450,
+};
+
+function getSodiumForItem(item){
+  if(!item || !item.id) return 0;
+  return SODIUM_MAP[item.id] || 0;
+}
+
+function getDailySodium(dateKey){
+  const actual = getActualMeals(dateKey);
+  let total = 0;
+  Object.values(actual).forEach(m => {
+    if(m && m.id) total += getSodiumForItem(m);
+  });
+  return total;
+}
+
+function getDailyProtein(dateKey){
+  const actual = getActualMeals(dateKey);
+  let total = 0;
+  Object.values(actual).forEach(m => { if(m) total += (m.pro || 0); });
+  return Math.round(total);
+}
 // ═══════════════════════════════════════════════
 function countWakeCompletionsAtLevel(levelMins){
   // Count days where wake discipline (d1, index 0) was checked AND the wake target was this level
@@ -5941,8 +6195,10 @@ function renderActualMeals(){
       div.innerHTML = `
         <div class="am-slot-left" style="cursor:pointer;" onclick="openActualMealEdit('${key}','${slot.key}')">
           <div class="am-slot-label">${slot.label}</div>
-          <div class="am-slot-dish ${deviated ? 'deviated' : 'from-plan'}">${item ? item.name : '—'}</div>
-          ${deviated ? '<div class="am-slot-tag">Edited</div>' : (item ? '<div style="font-size:9px;letter-spacing:.1em;color:var(--t4);margin-top:2px;">From plan · tap to edit</div>' : '')}
+          <div class="am-slot-dish ${deviated ? 'deviated' : 'from-plan'}" style="display:flex;align-items:center;">
+            ${item ? `<span class="food-dot ${getFoodColor(item)}"></span>` : ''}${item ? item.name : '—'}
+          </div>
+          ${deviated ? '<div class="am-slot-tag">Edited</div>' : (item ? '<div style="font-size:9px;letter-spacing:.1em;color:var(--t4);margin-top:2px;">Tap to edit</div>' : '')}
         </div>
         <div class="am-slot-right" style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
           <div class="am-slot-cal">${item ? item.cal : '—'}</div>
@@ -5956,6 +6212,8 @@ function renderActualMeals(){
 
   if(!anyData){
     summEl.innerHTML = `<div style="font-family:var(--serif);font-size:14px;font-weight:300;font-style:italic;color:var(--t4);">Pre-filled from meal plan. Tap any slot to edit, or skip if not eaten.</div>`;
+    renderSodiumBar();
+    renderProteinAlert();
     return;
   }
 
@@ -5975,6 +6233,9 @@ function renderActualMeals(){
       <span style="font-family:var(--serif);font-size:15px;font-weight:300;color:var(--t2);">${totalPro}g / ${totalCarb}g / ${totalFat}g</span>
     </div>
     ${gap !== null ? `<div style="font-family:var(--serif);font-size:14px;font-weight:300;font-style:italic;color:${gapColor};margin-top:4px;">${gapText}</div>` : ''}`;
+
+  renderSodiumBar();
+  renderProteinAlert();
 }
 
 function skipActualSlot(dateKey, slotKey){
@@ -6736,6 +6997,268 @@ function describeArc(cx, cy, r1, r2, startDeg, endDeg){
 }
 
 // ═══════════════════════════════════════════════
+// SODIUM + PROTEIN ALERTS
+// ═══════════════════════════════════════════════
+function renderSodiumBar(){
+  const key = keyForOffset(dayOffset);
+  const sodium = getDailySodium(key);
+  const wrap = document.getElementById('sodium-wrap');
+  const fill = document.getElementById('sodium-fill');
+  const val  = document.getElementById('sodium-val');
+  if(!wrap) return;
+  if(sodium === 0){ wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  const pct = Math.min(100, (sodium / SODIUM_LIMIT_MG) * 100);
+  fill.style.width = pct + '%';
+  fill.style.background = pct > 100 ? 'var(--risk-at)' : pct > 75 ? '#C49A3A' : 'var(--risk-on)';
+  val.textContent = `${sodium.toLocaleString()} / ${SODIUM_LIMIT_MG.toLocaleString()} mg`;
+}
+
+function renderProteinAlert(){
+  const key = keyForOffset(dayOffset);
+  const protein = getDailyProtein(key);
+  const el = document.getElementById('protein-alert');
+  if(!el) return;
+  const ist = new Date(Date.now() + 5.5*60*60*1000);
+  const hour = ist.getUTCHours();
+  // Show alert after 7pm if protein below 100g
+  if(hour >= 19 && protein < 100 && protein > 0){
+    const gap = PROTEIN_FLOOR_G - protein;
+    el.textContent = `Protein today: ${protein}g — ${gap}g below target. A boiled egg or handful of peanuts would help preserve muscle.`;
+    el.classList.add('visible');
+  } else if(protein === 0){
+    el.classList.remove('visible');
+  } else if(protein < PROTEIN_FLOOR_G && protein > 0){
+    el.textContent = `Protein today: ${protein}g of ${PROTEIN_FLOOR_G}g target.`;
+    el.classList.add('visible');
+  } else {
+    el.classList.remove('visible');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// COACH VOICE
+// ═══════════════════════════════════════════════
+const COACH_MESSAGES = {
+  missedLog: [
+    "Missed days don't erase progress. What got in the way?",
+    "The mission continues whether or not you log. Come back when you can.",
+    "One unlogged day is data, not failure. Keep going.",
+  ],
+  stepStreak: [
+    "Seven days of 10,000 steps. Your legs remember this now.",
+    "The walking habit is forming. The body is responding.",
+    "Steps are the most underrated discipline on this list.",
+  ],
+  weightSpike: [
+    "This is water. Your deficit was real yesterday. Trust the process.",
+    "Weight fluctuates 1–2kg daily from water and sodium. The trend is what matters.",
+    "One morning number doesn't reverse weeks of work. Stay the course.",
+  ],
+  goodDeficit: [
+    "The discipline and the deficit aligned today. This is what the mission looks like.",
+    "Today's work will show on the scale in 3–5 days. The lag is normal.",
+    "Good days compound. You're building something real.",
+  ],
+  behindPace: [
+    "Behind today. It's recoverable. What's one thing to change tomorrow?",
+    "The mission is 77 days, not one. Zoom out.",
+    "Every day behind pace just means the next day matters more.",
+  ],
+  highSodium: [
+    "Sodium is high today. Drink an extra glass of water tonight — it'll help.",
+    "High sodium days make the scale lie tomorrow morning. Don't be surprised.",
+    "Restaurant food is the main sodium source. Keep that in mind when eating out.",
+  ],
+  lowProtein: [
+    "Protein protects your muscle while fat leaves. Don't let it drop too low.",
+    "At a deficit, protein is the most important macro. Aim for 140g daily.",
+    "Boiled eggs, fish, cherupayar — cheap, easy, high-protein Kerala options.",
+  ],
+  wakEarly: [
+    "4:30am is not about willpower. It's about what you do at 10pm the night before.",
+    "Brahmamuhurta is documented across millennia. You're not the first to find value in it.",
+    "The quiet before the world wakes is yours alone. No one else is competing for that time.",
+  ],
+};
+
+function getCoachMessage(){
+  const key = todayKey();
+  const rec = records[key] || {};
+  const dismissedKey = 'coach_dismissed_' + key;
+  if(localStorage.getItem(dismissedKey)) return null;
+
+  const sodium = getDailySodium(key);
+  const protein = getDailyProtein(key);
+  const steps = rec.steps || 0;
+  const { deficitPerDay } = calcDynamicDeficit();
+  const actual = rec.actualMeals || {};
+  const foodCal = Object.values(actual).reduce((s,m) => s+(m&&m.cal||0), 0);
+  const cw = currentWeight();
+  const { tdee } = calcTDEE(cw, steps, rec.disciplines);
+  const deficit = foodCal > 0 ? tdee - foodCal : null;
+
+  // Check days since last log
+  let daysSinceLog = 0;
+  for(let i = 1; i <= 3; i++){
+    const k = keyForOffset(-i);
+    const r = records[k];
+    if(!r || !r.actualMeals || Object.keys(r.actualMeals).length === 0) daysSinceLog++;
+    else break;
+  }
+
+  // Check step streak
+  let stepStreak = 0;
+  for(let i = 0; i < 7; i++){
+    const k = keyForOffset(-i);
+    if((records[k] || {}).steps >= 10000) stepStreak++;
+    else break;
+  }
+
+  // Weight spike
+  const todayWt = parseFloat(rec.weight);
+  const ystdWt  = parseFloat((records[keyForOffset(-1)] || {}).weight);
+  const wtSpike = todayWt && ystdWt && (todayWt - ystdWt) > 1.0;
+
+  // Pick message
+  let pool = null;
+  if(daysSinceLog >= 2) pool = COACH_MESSAGES.missedLog;
+  else if(sodium > SODIUM_LIMIT_MG) pool = COACH_MESSAGES.highSodium;
+  else if(protein > 0 && protein < 100) pool = COACH_MESSAGES.lowProtein;
+  else if(wtSpike) pool = COACH_MESSAGES.weightSpike;
+  else if(stepStreak >= 7) pool = COACH_MESSAGES.stepStreak;
+  else if(deficit !== null && deficit > deficitPerDay + 200) pool = COACH_MESSAGES.goodDeficit;
+  else if(deficit !== null && deficit < deficitPerDay - 300) pool = COACH_MESSAGES.behindPace;
+
+  if(!pool) return null;
+  const idx = Math.floor(Math.random() * pool.length);
+  return pool[idx];
+}
+
+function renderCoachCard(){
+  const el = document.getElementById('coach-card');
+  if(!el) return;
+  const msg = getCoachMessage();
+  if(!msg){ el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  document.getElementById('coach-card-text').textContent = msg;
+}
+
+function dismissCoachCard(){
+  const key = todayKey();
+  localStorage.setItem('coach_dismissed_' + key, '1');
+  const el = document.getElementById('coach-card');
+  if(el) el.style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════
+// DEFICIT REFRAME
+// ═══════════════════════════════════════════════
+function getDeficitReframe(actualDeficit, requiredDeficit, targetDate){
+  if(actualDeficit === null) return null;
+  const gPerDay = actualDeficit / 7700; // kg per day
+  const remaining = parseFloat((currentWeight() || 99)) - 89.9;
+  const daysNeeded = remaining / gPerDay;
+  const arrivalDate = new Date(Date.now() + 5.5*60*60*1000);
+  arrivalDate.setUTCDate(arrivalDate.getUTCDate() + daysNeeded);
+  const target = new Date(targetDate);
+  const diff = Math.round((arrivalDate - target) / 86400000);
+  if(Math.abs(diff) <= 3) return 'At this pace, you arrive on September 1.';
+  if(diff < 0) return `At this pace, you arrive ${Math.abs(diff)} days early.`;
+  return `At this pace, you arrive ${diff} days after September 1.`;
+}
+
+// ═══════════════════════════════════════════════
+// WEEKLY CHECK-IN
+// ═══════════════════════════════════════════════
+function openWeeklyCheckin(){
+  const el = document.getElementById('weekly-checkin');
+  if(!el) return;
+
+  // Calculate this week's stats
+  let stepDays = 0, discDays = 0, logDays = 0;
+  for(let i = 6; i >= 0; i--){
+    const k = keyForOffset(-i);
+    const r = records[k] || {};
+    if((r.steps || 0) >= 10000) stepDays++;
+    const discs = (r.disciplines || []).filter(d => d && d.done).length;
+    if(discs >= 4) discDays++;
+    if(r.actualMeals && Object.keys(r.actualMeals).length > 0) logDays++;
+  }
+  document.getElementById('ci-steps').textContent = stepDays + '/7';
+  document.getElementById('ci-discs').textContent = discDays + '/7';
+  document.getElementById('ci-logs').textContent  = logDays + '/7';
+
+  // Load saved reflection
+  const weekKey = 'checkin_' + keyForOffset(0);
+  const saved = JSON.parse(localStorage.getItem(weekKey) || '{}');
+  document.getElementById('ci-challenge').value = saved.challenge || '';
+  document.getElementById('ci-win').value       = saved.win || '';
+  document.getElementById('ci-tmrw').value      = saved.tmrw || '';
+
+  el.classList.add('open');
+}
+
+function closeWeeklyCheckin(){
+  const el = document.getElementById('weekly-checkin');
+  if(el) el.classList.remove('open');
+}
+
+function saveWeeklyCheckin(){
+  const weekKey = 'checkin_' + keyForOffset(0);
+  const data = {
+    challenge: document.getElementById('ci-challenge').value,
+    win:       document.getElementById('ci-win').value,
+    tmrw:      document.getElementById('ci-tmrw').value,
+    savedAt:   new Date().toISOString(),
+  };
+  localStorage.setItem(weekKey, JSON.stringify(data));
+  closeWeeklyCheckin();
+}
+
+// ═══════════════════════════════════════════════
+// SHARE CARD — weekly summary as image
+// ═══════════════════════════════════════════════
+function shareWeeklySummary(){
+  let stepDays=0, discDays=0, deficit=0, wtStart=null, wtEnd=null;
+  for(let i=6;i>=0;i--){
+    const k=keyForOffset(-i);
+    const r=records[k]||{};
+    if((r.steps||0)>=10000) stepDays++;
+    if((r.disciplines||[]).filter(d=>d&&d.done).length>=4) discDays++;
+    const actual=r.actualMeals||{};
+    const fc=Object.values(actual).reduce((s,m)=>s+(m&&m.cal||0),0);
+    const wt=parseFloat(r.weight)||currentWeight();
+    const {tdee}=calcTDEE(wt,r.steps||0,r.disciplines);
+    if(fc>0) deficit+=tdee-fc;
+    if(i===6&&r.weight) wtStart=parseFloat(r.weight);
+    if(i===0&&r.weight) wtEnd=parseFloat(r.weight);
+  }
+  const wtChange = (wtStart&&wtEnd) ? (wtEnd-wtStart).toFixed(1) : null;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="360" height="280" viewBox="0 0 360 280">
+    <rect width="360" height="280" fill="#F4EFE5"/>
+    <text x="24" y="48" font-family="Georgia,serif" font-size="28" font-weight="300" fill="#1B1814">Mission 89.9</text>
+    <text x="24" y="68" font-family="sans-serif" font-size="10" letter-spacing="3" fill="#C2BAB0">WEEKLY SUMMARY</text>
+    <line x1="24" y1="82" x2="336" y2="82" stroke="#E6DFD3" stroke-width="1"/>
+    <text x="24"  y="120" font-family="Georgia,serif" font-size="42" font-weight="300" fill="#9A7B3C">${stepDays}/7</text>
+    <text x="24"  y="138" font-family="sans-serif" font-size="8" letter-spacing="2" fill="#8C857B">10K STEP DAYS</text>
+    <text x="148" y="120" font-family="Georgia,serif" font-size="42" font-weight="300" fill="#1B1814">${discDays}/7</text>
+    <text x="148" y="138" font-family="sans-serif" font-size="8" letter-spacing="2" fill="#8C857B">FULL DISC DAYS</text>
+    <text x="272" y="120" font-family="Georgia,serif" font-size="42" font-weight="300" fill="#1B1814">${wtChange!==null?(wtChange>0?'+':'')+wtChange:'—'}</text>
+    <text x="272" y="138" font-family="sans-serif" font-size="8" letter-spacing="2" fill="#8C857B">KG THIS WEEK</text>
+    <line x1="24" y1="158" x2="336" y2="158" stroke="#E6DFD3" stroke-width="1"/>
+    <text x="24" y="196" font-family="Georgia,serif" font-size="38" font-weight="300" fill="#1B1814">${Math.round(deficit).toLocaleString()}</text>
+    <text x="24" y="214" font-family="sans-serif" font-size="8" letter-spacing="2" fill="#8C857B">TOTAL DEFICIT (KCAL)</text>
+    <text x="24" y="260" font-family="sans-serif" font-size="8" letter-spacing="2" fill="#C2BAB0">89.9 · THE RE-ENTRY</text>
+  </svg>`;
+  const blob = new Blob([svg], {type:'image/svg+xml'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'mission-week.svg'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ═══════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════
 function init(){
@@ -6745,6 +7268,7 @@ function init(){
   }
   renderToday();
   renderLunar();
+  renderCoachCard();
   syncRecordInputs();
   startClock();
   initGoogleFit();
@@ -6773,7 +7297,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v35';
+const CACHE = 'mission-os-v43';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
