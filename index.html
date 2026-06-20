@@ -3531,13 +3531,13 @@ function renderCalendar(){
 
 function buildMealPlanImage(slots, dateStr, target){
   // ── Constants
-  const W    = 1080;
+  const W    = 720;
   const BG   = '#F4EFE5';
   const GOLD = '#9A7B3C';
   const INK  = '#1B1814';
   const SUB  = '#8C857B';
   const RULE = '#C8BFB0';
-  const PAD  = 72;
+  const PAD  = 48;
   const CW   = W - PAD * 2;
 
   // Font helpers — use system fonts that render on Android canvas
@@ -3850,20 +3850,24 @@ function openMealPlanImage(canvas){
   shareBtn.style.cssText = 'background:#B8924A;border:none;color:#1B1814;font-size:15px;font-weight:600;cursor:pointer;padding:10px 18px;border-radius:6px;font-family:Arial,sans-serif;';
   shareBtn.onclick = async () => {
     try {
-      // Convert dataUrl to Blob then File
-      const res = await fetch(dataUrl);
-      const blob = await res.blob();
+      // base64 -> Blob without fetch (avoids WebView memory crash)
+      function dataUrlToBlob(dataUrl){
+        const parts = dataUrl.split(',');
+        const mime  = parts[0].match(/:(.*?);/)[1];
+        const bin   = atob(parts[1]);
+        const arr   = new Uint8Array(bin.length);
+        for(let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        return new Blob([arr], {type: mime});
+      }
+      const blob = dataUrlToBlob(dataUrl);
       const file = new File([blob], 'meal-plan.png', {type:'image/png'});
       if(navigator.canShare && navigator.canShare({files:[file]})){
         await navigator.share({files:[file], title:'Meal Plan — 89.9'});
       } else if(navigator.share){
         await navigator.share({title:'Meal Plan — 89.9', text:'My meal plan for tomorrow.'});
       } else {
-        // Fallback: trigger download
         const a = document.createElement('a');
-        a.href = dataUrl;
-        a.download = 'meal-plan.png';
-        a.click();
+        a.href = dataUrl; a.download = 'meal-plan.png'; a.click();
       }
     } catch(e){
       if(e.name !== 'AbortError') alert('Share failed: ' + e.message);
@@ -7524,7 +7528,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v58';
+const CACHE = 'mission-os-v59';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
