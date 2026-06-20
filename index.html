@@ -3844,38 +3844,12 @@ function openMealPlanImage(canvas){
   closeBtn.style.cssText = 'background:none;border:none;color:#B8924A;font-size:17px;cursor:pointer;padding:8px 4px;font-family:Arial,sans-serif;';
   closeBtn.onclick = () => overlay.remove();
 
-  // Share button — uses Web Share API (native Android share sheet)
-  const shareBtn = document.createElement('button');
-  shareBtn.textContent = 'Share ↗';
-  shareBtn.style.cssText = 'background:#B8924A;border:none;color:#1B1814;font-size:15px;font-weight:600;cursor:pointer;padding:10px 18px;border-radius:6px;font-family:Arial,sans-serif;';
-  shareBtn.onclick = async () => {
-    try {
-      // base64 -> Blob without fetch (avoids WebView memory crash)
-      function dataUrlToBlob(dataUrl){
-        const parts = dataUrl.split(',');
-        const mime  = parts[0].match(/:(.*?);/)[1];
-        const bin   = atob(parts[1]);
-        const arr   = new Uint8Array(bin.length);
-        for(let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-        return new Blob([arr], {type: mime});
-      }
-      const blob = dataUrlToBlob(dataUrl);
-      const file = new File([blob], 'meal-plan.png', {type:'image/png'});
-      if(navigator.canShare && navigator.canShare({files:[file]})){
-        await navigator.share({files:[file], title:'Meal Plan — 89.9'});
-      } else if(navigator.share){
-        await navigator.share({title:'Meal Plan — 89.9', text:'My meal plan for tomorrow.'});
-      } else {
-        const a = document.createElement('a');
-        a.href = dataUrl; a.download = 'meal-plan.png'; a.click();
-      }
-    } catch(e){
-      if(e.name !== 'AbortError') alert('Share failed: ' + e.message);
-    }
-  };
+  const hint = document.createElement('span');
+  hint.style.cssText = 'color:#8C857B;font-size:12px;letter-spacing:.04em;text-align:right;line-height:1.5;font-family:Arial,sans-serif;';
+  hint.textContent = 'Screenshot to share';
 
   bar.appendChild(closeBtn);
-  bar.appendChild(shareBtn);
+  bar.appendChild(hint);
 
   // Scrollable image area
   const scroll = document.createElement('div');
@@ -7528,7 +7502,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v59';
+const CACHE = 'mission-os-v60';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
