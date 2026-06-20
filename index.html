@@ -5621,7 +5621,22 @@ function renderMpSlots(){
 
 function getMpSlotItem(slotKey){
   if(slotKey === 'breakfast') return mpPlan.breakfast || null;
-  if(slotKey === 'lunch') return mpPlan.lunch_fish || mpPlan.lunch_rice || null;
+  if(slotKey === 'lunch'){
+    // Build combined item for display — carry green status from all sub-items
+    const subItems = [mpPlan.lunch_rice, mpPlan.lunch_fish, mpPlan.lunch_thoran,
+                      mpPlan.lunch_sprouts, mpPlan.lunch_moru, mpPlan.lunch_sweet].filter(Boolean);
+    if(!subItems.length) return null;
+    const cal = subItems.reduce((s,i) => s+(i.cal||0), 0);
+    const pro = subItems.reduce((s,i) => s+(i.pro||0), 0);
+    const carb = subItems.reduce((s,i) => s+(i.carb||0), 0);
+    const fat  = subItems.reduce((s,i) => s+(i.fat||0), 0);
+    const name = subItems.map(i => i.name).join(' + ');
+    return {
+      name, cal, pro, carb, fat,
+      tgFriendly: subItems.every(i => i.tgFriendly !== false),
+      weightLossFriendly: subItems.every(i => i.weightLossFriendly !== false),
+    };
+  }
   if(slotKey === 'dinner') return mpPlan.dinner_millet || null;
   if(slotKey === 'snack') return mpPlan.snack || null;
   return null;
@@ -7355,7 +7370,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v47';
+const CACHE = 'mission-os-v48';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
