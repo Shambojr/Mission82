@@ -871,8 +871,16 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 .sodium-bar-track{height:4px;background:var(--bg-s);border-radius:2px;overflow:hidden;}
 .sodium-bar-fill{height:100%;border-radius:2px;transition:width .4s;}
 
+/* ═══ PROTEIN + SODIUM PROGRESS BARS ═══ */
+.nutrient-bar-wrap{padding:12px 28px 0;}
+.nutrient-bar-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.nutrient-bar-label{font-family:var(--sans);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);}
+.nutrient-bar-val{font-family:var(--serif);font-size:13px;font-weight:300;color:var(--t2);}
+.nutrient-bar-track{height:4px;background:var(--bg-s);border-radius:2px;overflow:hidden;margin-bottom:12px;}
+.nutrient-bar-fill{height:100%;border-radius:2px;transition:width .5s cubic-bezier(.16,1,.3,1);}
+
 /* ═══ PROTEIN ALERT ═══ */
-.protein-alert{margin:12px 28px 0;padding:10px 14px;border-radius:6px;border-left:3px solid #5B7A8A;background:rgba(91,122,138,.08);font-family:var(--serif);font-size:13px;font-weight:300;font-style:italic;color:var(--t2);line-height:1.5;display:none;}
+.protein-alert{margin:4px 28px 0;font-family:var(--serif);font-size:12px;font-weight:300;font-style:italic;color:var(--t4);line-height:1.5;display:none;}
 .protein-alert.visible{display:block;}
 
 /* ═══ COACH VOICE ═══ */
@@ -1420,18 +1428,27 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
     <div id="r-actual-summary"></div>
   </div>
 
-  <!-- Sodium bar -->
-  <div class="sodium-bar-wrap" id="sodium-wrap" style="display:none;">
-    <div class="sodium-bar-label">
-      <span>Sodium</span>
-      <span id="sodium-val">0 / 2000 mg</span>
+  <!-- Nutrient bars — protein + sodium -->
+  <div class="nutrient-bar-wrap" id="nutrient-bars" style="display:none;">
+    <!-- Protein bar -->
+    <div class="nutrient-bar-row">
+      <span class="nutrient-bar-label">Protein</span>
+      <span class="nutrient-bar-val" id="protein-bar-val">0 / 140g</span>
     </div>
-    <div class="sodium-bar-track">
-      <div class="sodium-bar-fill" id="sodium-fill" style="width:0%;background:var(--risk-on);"></div>
+    <div class="nutrient-bar-track">
+      <div class="nutrient-bar-fill" id="protein-bar-fill" style="width:0%;background:#5B7A8A;"></div>
+    </div>
+    <!-- Sodium bar -->
+    <div class="nutrient-bar-row" id="sodium-bar-row" style="display:none;">
+      <span class="nutrient-bar-label">Sodium</span>
+      <span class="nutrient-bar-val" id="sodium-bar-val">0 / 2000mg</span>
+    </div>
+    <div class="nutrient-bar-track" id="sodium-bar-track" style="display:none;">
+      <div class="nutrient-bar-fill" id="sodium-bar-fill" style="width:0%;background:var(--risk-on);"></div>
     </div>
   </div>
 
-  <!-- Protein alert -->
+  <!-- Protein hint -->
   <div class="protein-alert" id="protein-alert"></div>
 
   <!-- Steps — Google Fit -->
@@ -5714,16 +5731,28 @@ const SODIUM_MAP = {
 };
 
 function getSodiumForItem(item){
-  if(!item || !item.id) return 0;
-  return SODIUM_MAP[item.id] || 0;
+  if(!item) return 0;
+  // Check id map first
+  if(item.id && SODIUM_MAP[item.id]) return SODIUM_MAP[item.id];
+  // Fall back to name-based estimate
+  const name = (item.name || '').toLowerCase();
+  if(name.includes('shawarma') || name.includes('manchurian') || name.includes('chilli chicken')) return 1000;
+  if(name.includes('porotta') || name.includes('parotta')) return 600;
+  if(name.includes('dal tadka') || name.includes('dal makhani')) return 850;
+  if(name.includes('butter chicken') || name.includes('tikka masala')) return 950;
+  if(name.includes('ney pathiri') || name.includes('pathiri')) return 200;
+  if(name.includes('noodles') || name.includes('fried rice')) return 900;
+  if(name.includes('soup') && !name.includes('chicken')) return 600;
+  if(name.includes('chicken soup')) return 700;
+  if(name.includes('pickle')) return 400;
+  if(name.includes('prawn roast') || name.includes('prawn curry')) return 500;
+  return 0;
 }
 
 function getDailySodium(dateKey){
   const actual = getActualMeals(dateKey);
   let total = 0;
-  Object.values(actual).forEach(m => {
-    if(m && m.id) total += getSodiumForItem(m);
-  });
+  Object.values(actual).forEach(m => { if(m) total += getSodiumForItem(m); });
   return total;
 }
 
@@ -6212,8 +6241,8 @@ function renderActualMeals(){
 
   if(!anyData){
     summEl.innerHTML = `<div style="font-family:var(--serif);font-size:14px;font-weight:300;font-style:italic;color:var(--t4);">Pre-filled from meal plan. Tap any slot to edit, or skip if not eaten.</div>`;
-    renderSodiumBar();
-    renderProteinAlert();
+    renderNutrientBars();
+    // handled by renderNutrientBars
     return;
   }
 
@@ -6234,8 +6263,8 @@ function renderActualMeals(){
     </div>
     ${gap !== null ? `<div style="font-family:var(--serif);font-size:14px;font-weight:300;font-style:italic;color:${gapColor};margin-top:4px;">${gapText}</div>` : ''}`;
 
-  renderSodiumBar();
-  renderProteinAlert();
+  renderNutrientBars();
+  // handled by renderNutrientBars
 }
 
 function skipActualSlot(dateKey, slotKey){
@@ -6999,40 +7028,63 @@ function describeArc(cx, cy, r1, r2, startDeg, endDeg){
 // ═══════════════════════════════════════════════
 // SODIUM + PROTEIN ALERTS
 // ═══════════════════════════════════════════════
-function renderSodiumBar(){
-  const key = keyForOffset(dayOffset);
-  const sodium = getDailySodium(key);
-  const wrap = document.getElementById('sodium-wrap');
-  const fill = document.getElementById('sodium-fill');
-  const val  = document.getElementById('sodium-val');
-  if(!wrap) return;
-  if(sodium === 0){ wrap.style.display = 'none'; return; }
-  wrap.style.display = 'block';
-  const pct = Math.min(100, (sodium / SODIUM_LIMIT_MG) * 100);
-  fill.style.width = pct + '%';
-  fill.style.background = pct > 100 ? 'var(--risk-at)' : pct > 75 ? '#C49A3A' : 'var(--risk-on)';
-  val.textContent = `${sodium.toLocaleString()} / ${SODIUM_LIMIT_MG.toLocaleString()} mg`;
-}
+function renderSodiumBar(){} // now handled by renderNutrientBars
 
-function renderProteinAlert(){
+function renderProteinAlert(){} // now handled by renderNutrientBars
+
+function renderNutrientBars(){
   const key = keyForOffset(dayOffset);
   const protein = getDailyProtein(key);
-  const el = document.getElementById('protein-alert');
-  if(!el) return;
+  const sodium = getDailySodium(key);
+
+  const wrap = document.getElementById('nutrient-bars');
+  if(!wrap) return;
+
+  // Show wrap if any food logged
+  const actual = getActualMeals(key);
+  const hasFood = Object.values(actual).some(m => m !== null && m !== undefined);
+  wrap.style.display = hasFood ? 'block' : 'none';
+
+  // Protein bar
+  const proteinFill = document.getElementById('protein-bar-fill');
+  const proteinVal  = document.getElementById('protein-bar-val');
+  if(proteinFill && proteinVal){
+    const pct = Math.min(100, Math.round((protein / PROTEIN_FLOOR_G) * 100));
+    proteinFill.style.width = pct + '%';
+    proteinFill.style.background = pct >= 100 ? 'var(--risk-on)' : pct >= 70 ? '#5B7A8A' : 'var(--risk-at)';
+    proteinVal.textContent = `${protein}g / ${PROTEIN_FLOOR_G}g`;
+    proteinVal.style.color = pct >= 100 ? 'var(--risk-on)' : 'var(--t2)';
+  }
+
+  // Protein hint text
+  const hint = document.getElementById('protein-alert');
   const ist = new Date(Date.now() + 5.5*60*60*1000);
   const hour = ist.getUTCHours();
-  // Show alert after 7pm if protein below 100g
-  if(hour >= 19 && protein < 100 && protein > 0){
-    const gap = PROTEIN_FLOOR_G - protein;
-    el.textContent = `Protein today: ${protein}g — ${gap}g below target. A boiled egg or handful of peanuts would help preserve muscle.`;
-    el.classList.add('visible');
-  } else if(protein === 0){
-    el.classList.remove('visible');
-  } else if(protein < PROTEIN_FLOOR_G && protein > 0){
-    el.textContent = `Protein today: ${protein}g of ${PROTEIN_FLOOR_G}g target.`;
-    el.classList.add('visible');
-  } else {
-    el.classList.remove('visible');
+  if(hint){
+    if(hour >= 19 && protein < 100 && protein > 0){
+      hint.textContent = `${PROTEIN_FLOOR_G - protein}g short of target — a boiled egg or peanuts before bed will help.`;
+      hint.classList.add('visible');
+    } else {
+      hint.classList.remove('visible');
+    }
+  }
+
+  // Sodium bar — only show if meaningful sodium detected
+  const sodiumRow   = document.getElementById('sodium-bar-row');
+  const sodiumTrack = document.getElementById('sodium-bar-track');
+  const sodiumFill  = document.getElementById('sodium-bar-fill');
+  const sodiumVal   = document.getElementById('sodium-bar-val');
+  if(sodium > 0 && sodiumRow && sodiumFill && sodiumVal){
+    sodiumRow.style.display = 'flex';
+    sodiumTrack.style.display = 'block';
+    const sPct = Math.min(100, Math.round((sodium / SODIUM_LIMIT_MG) * 100));
+    sodiumFill.style.width = sPct + '%';
+    sodiumFill.style.background = sPct >= 100 ? 'var(--risk-at)' : sPct >= 75 ? '#C49A3A' : 'var(--risk-on)';
+    sodiumVal.textContent = `${sodium.toLocaleString()}mg / ${SODIUM_LIMIT_MG.toLocaleString()}mg`;
+    sodiumVal.style.color = sPct >= 100 ? 'var(--risk-at)' : 'var(--t2)';
+  } else if(sodiumRow){
+    sodiumRow.style.display = 'none';
+    if(sodiumTrack) sodiumTrack.style.display = 'none';
   }
 }
 
@@ -7297,7 +7349,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v43';
+const CACHE = 'mission-os-v44';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
