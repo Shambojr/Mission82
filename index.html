@@ -3300,6 +3300,7 @@ function buildCombinedItem(items){
       cat:  item.category,
       portion: qty !== 1 ? `${fmtQty(qty)} × ${item.servingSize}` : item.servingSize,
       tgFriendly: item.tgFriendly,
+      weightLossFriendly: item.weightLossFriendly,
     };
   }
   return {
@@ -3313,6 +3314,7 @@ function buildCombinedItem(items){
     cat:  items[0].category,
     portion: items.map(i => { const q=i.qty||1; return q!==1?`${fmtQty(q)} × ${i.servingSize}`:i.servingSize; }).join(' + '),
     tgFriendly: items.every(i => i.tgFriendly),
+    weightLossFriendly: items.every(i => i.weightLossFriendly),
   };
 }
 
@@ -7353,7 +7355,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v46';
+const CACHE = 'mission-os-v47';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
