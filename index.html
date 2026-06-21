@@ -4137,10 +4137,11 @@ function updateEnergySummary(){
     // Use actual logged meals
     actualCal = Object.values(actualMeals).reduce((s,m) => s + (m.cal||0), 0);
     planned = plan ? mealDayTotals(plan).cal : null;
-  } else if(plan){
-    // Fall back to planned
+  } else if(key !== todayKey() && plan){
+    // Past days: fall back to planned if no actuals
     planned = mealDayTotals(plan).cal;
   }
+  // Today with no logged meals: leave both null — shows as unlogged
 
   const displayCal = actualCal !== null ? actualCal : planned;
   const gap = displayCal !== null ? (displayCal - target) : null;
@@ -6294,6 +6295,9 @@ function getActualSlotItem(dateKey, slotKey){
     return { item: actual[slotKey], deviated: true };
   }
 
+  // Today starts blank — only fall back to plan for past days
+  if(dateKey === todayKey()) return null;
+
   // Fall back to plan
   const plan = meals[dateKey];
   if(!plan) return null;
@@ -7484,6 +7488,26 @@ function init(){
 }
 
 init();
+
+// ── Version check: reload if GitHub has a newer build
+(function checkVersion(){
+  const CURRENT = 'mission-os-v64';
+  // Only run on HTTPS (deployed app), not local file
+  if(location.protocol !== 'https:') return;
+  setTimeout(() => {
+    fetch(location.href, {cache:'no-store', method:'GET'})
+      .then(r => r.text())
+      .then(html => {
+        const m = html.match(/mission-os-v(\d+)/);
+        const live = m ? m[0] : null;
+        if(live && live !== CURRENT){
+          console.log('Mission OS: new version', live, '— reloading');
+          location.reload(true);
+        }
+      })
+      .catch(() => {}); // silent fail — offline is fine
+  }, 3000); // wait 3s after boot before checking
+})();
 </script>
 
 <script>
@@ -7504,7 +7528,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v62';
+const CACHE = 'mission-os-v64';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
