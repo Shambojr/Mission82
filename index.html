@@ -4862,8 +4862,7 @@ function getNextTrainingInfo(){
     if(!tr) continue; // skip days with no training entry
     if(tr.restDay){
       consecutiveCount = 0;
-      if(lastDayId !== null) break; // stop looking after a rest day once we have context
-      continue;
+      break; // always stop after a rest day — today should be a fresh session
     }
     if(tr.completed){
       if(lastDayId === null) lastDayId = tr.dayId;
@@ -7502,7 +7501,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v60';
+const CACHE = 'mission-os-v61';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
