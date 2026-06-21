@@ -1708,7 +1708,8 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
   <div id="tr-rest-card" style="display:none;padding:var(--s4) var(--pad);">
     <div style="font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t1);margin-bottom:var(--s2);">Rest Day</div>
     <div style="font-family:var(--serif);font-size:16px;font-weight:300;font-style:italic;color:var(--t3);line-height:1.6;margin-bottom:var(--s4);">Recovery is part of the process.<br>The body grows when it rests.</div>
-    <button onclick="takeRestDay()" class="btn-primary">Take Rest Day →</button>
+    <button onclick="takeRestDay()" class="btn-primary" style="margin-bottom:12px;">Take Rest Day →</button>
+    <button onclick="forceStartSession()" style="width:100%;padding:14px;background:none;border:1.5px solid var(--t3);color:var(--t2);font-family:var(--sans);font-size:13px;letter-spacing:.12em;cursor:pointer;">TRAIN ANYWAY</button>
   </div>
 
   <!-- Exercises -->
@@ -5042,7 +5043,9 @@ function updateTrainingProgress(day){
 function completeTrainingSession(){
   const today = todayKey();
   const info = getNextTrainingInfo();
-  const dayId = info.dayId || TR_SEQUENCE[0];
+  // Use forced session day if user overrode rest suggestion
+  const dayId = window._forceSessionDayId || info.dayId || TR_SEQUENCE[0];
+  window._forceSessionDayId = null;
 
   if(!records[today]) records[today] = {};
   records[today].training = {dayId, completed:true, date:today};
@@ -5079,6 +5082,58 @@ function autoCheckRestDayDumbbell(){
     records[today].disciplines[4].restDay = true; // no calorie burn on rest day
     save();
   }
+}
+
+function forceStartSession(){
+  // Override rest suggestion — load next session in sequence
+  const today = todayKey();
+  const keys = Object.keys(records).sort().reverse();
+  let lastDayId = null;
+  for(const k of keys){
+    if(k === today) continue;
+    const tr = (records[k]||{}).training;
+    if(tr && tr.completed && tr.dayId){
+      lastDayId = tr.dayId;
+      break;
+    }
+  }
+  const idx = lastDayId ? TR_SEQUENCE.indexOf(lastDayId) : -1;
+  const nextDayId = TR_SEQUENCE[(idx + 1) % TR_SEQUENCE.length];
+  // Temporarily override info type so renderTrainingOverlay shows the session
+  const restCard = document.getElementById('tr-rest-card');
+  if(restCard) restCard.style.display = 'none';
+  // Render the actual session
+  const day = TRAINING_DAYS.find(d => d.id === nextDayId);
+  if(!day) return;
+  const titleEl  = document.getElementById('tr-title');
+  const dayLabel = document.getElementById('tr-day-label');
+  const dayName  = document.getElementById('tr-day-name');
+  const dayFocus = document.getElementById('tr-day-focus');
+  const exercisesEl  = document.getElementById('tr-exercises');
+  const completeWrap = document.getElementById('tr-complete-wrap');
+  const supersetHint = document.getElementById('tr-superset-hint');
+  if(titleEl)  titleEl.textContent  = 'Training';
+  if(dayLabel) dayLabel.textContent = `Day ${day.id}`;
+  if(dayName)  dayName.textContent  = day.name;
+  if(dayFocus) dayFocus.textContent = day.focus || '';
+  if(supersetHint) supersetHint.textContent = day.supersetNote || '';
+  if(completeWrap) completeWrap.style.display = 'block';
+  trSetState = {};
+  if(exercisesEl){
+    exercisesEl.innerHTML = day.exercises.map((ex, i) => `
+      <div class="tr-ex" id="trex-${i}">
+        <div class="tr-ex-top">
+          <div>
+            <div class="tr-ex-name">${ex.name}</div>
+            <div class="tr-ex-detail">${ex.sets} sets × ${ex.reps}</div>
+          </div>
+          <button class="tr-ex-done" onclick="toggleTrEx(${i}, ${nextDayId})" id="trex-btn-${i}">Done</button>
+        </div>
+        ${ex.note ? `<div class="tr-ex-note">${ex.note}</div>` : ''}
+      </div>`).join('');
+  }
+  // Store which day we're doing so completeSession works
+  window._forceSessionDayId = nextDayId;
 }
 
 function takeRestDay(){
@@ -7507,7 +7562,7 @@ init();
 
 // ── Version check: reload if GitHub has a newer build
 (function checkVersion(){
-  const CURRENT = 'mission-os-v65';
+  const CURRENT = 'mission-os-v66';
   // Only run on HTTPS (deployed app), not local file
   if(location.protocol !== 'https:') return;
   setTimeout(() => {
@@ -7544,7 +7599,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v65';
+const CACHE = 'mission-os-v66';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
