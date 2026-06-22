@@ -1692,7 +1692,11 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
   <div class="ov-top">
     <span class="ov-back" onclick="closeTrainingOverlay()">←</span>
     <span class="ov-title" id="tr-overlay-title">Training</span>
-    <span style="width:40px;"></span>
+    <span id="tr-rest-btn" onclick="takeRestDay()" title="Mark as rest day" style="width:40px;display:flex;align-items:center;justify-content:flex-end;cursor:pointer;opacity:0.35;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </span>
   </div>
 
   <!-- Session header -->
@@ -1704,13 +1708,8 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 
   <div style="margin:0 var(--pad);height:1px;background:var(--rl);"></div>
 
-  <!-- Rest day card -->
-  <div id="tr-rest-card" style="display:none;padding:var(--s4) var(--pad);">
-    <div style="font-family:var(--serif);font-size:22px;font-weight:300;color:var(--t1);margin-bottom:var(--s2);">Rest Day</div>
-    <div style="font-family:var(--serif);font-size:16px;font-weight:300;font-style:italic;color:var(--t3);line-height:1.6;margin-bottom:var(--s4);">Recovery is part of the process.<br>The body grows when it rests.</div>
-    <button onclick="takeRestDay()" class="btn-primary" style="margin-bottom:12px;">Take Rest Day →</button>
-    <button onclick="forceStartSession()" style="width:100%;padding:14px;background:none;border:1.5px solid var(--t3);color:var(--t2);font-family:var(--sans);font-size:13px;letter-spacing:.12em;cursor:pointer;">TRAIN ANYWAY</button>
-  </div>
+  <!-- Rest day card (shown when rest taken) -->
+  <div id="tr-rest-card" style="display:none;"></div>
 
   <!-- Exercises -->
   <div id="tr-exercises" style="padding:0 var(--pad);"></div>
@@ -4850,42 +4849,25 @@ function getTrainingState(dateKey){
 
 function getNextTrainingInfo(){
   const today = todayKey();
+  const todayTr = getTrainingState(today);
 
-  // Check if today already has a session
-  const todayRec = records[today] || {};
-  if(todayRec.training){
-    return {type: 'today', data: todayRec.training};
-  }
+  // Today already acted on
+  if(todayTr) return {type:'today', data:todayTr};
 
-  // Find last completed session
+  // Find last completed session — sequence only advances on completion
   const keys = Object.keys(records).sort().reverse();
   let lastDayId = null;
-  let consecutiveCount = 0;
-
   for(const k of keys){
-    if(k === today) continue; // skip today — it hasn't been saved yet
+    if(k === today) continue;
     const tr = (records[k] || {}).training;
-    if(!tr) continue; // skip days with no training entry
-    if(tr.restDay){
-      consecutiveCount = 0;
-      break; // always stop after a rest day — today should be a fresh session
-    }
-    if(tr.completed){
-      if(lastDayId === null) lastDayId = tr.dayId;
-      consecutiveCount++;
-      if(consecutiveCount >= 2) break; // have enough info
+    if(tr && tr.completed && tr.dayId){
+      lastDayId = tr.dayId;
+      break;
     }
   }
 
-  // Suggest rest after 2 consecutive training days
-  if(consecutiveCount >= 2){
-    return {type:'rest'};
-  }
-
-  // Next day in sequence
-  if(lastDayId === null){
-    return {type:'session', dayId: TR_SEQUENCE[0]};
-  }
+  // Always show a session — no auto rest
+  if(lastDayId === null) return {type:'session', dayId: TR_SEQUENCE[0]};
   const idx = TR_SEQUENCE.indexOf(lastDayId);
   const nextIdx = (idx + 1) % TR_SEQUENCE.length;
   return {type:'session', dayId: TR_SEQUENCE[nextIdx]};
@@ -4922,26 +4904,15 @@ function renderTrainingOverlay(){
   const progressText = document.getElementById('tr-progress-text');
 
   // Already completed today
+  const restBtnC = document.getElementById('tr-rest-btn');
   if(todayTr && todayTr.completed){
     titleEl.textContent = 'Training';
     dayLabel.textContent = 'Completed Today';
     const day = TRAINING_DAYS.find(d => d.id === todayTr.dayId);
     dayName.textContent = day ? `Day ${day.id} — ${day.name}` : 'Session Done';
     dayFocus.textContent = 'Rest now. The work is done.';
+    if(restBtnC) restBtnC.style.display = 'none';
     restCard.style.display = 'none';
-    exercisesEl.innerHTML = '';
-    supersetHint.textContent = '';
-    completeWrap.style.display = 'none';
-    return;
-  }
-
-  // Rest day
-  if(info.type === 'rest' && !(todayTr && todayTr.restDay)){
-    titleEl.textContent = 'Training';
-    dayLabel.textContent = 'Recovery';
-    dayName.textContent = 'Rest Day';
-    dayFocus.textContent = '2 sessions complete.';
-    restCard.style.display = 'block';
     exercisesEl.innerHTML = '';
     supersetHint.textContent = '';
     completeWrap.style.display = 'none';
@@ -4949,17 +4920,20 @@ function renderTrainingOverlay(){
   }
 
   // Rest already taken today
+  const restBtn = document.getElementById('tr-rest-btn');
   if(todayTr && todayTr.restDay){
     titleEl.textContent = 'Training';
-    dayLabel.textContent = 'Rest Taken';
-    dayName.textContent = 'Recovery Day';
+    dayLabel.textContent = 'Rest Day';
+    dayName.textContent = 'Recovery';
     dayFocus.textContent = 'Come back tomorrow.';
+    if(restBtn) restBtn.style.display = 'none';
     restCard.style.display = 'none';
     exercisesEl.innerHTML = '';
     supersetHint.textContent = '';
     completeWrap.style.display = 'none';
     return;
   }
+  if(restBtn) restBtn.style.display = 'flex';
 
   // Show session
   const dayId = info.dayId || TR_SEQUENCE[0];
@@ -4970,7 +4944,7 @@ function renderTrainingOverlay(){
   dayLabel.textContent = `Day ${day.id} of 4`;
   dayName.textContent = day.name;
   dayFocus.textContent = '2 sec up · 1 sec hold · 3 sec down';
-  restCard.style.display = 'none';
+  restCard.style.display = 'block'; // sleep icon always visible alongside session
   supersetHint.textContent = day.supersetHint;
   completeWrap.style.display = 'block';
 
@@ -5138,6 +5112,8 @@ function forceStartSession(){
 }
 
 function takeRestDay(){
+  const today = todayKey();
+  if(!records[today]) records[today] = {};
   records[today].training = {restDay:true, date:today};
 
   // Auto-check dumbbell discipline — rest day, no calorie burn
@@ -7563,7 +7539,7 @@ init();
 
 // ── Version check: reload if GitHub has a newer build
 (function checkVersion(){
-  const CURRENT = 'mission-os-v67';
+  const CURRENT = 'mission-os-v70';
   // Only run on HTTPS (deployed app), not local file
   if(location.protocol !== 'https:') return;
   setTimeout(() => {
@@ -7600,7 +7576,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v67';
+const CACHE = 'mission-os-v70';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
