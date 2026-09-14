@@ -564,6 +564,28 @@ html,body{
 .ms-warning.on{display:block;}
 
 /* Bottom sheet */
+.boot-splash{
+  position:fixed;inset:0;
+  background:var(--bg);
+  z-index:300;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .5s ease;
+}
+.boot-splash.on{opacity:1;pointer-events:all;}
+.boot-splash-inner{
+  max-width:320px;padding:0 var(--pad);text-align:center;
+}
+.boot-splash-mark{
+  font-family:var(--serif);font-size:15px;letter-spacing:.3em;color:var(--ac);
+  margin-bottom:var(--s5);opacity:.7;
+}
+.boot-splash-text{
+  font-family:var(--serif);font-size:24px;font-weight:300;line-height:1.4;
+  color:var(--t1);font-style:italic;
+}
+.boot-splash-author{
+  font-family:var(--sans);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--t3);margin-top:var(--s4);display:none;
+}
 .bottom-sheet{
   position:fixed;inset:0;
   background:rgba(20,18,14,.48);
@@ -1225,6 +1247,13 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 
 </head>
 <body>
+<div class="boot-splash" id="boot-splash">
+  <div class="boot-splash-inner">
+    <div class="boot-splash-mark">89.9</div>
+    <div class="boot-splash-text" id="boot-splash-text"></div>
+    <div class="boot-splash-author" id="boot-splash-author"></div>
+  </div>
+</div>
 <div class="phone" id="phone">
 
 <!-- TODAY -->
@@ -1323,7 +1352,7 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
     <div style="font-family:var(--serif);font-size:17px;font-weight:300;color:var(--t3);line-height:1.8;margin-bottom:var(--s5);">
       You started at <span id="arr-start"></span> kg.<br>
       You arrived at <span id="arr-current"></span> kg.<br>
-      September 1, 2026.
+      <span id="arr-target-date"></span>.
     </div>
     <div style="height:1px;background:var(--ac);width:48px;margin:0 auto var(--s4);"></div>
     <div style="font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;color:var(--t3);margin-bottom:var(--s5);">"The pain of discipline is far less<br>than the pain of regret."</div>
@@ -1638,6 +1667,55 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
         <label class="flbl">Target Date</label>
         <input class="ms-date" id="ms-td" type="date">
       </div>
+      <div style="margin-top:20px;">
+        <label class="flbl">Wake Target</label>
+        <input class="ms-date" id="ms-wake" type="time">
+      </div>
+      <div class="ms-disc-section" style="margin-top:24px;">
+        <div class="flbl" style="margin-bottom:12px;">Disciplines</div>
+        <div class="ms-disc-row" data-disc-id="d2">
+          <label class="flbl">Slot 2 name</label>
+          <input class="finp" id="ms-disc-d2-name" type="text" placeholder="Angamardana">
+          <div class="ms-row" style="margin-top:8px;">
+            <div class="ms-field">
+              <label class="flbl">kcal/min</label>
+              <input class="finp" id="ms-disc-d2-kcal" type="number" step="0.1" inputmode="decimal" placeholder="6.9">
+            </div>
+            <div class="ms-field">
+              <label class="flbl">Duration (min)</label>
+              <input class="finp" id="ms-disc-d2-dur" type="number" step="1" inputmode="numeric" placeholder="45">
+            </div>
+          </div>
+        </div>
+        <div class="ms-disc-row" data-disc-id="d4" style="margin-top:16px;">
+          <label class="flbl">Slot 4 name</label>
+          <input class="finp" id="ms-disc-d4-name" type="text" placeholder="Kriya">
+          <div class="ms-row" style="margin-top:8px;">
+            <div class="ms-field">
+              <label class="flbl">kcal/min</label>
+              <input class="finp" id="ms-disc-d4-kcal" type="number" step="0.1" inputmode="decimal" placeholder="2.7">
+            </div>
+            <div class="ms-field">
+              <label class="flbl">Duration (min)</label>
+              <input class="finp" id="ms-disc-d4-dur" type="number" step="1" inputmode="numeric" placeholder="30">
+            </div>
+          </div>
+        </div>
+        <div class="ms-disc-row" data-disc-id="d5" style="margin-top:16px;">
+          <label class="flbl">Slot 5 name</label>
+          <input class="finp" id="ms-disc-d5-name" type="text" placeholder="Dumbbell Training">
+          <div class="ms-row" style="margin-top:8px;">
+            <div class="ms-field">
+              <label class="flbl">kcal/min</label>
+              <input class="finp" id="ms-disc-d5-kcal" type="number" step="0.1" inputmode="decimal" placeholder="5.8">
+            </div>
+            <div class="ms-field">
+              <label class="flbl">Duration (min)</label>
+              <input class="finp" id="ms-disc-d5-dur" type="number" step="1" inputmode="numeric" placeholder="45">
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="ms-warning" id="ms-warning">This pace exceeds 1 kg/week. Consider adjusting.</div>
     <button class="btn-primary" onclick="applyMissionSettings()">Apply →</button>
@@ -1819,6 +1897,45 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
     <input id="db-search" type="text" placeholder="Search dishes…"
       style="width:100%;background:none;border:none;border-bottom:1px solid var(--rls);outline:none;font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t1);caret-color:var(--ac);padding-bottom:8px;"
       oninput="renderDbBrowser()">
+    <div style="text-align:right;margin-top:8px;">
+      <span style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--ac);cursor:pointer;" onclick="toggleCustomFoodPanel()">+ Add Custom Item</span>
+    </div>
+  </div>
+
+  <!-- Custom item entry panel -->
+  <div id="db-custom-panel" style="display:none;padding:16px 28px;background:var(--bg-r);border-bottom:1px solid var(--rls);">
+    <div style="font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;">Custom Item</div>
+    <input id="cf-name" type="text" placeholder="Dish name"
+      style="width:100%;background:none;border:none;border-bottom:1px solid var(--rls);outline:none;font-family:var(--serif);font-size:17px;font-weight:300;color:var(--t1);caret-color:var(--ac);padding-bottom:6px;margin-bottom:12px;">
+    <div style="display:flex;gap:10px;margin-bottom:12px;">
+      <input id="cf-cal" type="number" inputmode="numeric" placeholder="kcal"
+        style="flex:1;background:var(--bg);border:1px solid var(--rls);padding:8px;font-family:var(--sans);font-size:13px;color:var(--t1);">
+      <input id="cf-pro" type="number" inputmode="decimal" placeholder="Protein g"
+        style="flex:1;background:var(--bg);border:1px solid var(--rls);padding:8px;font-family:var(--sans);font-size:13px;color:var(--t1);">
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:14px;">
+      <input id="cf-carb" type="number" inputmode="decimal" placeholder="Carbs g"
+        style="flex:1;background:var(--bg);border:1px solid var(--rls);padding:8px;font-family:var(--sans);font-size:13px;color:var(--t1);">
+      <input id="cf-fat" type="number" inputmode="decimal" placeholder="Fat g"
+        style="flex:1;background:var(--bg);border:1px solid var(--rls);padding:8px;font-family:var(--sans);font-size:13px;color:var(--t1);">
+    </div>
+    <div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;">Color flag</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <label style="flex:1;text-align:center;padding:8px 4px;border:1px solid #6B8A4E;color:#6B8A4E;font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;">
+        <input type="radio" name="cf-color" value="green" checked style="margin-right:4px;">Green</label>
+      <label style="flex:1;text-align:center;padding:8px 4px;border:1px solid #C49A3A;color:#C49A3A;font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;">
+        <input type="radio" name="cf-color" value="yellow" style="margin-right:4px;">Yellow</label>
+      <label style="flex:1;text-align:center;padding:8px 4px;border:1px solid var(--risk-at);color:var(--risk-at);font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;">
+        <input type="radio" name="cf-color" value="red" style="margin-right:4px;">Red</label>
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:11px;color:var(--t2);">
+      <input id="cf-save-db" type="checkbox">
+      Save to database for future use
+    </label>
+    <div style="display:flex;gap:12px;justify-content:flex-end;">
+      <span style="font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);cursor:pointer;padding:8px;" onclick="toggleCustomFoodPanel()">Cancel</span>
+      <span style="font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ac);cursor:pointer;padding:8px;" onclick="addCustomFoodItem()">Add →</span>
+    </div>
   </div>
 
   <!-- Category filter tabs -->
@@ -1848,13 +1965,32 @@ const DEFAULT_MISSION = {
   startDate: (()=>{ const ist=new Date(Date.now()+5.5*60*60*1000); return ist.toISOString().slice(0,10); })(),
 };
 
-const DISCIPLINES = [
+let DISCIPLINES = [
   {id:'d1', name:'Wake Early',    category:'Discipline', kcalPerMin:0,   defaultDur:0,  travelName:'Wake Early'},
   {id:'d2', name:'Angamardana',         category:'Sadhana',    kcalPerMin:6.9, defaultDur:45, travelName:'Room Stretching'},
   {id:'d3', name:'10,000 Steps',        category:'Fitness',    kcalPerMin:0,   defaultDur:0,  travelName:'10,000 Steps'},
   {id:'d4', name:'Kriya',               category:'Sadhana',    kcalPerMin:2.7, defaultDur:30, travelName:'Kriya'},
   {id:'d5', name:'Dumbbell Training',   category:'Fitness',    kcalPerMin:5.8, defaultDur:45, travelName:'Bodyweight Training'},
 ];
+// Editable slots: d2, d4, d5 — name/kcalPerMin/defaultDur can be overridden per-install via mission.disciplineOverrides
+const EDITABLE_DISC_IDS = ['d2','d4','d5'];
+function applyDisciplineOverrides(){
+  if(!mission || !mission.disciplineOverrides) return;
+  DISCIPLINES.forEach(d => {
+    const o = mission.disciplineOverrides[d.id];
+    if(!o) return;
+    if(o.name) d.name = o.name;
+    if(typeof o.kcalPerMin === 'number') d.kcalPerMin = o.kcalPerMin;
+    if(typeof o.defaultDur === 'number') d.defaultDur = o.defaultDur;
+  });
+}
+function abbrevName(name){
+  if(!name) return '';
+  if(name.length <= 9) return name;
+  const firstWord = name.split(' ')[0];
+  if(firstWord.length <= 9) return firstWord;
+  return firstWord.slice(0,7) + '.';
+}
 
 // ═══════════════════════════════════════════════
 // FOOD DATABASE
@@ -2105,6 +2241,8 @@ const K_MISSION  = 'mos_mission';
 const K_MEALS    = 'mos_meals';
 const K_TRAVEL   = 'mos_travel';
 const K_DARK     = 'mos_dark';
+const K_CUSTOM_FOODS = 'mos_custom_foods';
+let CUSTOM_FOOD_DB = [];
 
 // ═══════════════════════════════════════════════
 // STATE
@@ -2134,7 +2272,24 @@ function load(){
     meals = ml ? JSON.parse(ml) : {};
     travelMode = localStorage.getItem(K_TRAVEL) === 'true';
     isDark = localStorage.getItem(K_DARK) === 'true';
+    CUSTOM_FOOD_DB = JSON.parse(localStorage.getItem(K_CUSTOM_FOODS) || '[]');
   } catch(e){ mission = {...DEFAULT_MISSION}; }
+  // Migrate old wake-progression system to a single editable target, once.
+  if(typeof mission.wakeTargetMinutes !== 'number'){
+    mission.wakeTargetMinutes = legacyWakeProgressionSnapshot();
+  }
+  applyDisciplineOverrides();
+}
+// One-time migration helper — freezes whatever the old progression system had
+// reached at the moment of upgrade, so existing users don't get jumped back to 6:45am.
+function legacyWakeProgressionSnapshot(){
+  const START_MINS = 6 * 60 + 45, TARGET_MINS = 4 * 60 + 30, STEP = 15, PER_LEVEL = 5;
+  let totalCompletions = 0;
+  Object.values(records || {}).forEach(r => {
+    if(r && r.disciplines && r.disciplines[0] && r.disciplines[0].done) totalCompletions++;
+  });
+  const shifts = Math.floor(totalCompletions / PER_LEVEL);
+  return Math.max(TARGET_MINS, START_MINS - shifts * STEP);
 }
 function save(){
   try{
@@ -2543,7 +2698,7 @@ function renderDiscDots(){
   if(!el) return;
   const todayRec = records[todayKey()] || {};
   const todayDiscs = todayRec.disciplines || [];
-  const { label: wakeLabel, reached } = getWakeTarget();
+  const wakeLabel = getWakeTarget().label;
   el.innerHTML = '';
 
   DISCIPLINES.forEach((disc, i) => {
@@ -2555,14 +2710,10 @@ function renderDiscDots(){
     let short;
     if(disc.id === 'd1'){
       short = wakeLabel; // show the actual time e.g. "6:45 am"
+    } else if(disc.id === 'd3'){
+      short = displayName.replace('10,000 Steps','Steps');
     } else {
-      short = displayName
-        .replace('Angamardana','Angamar.')
-        .replace('10,000 Steps','Steps')
-        .replace('Dumbbell Training','Dumbbell')
-        .replace('Bodyweight Training','Bodyweight')
-        .replace('Room Stretching','Stretch')
-        .replace('Wake Early','Wake');
+      short = abbrevName(displayName);
     }
 
     const div = document.createElement('div');
@@ -2576,12 +2727,8 @@ function renderDiscDots(){
   const wakeLine = document.getElementById('wake-target-line');
   if(wakeLine){
     const wt = getWakeTarget();
-    if(wt.reached){
-      wakeLine.textContent = 'Wake target reached — 4:30 am';
-    } else {
-      const prog = `${wt.completionsAtCurrentLevel}/5`;
-      wakeLine.textContent = `Wake target: ${wt.label} · ${prog} days done`;
-    }
+    const streak = maxConsecutiveDays('d1');
+    wakeLine.textContent = `Wake target: ${wt.label} · best streak ${streak}/42 days`;
   }
 }
 
@@ -2591,6 +2738,10 @@ function toggleTodayDiscDot(idx, el){
   if(!records[key].disciplines) records[key].disciplines = [];
   while(records[key].disciplines.length <= idx) records[key].disciplines.push({done:false, dur:0});
   records[key].disciplines[idx].done = !records[key].disciplines[idx].done;
+  // Preserve restDay flag on dumbbell (idx 4) if training is a rest day
+  const tr = (records[key].training || {});
+  if(idx === 4 && tr.restDay) records[key].disciplines[idx].restDay = true;
+  else if(idx === 4) delete records[key].disciplines[idx].restDay;
   save();
   el.classList.toggle('done');
   // Auto-check steps if steps disc
@@ -3185,6 +3336,55 @@ const CAT_ORDER = ['breakfast_main','breakfast_side','egg','nuts','fish','fish_f
 let dbActiveCat = 'all';
 let dbTrayItems = []; // [{id, name, calories, protein, carbs, fat, servingSize, tgFriendly, category}]
 
+function toggleCustomFoodPanel(){
+  const panel = document.getElementById('db-custom-panel');
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if(!isOpen){
+    ['cf-name','cf-cal','cf-pro','cf-carb','cf-fat'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('cf-save-db').checked = false;
+    const greenRadio = document.querySelector('input[name="cf-color"][value="green"]');
+    if(greenRadio) greenRadio.checked = true;
+  }
+}
+
+function addCustomFoodItem(){
+  const name = document.getElementById('cf-name').value.trim();
+  const cal  = parseFloat(document.getElementById('cf-cal').value);
+  const pro  = parseFloat(document.getElementById('cf-pro').value) || 0;
+  const carb = parseFloat(document.getElementById('cf-carb').value) || 0;
+  const fat  = parseFloat(document.getElementById('cf-fat').value) || 0;
+  if(!name || !cal){ alert('Please enter at least a name and calories.'); return; }
+
+  const color = (document.querySelector('input[name="cf-color"]:checked') || {}).value || 'yellow';
+  const tgFriendly = color === 'green';
+  const weightLossFriendly = color === 'green';
+  const tags = color === 'red' ? ['TreatMeal','Custom'] : ['Custom'];
+
+  const item = {
+    id: 'custom_' + Date.now(),
+    name,
+    mealSlot: 'any',
+    category: 'custom',
+    servingSize: '1 serving',
+    calories: cal, protein: pro, carbs: carb, fat: fat,
+    fiber: 0, satietyScore: 5, proteinScore: Math.min(10, Math.round(pro/3)),
+    tgFriendly, weightLossFriendly,
+    travelModeEligible: true, frequencyLimitPerWeek: null,
+    tags,
+  };
+
+  if(document.getElementById('cf-save-db').checked){
+    CUSTOM_FOOD_DB.push(item);
+    localStorage.setItem(K_CUSTOM_FOODS, JSON.stringify(CUSTOM_FOOD_DB));
+  }
+
+  dbTrayItems.push({...item, qty: 1});
+  toggleCustomFoodPanel();
+  renderDbTray();
+  renderDbBrowser();
+}
+
 function openReplace(dateKey, slot){
   currentReplaceSlot = slot;
   currentReplaceDate = dateKey;
@@ -3351,7 +3551,7 @@ function renderDbCategories(){
 function renderDbBrowser(){
   const query = (document.getElementById('db-search').value || '').toLowerCase().trim();
   const el = document.getElementById('db-results');
-  let items = MASTER_DB;
+  let items = MASTER_DB.concat(CUSTOM_FOOD_DB);
   if(dbActiveCat !== 'all') items = items.filter(i => i.category === dbActiveCat);
   if(query) items = items.filter(i =>
     i.name.toLowerCase().includes(query) ||
@@ -4551,8 +4751,13 @@ function checkArrival(){
   if(!overlay) return;
   const start = document.getElementById('arr-start');
   const curr = document.getElementById('arr-current');
+  const targetDateEl = document.getElementById('arr-target-date');
   if(start) start.textContent = mission.startWeight;
   if(curr) curr.textContent = currentWeight();
+  if(targetDateEl){
+    const td = keyToDate(mission.targetDate);
+    targetDateEl.textContent = MO[td.getMonth()] + ' ' + td.getDate() + ', ' + td.getFullYear();
+  }
   overlay.classList.add('on');
 }
 
@@ -4656,8 +4861,10 @@ function renderTodayAscent(){
 
   // Summit
   html += `<circle cx="${SUMMIT.x}" cy="${SUMMIT.y}" r="3" fill="${acColor}" opacity="0.7"/>`;
+  const summitD = keyToDate(mission.targetDate);
+  const summitLabel = MO_SHORT[summitD.getMonth()] + ' ' + summitD.getDate();
   html += `<text x="${SUMMIT.x}" y="${SUMMIT.y - 5}" text-anchor="middle"
-    font-family="sans-serif" font-size="7" fill="${acColor}" opacity="0.9">Sep 1</text>`;
+    font-family="sans-serif" font-size="7" fill="${acColor}" opacity="0.9">${summitLabel}</text>`;
 
   svg.innerHTML = html;
 }
@@ -5234,8 +5441,8 @@ const BADGES = [
     check:()=>maxConsecutiveDays('d1') >= 21, prog:()=>({cur:Math.min(21,maxConsecutiveDays('d1')),max:21})},
   {id:'w4', cat:'wake', emoji:'🌄', name:'The Early Hours', desc:'The final resistance breaks.', art:BADGE_ART.w4,
     check:()=>completionDays('d1') >= 50, prog:()=>({cur:Math.min(50,completionDays('d1')),max:50})},
-  {id:'w5', cat:'wake', emoji:'🏔', name:'Brahma Muhurta', desc:'The final hour is claimed.', art:BADGE_ART.w5,
-    check:()=>getWakeTarget().reached, prog:()=>({cur:missionDay(),max:46})},
+  {id:'w5', cat:'wake', emoji:'🏔', name:'Brahma Muhurta', desc:'42 consecutive days at your wake target.', art:BADGE_ART.w5,
+    check:()=>maxConsecutiveDays('d1') >= 42, prog:()=>({cur:Math.min(42,maxConsecutiveDays('d1')),max:42})},
 
   // ── ANGAMARDANA
   {id:'a1', cat:'angamardana', emoji:'🕉', name:'First Bend', desc:'Body enters the process.', art:BADGE_ART.a1,
@@ -5465,7 +5672,8 @@ function showBadgeEarned(badge, review = false){
       else if(max === 7)  milestoneText = '7 consecutive early wake-ups';
       else if(max === 21) milestoneText = '21 consecutive early wake-ups';
       else if(max === 50) milestoneText = '50 total early wake-ups';
-      else milestoneText = 'Wake target of 4:30 am reached';
+      else if(max === 42) milestoneText = `42 consecutive days at ${getWakeTarget().label}`;
+      else milestoneText = 'Wake target reached';
     } else if(badge.cat === 'angamardana'){
       if(max === 1)  milestoneText = 'First Angamardana session completed';
       else if(max === 7)  milestoneText = '7 total Angamardana sessions';
@@ -5963,71 +6171,21 @@ function getDailyProtein(dateKey){
   return Math.round(total);
 }
 // ═══════════════════════════════════════════════
-function countWakeCompletionsAtLevel(levelMins){
-  // Count days where wake discipline (d1, index 0) was checked AND the wake target was this level
-  let count = 0;
-  const keys = Object.keys(records).sort();
-  for(const k of keys){
-    const r = records[k];
-    if(!r || !r.disciplines) continue;
-    const wakeDisc = r.disciplines[0];
-    if(!wakeDisc || !wakeDisc.done) continue;
-    // What was the wake target on that day?
-    const dayTarget = getWakeTargetForCompletions(r.wakeCompletionsOnSave || 0);
-    if(dayTarget.minutes === levelMins) count++;
-  }
-  return count;
-}
-
-function getWakeTargetForCompletions(completionsBefore){
-  // Given N total prior completions, what level are we on?
-  const START_MINS = 6 * 60 + 45;
-  const TARGET_MINS = 4 * 60 + 30;
-  const STEP = 15;
-  const COMPLETIONS_PER_LEVEL = 5;
-  const shiftsCompleted = Math.floor(completionsBefore / COMPLETIONS_PER_LEVEL);
-  const currentMins = Math.max(TARGET_MINS, START_MINS - shiftsCompleted * STEP);
-  return { minutes: currentMins };
-}
-
-function getWakeTarget(){
-  const START_MINS = 6 * 60 + 45;
-  const TARGET_MINS = 4 * 60 + 30;
-  const STEP = 15;
-  const COMPLETIONS_PER_LEVEL = 5;
-
-  // Count total wake completions across all records
-  let totalCompletions = 0;
-  const keys = Object.keys(records).sort();
-  for(const k of keys){
-    const r = records[k];
-    if(!r || !r.disciplines) continue;
-    const wakeDisc = r.disciplines[0];
-    if(wakeDisc && wakeDisc.done) totalCompletions++;
-  }
-
-  const shiftsCompleted = Math.floor(totalCompletions / COMPLETIONS_PER_LEVEL);
-  const currentMins = Math.max(TARGET_MINS, START_MINS - shiftsCompleted * STEP);
-  const completionsAtCurrentLevel = totalCompletions % COMPLETIONS_PER_LEVEL;
-  const isAtFinal = currentMins === TARGET_MINS;
-
-  const hours = Math.floor(currentMins / 60);
-  const mins = currentMins % 60;
+// Wake target is now a single, user-editable time (mission.wakeTargetMinutes) —
+// no more auto progression. "Reached" a badge is about streak length, not level.
+function minutesToLabel(mins){
+  const hours = Math.floor(mins / 60);
+  const m = mins % 60;
   const ampm = hours < 12 ? 'am' : 'pm';
   const h12 = hours === 0 ? 12 : (hours > 12 ? hours - 12 : hours);
-  return {
-    label: `${h12}:${String(mins).padStart(2,'0')} ${ampm}`,
-    reached: isAtFinal,
-    minutes: currentMins,
-    totalCompletions,
-    completionsAtCurrentLevel,
-    completionsNeeded: COMPLETIONS_PER_LEVEL - completionsAtCurrentLevel,
-  };
+  return `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
 }
-
+function getWakeTarget(){
+  const mins = (mission && typeof mission.wakeTargetMinutes === 'number') ? mission.wakeTargetMinutes : 270;
+  return { label: minutesToLabel(mins), minutes: mins };
+}
 function getWakeDisplayName(){
-  const { label, reached } = getWakeTarget();
-  return reached ? 'Wake at 4:30 am' : `Wake at ${label}`;
+  return `Wake at ${getWakeTarget().label}`;
 }
 // ═══════════════════════════════════════════════
 function showDataDiagnostic(){
@@ -6621,6 +6779,15 @@ function renderMission(){
   document.getElementById('ms-cw').value = cw;
   document.getElementById('ms-tw').value = tw;
   document.getElementById('ms-td').value = mission.targetDate;
+  const wm = getWakeTarget().minutes;
+  document.getElementById('ms-wake').value = String(Math.floor(wm/60)).padStart(2,'0') + ':' + String(wm%60).padStart(2,'0');
+  EDITABLE_DISC_IDS.forEach(id => {
+    const d = DISCIPLINES.find(x => x.id === id);
+    if(!d) return;
+    document.getElementById(`ms-disc-${id}-name`).value = d.name;
+    document.getElementById(`ms-disc-${id}-kcal`).value = d.kcalPerMin;
+    document.getElementById(`ms-disc-${id}-dur`).value = d.defaultDur;
+  });
 
   // Discipline Ascent
   renderDisciplineAscent();
@@ -6708,10 +6875,39 @@ function applyMissionSettings(){
   mission.startWeight = cw;
   mission.targetWeight = tw;
   mission.targetDate = td;
+
+  // Wake target
+  const wakeVal = document.getElementById('ms-wake').value; // "HH:MM"
+  if(wakeVal){
+    const [wh, wmin] = wakeVal.split(':').map(Number);
+    mission.wakeTargetMinutes = wh * 60 + wmin;
+  }
+
+  // Discipline overrides (name / kcalPerMin / defaultDur) for editable slots
+  if(!mission.disciplineOverrides) mission.disciplineOverrides = {};
+  EDITABLE_DISC_IDS.forEach(id => {
+    const nameEl = document.getElementById(`ms-disc-${id}-name`);
+    const kcalEl = document.getElementById(`ms-disc-${id}-kcal`);
+    const durEl  = document.getElementById(`ms-disc-${id}-dur`);
+    if(!nameEl) return;
+    const name = nameEl.value.trim();
+    const kcal = parseFloat(kcalEl.value);
+    const dur  = parseInt(durEl.value);
+    if(name || !isNaN(kcal) || !isNaN(dur)){
+      mission.disciplineOverrides[id] = {
+        name: name || undefined,
+        kcalPerMin: !isNaN(kcal) ? kcal : undefined,
+        defaultDur: !isNaN(dur) ? dur : undefined,
+      };
+    }
+  });
+  applyDisciplineOverrides();
+
   save();
   renderMission();
   renderRiskCard();
   renderTomorrowCard();
+  renderDiscDots();
 }
 
 function completionRate(discId){
@@ -7295,6 +7491,44 @@ function renderNutrientBars(){
   }
 }
 
+const SPLASH_QUOTES = [{"text": "Your wake target isn't about willpower. It's about what you do at 10pm the night before.", "author": null}, {"text": "The quiet before the world wakes is yours alone. No one else is competing for that time.", "author": null}, {"text": "Every early morning is a vote for who you're becoming.", "author": null}, {"text": "You don't feel like it. Get up anyway. That's the whole practice.", "author": null}, {"text": "The alarm is just a decision wearing a sound.", "author": null}, {"text": "Nobody sees the 5am version of you. That's exactly why it counts.", "author": null}, {"text": "Discipline is doing it on the days you don't want to.", "author": null}, {"text": "The bed will still be warm tomorrow. Get up anyway.", "author": null}, {"text": "You're not waking up early. You're refusing to lose the morning.", "author": null}, {"text": "The version of you that hits snooze and the version that doesn't are not the same person by noon.", "author": null}, {"text": "Early mornings compound. So does staying in bed.", "author": null}, {"text": "This one decision, repeated, becomes your whole identity.", "author": null}, {"text": "The hardest part is the first movement. After that, momentum does the work.", "author": null}, {"text": "You set this target. Honor it like someone else is counting on you — because they are: you.", "author": null}, {"text": "Consistency at dawn builds confidence that lasts all day.", "author": null}, {"text": "The mission doesn't care how you feel at 5am. Show up anyway.", "author": null}, {"text": "Waking on time is the first discipline of the day. Everything else follows its lead.", "author": null}, {"text": "Tired is a feeling. Getting up is a choice. Don't confuse the two.", "author": null}, {"text": "The body resists first, then it thanks you.", "author": null}, {"text": "Whatever you call your practice, showing up daily is what makes it yours.", "author": null}, {"text": "Some days it flows. Some days you force it. Both count the same.", "author": null}, {"text": "The mat doesn't care about your mood. Get on it anyway.", "author": null}, {"text": "Discomfort today is capacity tomorrow.", "author": null}, {"text": "Your practice isn't about performance. It's about proof — proof you show up.", "author": null}, {"text": "The days you don't want to practice are the days that matter most.", "author": null}, {"text": "Strength built quietly is still strength.", "author": null}, {"text": "You're not just training a body. You're training a habit of obedience to your own word.", "author": null}, {"text": "Skipping once is a day. Skipping twice is a pattern. Don't let it become one.", "author": null}, {"text": "The breath leads. The body follows. The mind eventually agrees.", "author": null}, {"text": "Every rep, every stretch, every rotation — it's all just repetition asking you to keep a promise.", "author": null}, {"text": "Nobody's watching your form at home. Do it right anyway.", "author": null}, {"text": "This practice existed before you and will outlast the excuse you're about to make.", "author": null}, {"text": "Discipline in the body precedes discipline everywhere else.", "author": null}, {"text": "Show up first. Improve later. In that order.", "author": null}, {"text": "You don't need motivation. You need the mat and five minutes.", "author": null}, {"text": "The resistance you feel today is smaller than the resistance you overcame yesterday.", "author": null}, {"text": "Steps are the easiest discipline to fake and the easiest to fulfill. Choose fulfillment.", "author": null}, {"text": "Every step is a small, boring, undeniable vote for the mission.", "author": null}, {"text": "Movement is medicine you don't need a prescription for.", "author": null}, {"text": "10,000 steps isn't a workout. It's a floor. Don't let it become a ceiling too.", "author": null}, {"text": "Walk while you think. Walk while you're bored. Walk while you're annoyed. Just walk.", "author": null}, {"text": "The steps you take today don't feel like much. That's exactly why most people skip them.", "author": null}, {"text": "Nobody ever regretted a walk. Plenty regret the one they skipped.", "author": null}, {"text": "Your legs don't need convincing. Your mind does. Move first, argue later.", "author": null}, {"text": "A sedentary day is a quiet vote against the mission. Don't cast it.", "author": null}, {"text": "Steps are free. Excuses are expensive.", "author": null}, {"text": "If today feels heavy, that's exactly when the walk matters most.", "author": null}, {"text": "You don't need a destination. You need motion.", "author": null}, {"text": "Every stationary hour is a small debt. Steps are how you pay it back.", "author": null}, {"text": "The scale responds to weeks, not days. Steps are how you stay patient.", "author": null}, {"text": "Stillness is a discipline, not an absence of effort.", "author": null}, {"text": "The mind that won't sit still is exactly the mind that needs to.", "author": null}, {"text": "Five quiet minutes can undo an hour of noise.", "author": null}, {"text": "You don't clear the mind. You just stop feeding it for a while.", "author": null}, {"text": "The practice isn't about doing it perfectly. It's about doing it daily.", "author": null}, {"text": "Sitting still is harder than it looks and more useful than it seems.", "author": null}, {"text": "Your thoughts will wander. Bring them back. That's the entire exercise.", "author": null}, {"text": "Some days it's silence. Some days it's just less noise. Both are progress.", "author": null}, {"text": "This is the one discipline no one can see you doing — and it shapes all the others.", "author": null}, {"text": "Discomfort with stillness is proof you needed it.", "author": null}, {"text": "You don't need incense or a mountain. You need five minutes and consistency.", "author": null}, {"text": "Skipping this one feels harmless. It rarely is.", "author": null}, {"text": "Muscle is built in recovery, but it's earned in effort.", "author": null}, {"text": "Weight doesn't care about your excuses. It only responds to reps.", "author": null}, {"text": "Strength training isn't about today's number. It's about the trend line.", "author": null}, {"text": "The set you almost skipped is usually the one that mattered most.", "author": null}, {"text": "Progressive overload is just discipline with a spreadsheet.", "author": null}, {"text": "Your body adapts to what you consistently ask of it. Ask for more, carefully.", "author": null}, {"text": "Lifting heavy things repeatedly is a strange way to build a calm mind, but it works.", "author": null}, {"text": "Every session is a deposit. Skipping is a withdrawal.", "author": null}, {"text": "You don't need to feel strong to train. Training is how you become strong.", "author": null}, {"text": "Form first, ego second, always.", "author": null}, {"text": "The iron doesn't lie. It shows you exactly where you stand today.", "author": null}, {"text": "Rest days build the muscle. Training days build the discipline. You need both.", "author": null}, {"text": "Small weights, done consistently, outperform heavy weights done rarely.", "author": null}, {"text": "Rest is not the opposite of discipline. It's part of it.", "author": null}, {"text": "A planned rest day is strength. An accidental one is drift. Know the difference.", "author": null}, {"text": "Recovery is when the body actually changes. Respect it like training.", "author": null}, {"text": "Resting on purpose is not the same as giving up.", "author": null}, {"text": "You earned this rest. Take it fully, then get back to work tomorrow.", "author": null}, {"text": "The mission doesn't punish rest. It punishes pretending rest is a habit.", "author": null}, {"text": "A streak isn't about one perfect day. It's about not letting a bad day become two.", "author": null}, {"text": "Every day you protect the streak, the streak starts protecting you.", "author": null}, {"text": "The first few days of a streak take willpower. After that, it takes identity.", "author": null}, {"text": "Don't break the chain for something you won't remember in a week.", "author": null}, {"text": "Streaks die from small permissions, not big failures. Watch the small ones.", "author": null}, {"text": "Long streaks are just short streaks that refused to end.", "author": null}, {"text": "Motivation was never going to show up every day. Discipline was always the backup plan.", "author": null}, {"text": "You don't need to want to. You need to do it anyway.", "author": null}, {"text": "Feelings are unreliable narrators. Don't let them run the mission.", "author": null}, {"text": "The days you don't feel like it are exactly the days that separate people.", "author": null}, {"text": "Waiting to feel motivated is how missions quietly die.", "author": null}, {"text": "You committed to this when you were thinking clearly. Trust that version of you today.", "author": null}, {"text": "Low motivation is normal. Quitting because of it is optional.", "author": null}, {"text": "Discipline is just motivation that doesn't need to be asked twice.", "author": null}, {"text": "Routines break on weekends because you let them, not because they have to.", "author": null}, {"text": "Travel is not a pause button. It's a different set of choices.", "author": null}, {"text": "The mission doesn't take weekends off. Neither should the discipline.", "author": null}, {"text": "New environment, same standards. That's the actual test.", "author": null}, {"text": "It's easier to maintain a habit than to rebuild one. Don't let two off-days become a reset.", "author": null}, {"text": "This badge isn't the goal. It's proof the process is working.", "author": null}, {"text": "Every milestone was built from days that felt unremarkable at the time.", "author": null}, {"text": "You didn't notice the discipline compounding. That's exactly how compounding works.", "author": null}, {"text": "This is what consistency looks like when you finally step back and look at it.", "author": null}, {"text": "Nobody sees the boring middle of a mission. You're living proof it's worth it.", "author": null}, {"text": "The first week is the hardest because nothing has become automatic yet. Push through it.", "author": null}, {"text": "Early days are about proving the system to yourself, not proving yourself to anyone else.", "author": null}, {"text": "You don't need to be good at this yet. You need to keep showing up while you get good at it.", "author": null}, {"text": "The first ten days build the habit. The next hundred build the identity.", "author": null}, {"text": "Every mission feels impossible on day one and inevitable on day ninety.", "author": null}, {"text": "The final stretch is won by whoever refuses to coast.", "author": null}, {"text": "You've already proven you can do this. Now prove you can finish it.", "author": null}, {"text": "This is exactly where missions are lost — not from lack of ability, but from early celebration.", "author": null}, {"text": "The last mile always feels longer than the math says it is. Keep going anyway.", "author": null}, {"text": "Don't let \"almost there\" become an excuse to ease off. Almost isn't there.", "author": null}, {"text": "There is no luck except where there is discipline.", "author": null}, {"text": "The mind is a lousy master but a wonderful servant.", "author": null}, {"text": "He who conquers himself has won a greater victory than he who conquers a city.", "author": null}, {"text": "It is easier to suppress the first desire than to satisfy all that follow.", "author": null}, {"text": "There is no pleasure in life equal to the conquest of a bad habit.", "author": null}, {"text": "This isn't a diet. It's a rebuild. Treat it like one.", "author": null}, {"text": "Nobody remembers the easy days of a mission. They remember the ones they almost quit.", "author": null}, {"text": "The mission was never about one meal or one morning. It's about who you are in six months.", "author": null}, {"text": "You didn't sign up for comfortable. You signed up for different.", "author": null}, {"text": "Every mission has a version of you at the start who doesn't yet believe it's possible. Prove that version wrong.", "author": null}, {"text": "The finish line isn't a number on a scale. It's a person who no longer negotiates with themselves.", "author": null}, {"text": "This is the long game. Play it like one.", "author": null}, {"text": "A mission is just a decision, defended daily.", "author": null}, {"text": "You're not chasing a deadline. You're becoming someone who doesn't need one.", "author": null}, {"text": "Nobody else is going to want this as much as you do. That's fine. It was never their mission.", "author": null}, {"text": "The mission doesn't ask for your best day. It asks for today.", "author": null}, {"text": "You already decided this mattered. Today is just proof.", "author": null}, {"text": "Some missions are won in public. This one is won alone, at 90% of the moments nobody sees.", "author": null}, {"text": "This mission ends the day you stop showing up — not the day on the calendar.", "author": null}, {"text": "You are not behind. You are exactly as far as your effort has taken you. Keep going.", "author": null}, {"text": "You're not trying to lose weight. You're trying to become someone who doesn't need to.", "author": null}, {"text": "Every discipline you keep is a vote for the person you're building.", "author": null}, {"text": "Habits are just identity, repeated until it's true.", "author": null}, {"text": "You don't rise to the mission. You fall to the level of your habits. Build better ones.", "author": null}, {"text": "Who you are at 4:30am says more than who you are at a dinner party.", "author": null}, {"text": "The person who finishes this mission is not the person who started it. That's the point.", "author": null}, {"text": "Discipline isn't punishment. It's how you keep a promise to someone you'll become.", "author": null}, {"text": "You are what you repeatedly do — not what you occasionally intend.", "author": null}, {"text": "Change your evidence, change your identity. Today is one more piece of evidence.", "author": null}, {"text": "The mirror doesn't lie, but it also doesn't know what you did today. Only you do.", "author": null}, {"text": "Hard is not the same as wrong. Keep going.", "author": null}, {"text": "The days that feel like failure are usually just the days that felt like effort.", "author": null}, {"text": "You don't need a good day. You need a day you didn't quit.", "author": null}, {"text": "Difficulty is not a sign to stop. It's usually a sign you're close to the part that matters.", "author": null}, {"text": "Every person who finished something hard had a day exactly like today.", "author": null}, {"text": "Suffering is optional. Effort isn't.", "author": null}, {"text": "The obstacle is not in the way. It is the way.", "author": null}, {"text": "You've survived every hard day so far. That's a perfect record. Protect it.", "author": null}, {"text": "Pain is temporary and forgettable. Quitting is permanent and remembered.", "author": null}, {"text": "Nobody who kept going ever regretted it later. Remember that on the days you want to stop.", "author": null}, {"text": "Strength isn't the absence of struggle. It's what struggle builds.", "author": null}, {"text": "The version of you that wants to quit right now is not the version making the decisions.", "author": null}, {"text": "You don't have to feel strong. You have to act like the person who is.", "author": null}, {"text": "Growth lives exactly at the edge of what's uncomfortable. Stay there a little longer.", "author": null}, {"text": "This feeling — the one that wants to quit — is not new information. You've felt it before and kept going anyway.", "author": null}, {"text": "Small, boring, repeated — that's what actually works.", "author": null}, {"text": "Nobody claps for a normal Tuesday. Show up for it anyway.", "author": null}, {"text": "The unremarkable days are where missions are actually won.", "author": null}, {"text": "You don't need a breakthrough today. You need consistency.", "author": null}, {"text": "A quiet win still counts. Log it and move on.", "author": null}, {"text": "Progress doesn't announce itself. It just adds up while you're not looking.", "author": null}, {"text": "One good decision doesn't feel like much. A hundred of them is a different person.", "author": null}, {"text": "The compound interest of discipline is invisible daily and undeniable annually.", "author": null}, {"text": "Today's effort won't feel historic. Do it anyway — history is made of days like this.", "author": null}, {"text": "You're allowed to be unimpressed with today's progress and still show up for it.", "author": null}, {"text": "Keeping a promise to yourself is a rarer skill than most people think. Practice it today.", "author": null}, {"text": "Self-respect isn't given. It's built, one kept promise at a time.", "author": null}, {"text": "Every time you do what you said you would, you trust yourself a little more.", "author": null}, {"text": "Broken promises to yourself are the quietest kind of self-betrayal. Don't make one today.", "author": null}, {"text": "The relationship that matters most is the one you have with your own word.", "author": null}, {"text": "You don't need anyone else to believe in you today. You need to believe your own commitments.", "author": null}, {"text": "Discipline is just self-respect wearing a schedule.", "author": null}, {"text": "However the morning starts, the mission still needs you.", "author": null}, {"text": "The first decision of the day usually predicts the rest of it. Choose well.", "author": null}, {"text": "A strong morning doesn't guarantee a strong day. But a weak one rarely helps.", "author": null}, {"text": "You don't need to feel ready. You need to start.", "author": null}, {"text": "Whatever mood you woke up in, the mission doesn't check first.", "author": null}, {"text": "Before you sleep, ask honestly: did today serve the mission or just pass by?", "author": null}, {"text": "Tomorrow is easier when tonight is honest.", "author": null}, {"text": "The small decisions made tonight decide how tomorrow starts.", "author": null}, {"text": "Rest with a clear conscience — that means showing up today, not being perfect today.", "author": null}, {"text": "The only comparison that matters is you, ninety days ago.", "author": null}, {"text": "Someone else's pace was never your race.", "author": null}, {"text": "Stop measuring against people who didn't start where you started.", "author": null}, {"text": "You're not behind anyone. You're exactly on your own timeline.", "author": null}, {"text": "The only rival worth tracking is the version of you that almost gave up.", "author": null}, {"text": "Everything worth having costs something you'd rather not give up. Pay it anyway.", "author": null}, {"text": "You're not missing out. You're choosing what matters more.", "author": null}, {"text": "The easy version of today was available. You chose the other one. That's the whole story.", "author": null}, {"text": "Discipline is just preferring long-term respect over short-term comfort.", "author": null}, {"text": "What you say no to today defines what you can say yes to later.", "author": null}, {"text": "A setback is not a verdict. It's a Tuesday.", "author": null}, {"text": "The mission doesn't end because one day did. Keep going tomorrow.", "author": null}, {"text": "Falling off the plan once is normal. Deciding to stay off is the actual mistake.", "author": null}, {"text": "You don't need a comeback story if you never fully stopped.", "author": null}, {"text": "Every strong streak has a weak day buried somewhere in it. That's not failure. That's data.", "author": null}, {"text": "The body changes on its own schedule, not yours. Keep showing up regardless.", "author": null}, {"text": "Trust the process on the days the process doesn't show results yet.", "author": null}, {"text": "Results lag effort by weeks. Don't judge today by today's mirror.", "author": null}, {"text": "Patience is just discipline stretched out over time.", "author": null}, {"text": "The slow way is usually the only way that actually holds.", "author": null}, {"text": "Courage isn't the absence of doubt. It's moving despite it.", "author": null}, {"text": "You don't need certainty to start. You need willingness.", "author": null}, {"text": "Every hard thing was impossible right up until someone did it anyway.", "author": null}, {"text": "Doubt is loud. Let it talk. Move anyway.", "author": null}, {"text": "Who's gonna carry the boats?", "author": "David Goggins"}, {"text": "No one is going to come help you. No one's coming to save you.", "author": "David Goggins"}, {"text": "We're either getting better or we're getting worse.", "author": "David Goggins"}, {"text": "I don't stop when I'm tired. I stop when I'm done.", "author": "David Goggins"}, {"text": "The most important conversations you'll ever have are the ones you'll have with yourself.", "author": "David Goggins"}, {"text": "Stay hard.", "author": "David Goggins"}, {"text": "The best way to pursue any discipline is the martial art way.", "author": "Joe Rogan"}, {"text": "You have to challenge yourself every day and push yourself out of your comfort zone.", "author": "Joe Rogan"}, {"text": "The best nootropic is sleep.", "author": "Andrew Huberman"}, {"text": "Sunlight before screen light. Every day. Even if cloudy.", "author": "Andrew Huberman"}, {"text": "Fear is a sensation. Courage is a decision.", "author": "Andrew Huberman"}, {"text": "Don't ask how people are doing, ask how they are sleeping.", "author": "Andrew Huberman"}, {"text": "Discipline equals freedom.", "author": "Jocko Willink"}, {"text": "Great things come from hard work and perseverance. No excuses.", "author": "Kobe Bryant"}, {"text": "Discipline is the bridge between goals and accomplishment.", "author": "Jim Rohn"}, {"text": "No man is free who is not master of himself.", "author": "Epictetus"}];
+
+function getDailySplashQuote(){
+  const key = todayKey();
+  const [y,m,d] = key.split('-').map(Number);
+  const days = Math.floor(Date.UTC(y, m-1, d) / 86400000);
+  const idx = ((days % SPLASH_QUOTES.length) + SPLASH_QUOTES.length) % SPLASH_QUOTES.length;
+  return SPLASH_QUOTES[idx];
+}
+function maybeShowSplash(){
+  const key = todayKey();
+  const shownKey = 'splash_shown_' + key;
+  if(localStorage.getItem(shownKey)) return; // already shown once today
+  const el = document.getElementById('boot-splash');
+  if(!el) return;
+  const q = getDailySplashQuote();
+  document.getElementById('boot-splash-text').textContent = q.text;
+  const authorEl = document.getElementById('boot-splash-author');
+  if(q.author){ authorEl.textContent = '— ' + q.author; authorEl.style.display = 'block'; }
+  else { authorEl.style.display = 'none'; }
+  el.classList.add('on');
+
+  // Hold time scales with reading length (~200wpm) instead of a fixed short flash.
+  const wordCount = q.text.split(/\s+/).length;
+  const readingMs = Math.round((wordCount / 200) * 60 * 1000);
+  const HOLD_MS = Math.max(3200, Math.min(7000, readingMs + 1500));
+
+  let dismissed = false;
+  const dismiss = () => {
+    if(dismissed) return;
+    dismissed = true;
+    el.classList.remove('on');
+    localStorage.setItem(shownKey, '1');
+  };
+  const timer = setTimeout(dismiss, HOLD_MS);
+  el.addEventListener('click', () => { clearTimeout(timer); dismiss(); }, {once:true});
+}
+
 // ═══════════════════════════════════════════════
 // COACH VOICE
 // ═══════════════════════════════════════════════
@@ -7315,29 +7549,82 @@ const COACH_MESSAGES = {
     "One morning number doesn't reverse weeks of work. Stay the course.",
   ],
   goodDeficit: [
-    "The discipline and the deficit aligned today. This is what the mission looks like.",
-    "Today's work will show on the scale in 3–5 days. The lag is normal.",
-    "Good days compound. You're building something real.",
+    "Today the math worked because the discipline worked first.",
+    "This is what the mission actually looks like — quiet, boring, correct.",
+    "The scale won't move today because of this. It'll move because of ten days like this.",
+    "You don't feel different yet. You will in three weeks.",
+    "Good days don't need celebration. They need repetition.",
+    "This is not a peak. It's the baseline you're building.",
+    "One good day proves it's possible. The next ten prove it's who you are.",
+    "The deficit is just arithmetic. The discipline behind it is the real number.",
   ],
   behindPace: [
-    "Behind today. It's recoverable. What's one thing to change tomorrow?",
-    "The mission is 77 days, not one. Zoom out.",
-    "Every day behind pace just means the next day matters more.",
+    "Behind today. Recoverable tomorrow. That's the whole story — don't make it bigger.",
+    "One bad day is data. Two in a row is a pattern. Don't let it become one.",
+    "The mission is measured in weeks, not moments. Zoom out.",
+    "Missing pace once doesn't cancel the plan. Panicking about it might.",
+    "Tomorrow doesn't know today happened unless you let it.",
+    "Every mission has off days. What matters is what you do the day after.",
+    "This isn't failure. It's information. Use it.",
+    "Nobody stays exactly on pace forever. What matters is the average, not the outlier.",
   ],
   highSodium: [
-    "Sodium is high today. Drink an extra glass of water tonight — it'll help.",
-    "High sodium days make the scale lie tomorrow morning. Don't be surprised.",
-    "Restaurant food is the main sodium source. Keep that in mind when eating out.",
+    "High sodium today just means tomorrow's scale number will lie a little. Don't panic at it.",
+    "Salt retains water, not fat. Know the difference before you react.",
+    "A high-sodium day is not a bad day. It's just a wet one.",
+    "Drink the extra water tonight. Tomorrow's number will thank you.",
   ],
   lowProtein: [
-    "Protein protects your muscle while fat leaves. Don't let it drop too low.",
-    "At a deficit, protein is the most important macro. Aim for 140g daily.",
-    "Boiled eggs, fish, cherupayar — cheap, easy, high-protein Kerala options.",
+    "Protein is what protects muscle while the deficit removes fat. Don't shortchange it.",
+    "Low protein days make the whole deficit less efficient. Fix it before dinner, not after.",
+    "Muscle is expensive to build and cheap to lose. Protein is how you keep it.",
+    "This is the one macro where \"close enough\" isn't close enough.",
   ],
   wakEarly: [
-    "4:30am is not about willpower. It's about what you do at 10pm the night before.",
-    "Brahmamuhurta is documented across millennia. You're not the first to find value in it.",
+    "Your wake target isn't about willpower. It's about what you do at 10pm the night before.",
     "The quiet before the world wakes is yours alone. No one else is competing for that time.",
+    "Every early morning is a vote for who you're becoming.",
+    "You don't feel like it. Get up anyway. That's the whole practice.",
+    "The alarm is just a decision wearing a sound.",
+    "Nobody sees the 5am version of you. That's exactly why it counts.",
+    "Discipline is doing it on the days you don't want to.",
+    "The bed will still be warm tomorrow. Get up anyway.",
+    "You're not waking up early. You're refusing to lose the morning.",
+    "The version of you that hits snooze and the version that doesn't are not the same person by noon.",
+    "Early mornings compound. So does staying in bed.",
+    "This one decision, repeated, becomes your whole identity.",
+    "The hardest part is the first movement. After that, momentum does the work.",
+    "You set this target. Honor it like someone else is counting on you — because they are: you.",
+    "Consistency at dawn builds confidence that lasts all day.",
+    "The mission doesn't care how you feel at 5am. Show up anyway.",
+    "Waking on time is the first discipline of the day. Everything else follows its lead.",
+    "Tired is a feeling. Getting up is a choice. Don't confuse the two.",
+  ],
+  restDay: [
+    "Rest is not the opposite of discipline. It's part of it.",
+    "A planned rest day is strength. An accidental one is drift. Know the difference.",
+    "Recovery is when the body actually changes. Respect it like training.",
+    "Resting on purpose is not the same as giving up.",
+    "You earned this rest. Take it fully, then get back to work tomorrow.",
+    "The mission doesn't punish rest. It punishes pretending rest is a habit.",
+  ],
+  streakBuilding: [
+    "A streak isn't about one perfect day. It's about not letting a bad day become two.",
+    "Every day you protect the streak, the streak starts protecting you.",
+    "The first few days of a streak take willpower. After that, it takes identity.",
+    "Don't break the chain for something you won't remember in a week.",
+    "Streaks die from small permissions, not big failures. Watch the small ones.",
+    "Long streaks are just short streaks that refused to end.",
+  ],
+  lowMotivation: [
+    "Motivation was never going to show up every day. Discipline was always the backup plan.",
+    "You don't need to want to. You need to do it anyway.",
+    "Feelings are unreliable narrators. Don't let them run the mission.",
+    "The days you don't feel like it are exactly the days that separate people.",
+    "Waiting to feel motivated is how missions quietly die.",
+    "You committed to this when you were thinking clearly. Trust that version of you today.",
+    "Low motivation is normal. Quitting because of it is optional.",
+    "Discipline is just motivation that doesn't need to be asked twice.",
   ],
 };
 
@@ -7379,13 +7666,29 @@ function getCoachMessage(){
   const ystdWt  = parseFloat((records[keyForOffset(-1)] || {}).weight);
   const wtSpike = todayWt && ystdWt && (todayWt - ystdWt) > 1.0;
 
+  // Rest day taken today (dumbbell/training marked as rest)
+  const isRestDay = !!(rec.training && rec.training.restDay);
+
+  // Any non-wake, non-steps discipline (d2/d4/d5) on a 7+ day streak
+  let disciplineStreak7 = false;
+  for(const idx of [1,3,4]){ // DISCIPLINES indices for d2, d4, d5
+    let s = 0;
+    for(let i = 0; i < 7; i++){
+      const k = keyForOffset(-i);
+      const discs = (records[k] || {}).disciplines || [];
+      if(discs[idx] && discs[idx].done) s++; else break;
+    }
+    if(s >= 7){ disciplineStreak7 = true; break; }
+  }
+
   // Pick message
   let pool = null;
   if(daysSinceLog >= 2) pool = COACH_MESSAGES.missedLog;
   else if(sodium > SODIUM_LIMIT_MG) pool = COACH_MESSAGES.highSodium;
   else if(protein > 0 && protein < 100) pool = COACH_MESSAGES.lowProtein;
   else if(wtSpike) pool = COACH_MESSAGES.weightSpike;
-  else if(stepStreak >= 7) pool = COACH_MESSAGES.stepStreak;
+  else if(isRestDay) pool = COACH_MESSAGES.restDay;
+  else if(stepStreak >= 7 || disciplineStreak7) pool = stepStreak >= 7 ? COACH_MESSAGES.stepStreak : COACH_MESSAGES.streakBuilding;
   else if(deficit !== null && deficit > deficitPerDay + 200) pool = COACH_MESSAGES.goodDeficit;
   else if(deficit !== null && deficit < deficitPerDay - 300) pool = COACH_MESSAGES.behindPace;
 
@@ -7416,15 +7719,16 @@ function dismissCoachCard(){
 function getDeficitReframe(actualDeficit, requiredDeficit, targetDate){
   if(actualDeficit === null) return null;
   const gPerDay = actualDeficit / 7700; // kg per day
-  const remaining = parseFloat((currentWeight() || 99)) - 89.9;
+  const remaining = parseFloat((currentWeight() || 99)) - mission.targetWeight;
   const daysNeeded = remaining / gPerDay;
   const arrivalDate = new Date(Date.now() + 5.5*60*60*1000);
   arrivalDate.setUTCDate(arrivalDate.getUTCDate() + daysNeeded);
   const target = new Date(targetDate);
   const diff = Math.round((arrivalDate - target) / 86400000);
-  if(Math.abs(diff) <= 3) return 'At this pace, you arrive on September 1.';
+  const targetLabel = MO[target.getMonth()] + ' ' + target.getDate();
+  if(Math.abs(diff) <= 3) return `At this pace, you arrive on ${targetLabel}.`;
   if(diff < 0) return `At this pace, you arrive ${Math.abs(diff)} days early.`;
-  return `At this pace, you arrive ${diff} days after September 1.`;
+  return `At this pace, you arrive ${diff} days after ${targetLabel}.`;
 }
 
 // ═══════════════════════════════════════════════
@@ -7522,6 +7826,7 @@ function shareWeeklySummary(){
 // ═══════════════════════════════════════════════
 function init(){
   load();
+  maybeShowSplash();
   if(isDark){
     document.getElementById('phone').classList.add('dk');
   }
@@ -7539,7 +7844,7 @@ init();
 
 // ── Version check: reload if GitHub has a newer build
 (function checkVersion(){
-  const CURRENT = 'mission-os-v70';
+  const CURRENT = 'mission-os-v74';
   // Only run on HTTPS (deployed app), not local file
   if(location.protocol !== 'https:') return;
   setTimeout(() => {
@@ -7576,7 +7881,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v70';
+const CACHE = 'mission-os-v74';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
