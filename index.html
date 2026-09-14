@@ -1961,7 +1961,7 @@ const PROFILE = {
 const DEFAULT_MISSION = {
   startWeight: 102,
   targetWeight: 92,
-  targetDate: '2026-09-01',
+  targetDate: (()=>{ const ist=new Date(Date.now()+5.5*60*60*1000); ist.setUTCDate(ist.getUTCDate()+90); return ist.toISOString().slice(0,10); })(),
   startDate: (()=>{ const ist=new Date(Date.now()+5.5*60*60*1000); return ist.toISOString().slice(0,10); })(),
 };
 
@@ -7090,6 +7090,7 @@ function switchTab(tab, direction){
   if(tab==='record'){ syncRecordInputs(); }
   if(tab==='mission'){ renderMission(); }
   if(tab==='patterns'){ renderPatterns(); }
+  if(tab==='today'){ renderToday(); renderLunar(); renderCoachCard(); }
 }
 
 // ═══════════════════════════════════════════════
@@ -7368,9 +7369,11 @@ function renderWheelInto(svgId, labelId, legendId){
   if(label) label.textContent = MO_FULL[wheelMonth] + ' ' + wheelYear;
   const daysInMonth = new Date(wheelYear, wheelMonth + 1, 0).getDate();
   if(legend){
-    legend.innerHTML = colors.map(c =>
-      '<div class="wheel-legend-item"><div class="wheel-legend-dot" style="background:' + c.fill + ';"></div><span>' + c.name + '</span></div>'
-    ).join('');
+    legend.innerHTML = colors.map(c => {
+      // Wake (disc 0) and Steps (disc 2) never rename; the rest reflect live discipline names.
+      const liveName = (c.disc === 0 || c.disc === 2) ? c.name : abbrevName(DISCIPLINES[c.disc].name);
+      return '<div class="wheel-legend-item"><div class="wheel-legend-dot" style="background:' + c.fill + ';"></div><span>' + liveName + '</span></div>';
+    }).join('');
   }
   const RINGS=5, R_INNER=32, R_OUTER=148;
   const ringW=(R_OUTER-R_INNER)/RINGS, GAP_ANG=0.8, GAP_RAD=0.6;
@@ -7844,7 +7847,7 @@ init();
 
 // ── Version check: reload if GitHub has a newer build
 (function checkVersion(){
-  const CURRENT = 'mission-os-v74';
+  const CURRENT = 'mission-os-v76';
   // Only run on HTTPS (deployed app), not local file
   if(location.protocol !== 'https:') return;
   setTimeout(() => {
@@ -7881,7 +7884,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v74';
+const CACHE = 'mission-os-v76';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
