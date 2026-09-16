@@ -1667,10 +1667,6 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
         <label class="flbl">Target Date</label>
         <input class="ms-date" id="ms-td" type="date">
       </div>
-      <div style="margin-top:20px;">
-        <label class="flbl">Wake Target</label>
-        <input class="ms-date" id="ms-wake" type="time">
-      </div>
       <div class="ms-disc-section" style="margin-top:24px;">
         <div class="flbl" style="margin-bottom:12px;">Disciplines</div>
         <div class="ms-disc-row" data-disc-id="d2">
@@ -2274,22 +2270,7 @@ function load(){
     isDark = localStorage.getItem(K_DARK) === 'true';
     CUSTOM_FOOD_DB = JSON.parse(localStorage.getItem(K_CUSTOM_FOODS) || '[]');
   } catch(e){ mission = {...DEFAULT_MISSION}; }
-  // Migrate old wake-progression system to a single editable target, once.
-  if(typeof mission.wakeTargetMinutes !== 'number'){
-    mission.wakeTargetMinutes = legacyWakeProgressionSnapshot();
-  }
   applyDisciplineOverrides();
-}
-// One-time migration helper — freezes whatever the old progression system had
-// reached at the moment of upgrade, so existing users don't get jumped back to 6:45am.
-function legacyWakeProgressionSnapshot(){
-  const START_MINS = 6 * 60 + 45, TARGET_MINS = 4 * 60 + 30, STEP = 15, PER_LEVEL = 5;
-  let totalCompletions = 0;
-  Object.values(records || {}).forEach(r => {
-    if(r && r.disciplines && r.disciplines[0] && r.disciplines[0].done) totalCompletions++;
-  });
-  const shifts = Math.floor(totalCompletions / PER_LEVEL);
-  return Math.max(TARGET_MINS, START_MINS - shifts * STEP);
 }
 function save(){
   try{
@@ -2727,8 +2708,12 @@ function renderDiscDots(){
   const wakeLine = document.getElementById('wake-target-line');
   if(wakeLine){
     const wt = getWakeTarget();
-    const streak = maxConsecutiveDays('d1');
-    wakeLine.textContent = `Wake target: ${wt.label} · best streak ${streak}/42 days`;
+    if(wt.reached){
+      wakeLine.textContent = 'Wake target reached — 4:30 am';
+    } else {
+      const prog = `${wt.completionsAtCurrentLevel}/5`;
+      wakeLine.textContent = `Wake target: ${wt.label} · ${prog} days done`;
+    }
   }
 }
 
@@ -6181,11 +6166,37 @@ function minutesToLabel(mins){
   return `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
 }
 function getWakeTarget(){
-  const mins = (mission && typeof mission.wakeTargetMinutes === 'number') ? mission.wakeTargetMinutes : 270;
-  return { label: minutesToLabel(mins), minutes: mins };
+  const START_MINS = 6 * 60 + 45;
+  const TARGET_MINS = 4 * 60 + 30;
+  const STEP = 15;
+  const COMPLETIONS_PER_LEVEL = 5;
+
+  let totalCompletions = 0;
+  const keys = Object.keys(records).sort();
+  for(const k of keys){
+    const r = records[k];
+    if(!r || !r.disciplines) continue;
+    const wakeDisc = r.disciplines[0];
+    if(wakeDisc && wakeDisc.done) totalCompletions++;
+  }
+
+  const shiftsCompleted = Math.floor(totalCompletions / COMPLETIONS_PER_LEVEL);
+  const currentMins = Math.max(TARGET_MINS, START_MINS - shiftsCompleted * STEP);
+  const completionsAtCurrentLevel = totalCompletions % COMPLETIONS_PER_LEVEL;
+  const isAtFinal = currentMins === TARGET_MINS;
+
+  return {
+    label: minutesToLabel(currentMins),
+    reached: isAtFinal,
+    minutes: currentMins,
+    totalCompletions,
+    completionsAtCurrentLevel,
+    completionsNeeded: COMPLETIONS_PER_LEVEL - completionsAtCurrentLevel,
+  };
 }
 function getWakeDisplayName(){
-  return `Wake at ${getWakeTarget().label}`;
+  const { label, reached } = getWakeTarget();
+  return reached ? 'Wake at 4:30 am' : `Wake at ${label}`;
 }
 // ═══════════════════════════════════════════════
 function showDataDiagnostic(){
@@ -6779,8 +6790,6 @@ function renderMission(){
   document.getElementById('ms-cw').value = cw;
   document.getElementById('ms-tw').value = tw;
   document.getElementById('ms-td').value = mission.targetDate;
-  const wm = getWakeTarget().minutes;
-  document.getElementById('ms-wake').value = String(Math.floor(wm/60)).padStart(2,'0') + ':' + String(wm%60).padStart(2,'0');
   EDITABLE_DISC_IDS.forEach(id => {
     const d = DISCIPLINES.find(x => x.id === id);
     if(!d) return;
@@ -6875,13 +6884,6 @@ function applyMissionSettings(){
   mission.startWeight = cw;
   mission.targetWeight = tw;
   mission.targetDate = td;
-
-  // Wake target
-  const wakeVal = document.getElementById('ms-wake').value; // "HH:MM"
-  if(wakeVal){
-    const [wh, wmin] = wakeVal.split(':').map(Number);
-    mission.wakeTargetMinutes = wh * 60 + wmin;
-  }
 
   // Discipline overrides (name / kcalPerMin / defaultDur) for editable slots
   if(!mission.disciplineOverrides) mission.disciplineOverrides = {};
@@ -7847,7 +7849,7 @@ init();
 
 // ── Version check: reload if GitHub has a newer build
 (function checkVersion(){
-  const CURRENT = 'mission-os-v76';
+  const CURRENT = 'mission-os-v77';
   // Only run on HTTPS (deployed app), not local file
   if(location.protocol !== 'https:') return;
   setTimeout(() => {
@@ -7884,7 +7886,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v76';
+const CACHE = 'mission-os-v77';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
