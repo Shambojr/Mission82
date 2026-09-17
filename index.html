@@ -1011,6 +1011,10 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
 
 /* ═══ ANT SCENE ═══ */
 .ant-scene-wrap{margin:var(--s4) var(--pad) 0;position:relative;height:160px;}
+.gg-bar-wrap{margin:var(--s3) 28px 0;height:1px;background:var(--rl);position:relative;overflow:hidden;}
+.gg-bar-fill{position:absolute;top:0;left:0;height:100%;width:0%;background:var(--ac);transition:width .45s cubic-bezier(.16,1,.3,1);}
+.gg-bar-fill.full{animation:gg-shimmer 2.2s ease-in-out infinite;}
+@keyframes gg-shimmer{0%,100%{opacity:1;}50%{opacity:.5;}}
 .ant-scene-label{font-family:var(--sans);font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--t4);position:absolute;top:0;left:0;}
 .ant-scene-day{font-family:var(--serif);font-size:11px;font-weight:300;color:var(--t3);position:absolute;top:0;right:0;letter-spacing:.04em;}
 .ant-scene-svg{position:absolute;top:18px;left:0;width:100%;height:calc(100% - 18px);pointer-events:none;}
@@ -1325,6 +1329,11 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
     <span class="ant-scene-label">Mission Progress</span>
     <span class="ant-scene-day" id="ant-scene-day"></span>
     <svg class="ant-scene-svg" id="ant-scene-svg" viewBox="0 0 320 142" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <!-- Golden Grain progress line -->
+  <div class="gg-bar-wrap" id="gg-bar-wrap">
+    <div class="gg-bar-fill" id="gg-bar"></div>
   </div>
 
   <!-- Verdict sentence — appears after 6pm -->
@@ -2638,6 +2647,9 @@ function renderToday(){
 
   // Discipline dots
   renderDiscDots();
+
+  // Golden Grain meter
+  renderGoldenGrainMeter();
 
   // Ant scene
   renderAntScene();
@@ -4415,6 +4427,37 @@ function saveRecord(){
 // ═══════════════════════════════════════════════
 // ANT SCENE
 // ═══════════════════════════════════════════════
+function getDayDeficit(dateKey){
+  const rec = records[dateKey];
+  if(!rec) return null;
+  const actual = rec.actualMeals || {};
+  const meals = Object.values(actual).filter(m => m !== null && m !== undefined);
+  if(meals.length === 0) return null;
+
+  const foodCal = meals.reduce((s,m) => s + (m.cal||0), 0);
+  const pro  = meals.reduce((s,m) => s + (m.pro||0), 0);
+  const carb = meals.reduce((s,m) => s + (m.carb||0), 0);
+  const fat  = meals.reduce((s,m) => s + (m.fat||0), 0);
+
+  const weight = parseFloat(rec.weight) || currentWeight() || 99;
+  const bmr = calcBMR(weight);
+  const steps = parseInt(rec.steps) || 0;
+  const neat = Math.round(steps * STEP_KCAL_PER_KG * weight);
+
+  let ex = 0;
+  const discs = rec.disciplines || [];
+  DISCIPLINES.forEach((d, i) => {
+    const entry = discs[i];
+    const done = entry && entry.done;
+    const isRestDay = entry && entry.restDay;
+    if(done && !isRestDay && d.kcalPerMin && d.defaultDur) ex += Math.round(d.kcalPerMin * d.defaultDur);
+  });
+
+  const tef = Math.round(pro * 4 * 0.25 + carb * 4 * 0.08 + fat * 9 * 0.03);
+  const tdee = bmr + neat + ex + tef;
+  return tdee - foodCal;
+}
+
 function isDayEarned(dateKey){
   const rec = records[dateKey] || {};
   const discs = rec.disciplines || [];
@@ -4432,13 +4475,70 @@ function isDayEarned(dateKey){
 }
 
 function isDayGolden(dateKey){
-  // Golden grain: 4+ disciplines AND 90%+ of logged meals are green
+  // Golden grain: 4+ disciplines, 90%+ of logged meals green, AND the day's deficit met the required pace
   if(!isDayEarned(dateKey)) return false;
   const actual = (records[dateKey] || {}).actualMeals || {};
   const meals = Object.values(actual).filter(m => m !== null && m !== undefined);
   if(meals.length === 0) return false;
   const greenCount = meals.filter(m => getFoodColor(m) === 'green').length;
-  return (greenCount / meals.length) >= 0.9;
+  if((greenCount / meals.length) < 0.9) return false;
+
+  const dayDeficit = getDayDeficit(dateKey);
+  if(dayDeficit === null) return false;
+  const required = calcDynamicDeficit().deficitPerDay;
+  return dayDeficit >= required;
+}
+
+function renderGoldenGrainMeter(){
+  const bar = document.getElementById('gg-bar');
+  const wrap = document.getElementById('gg-bar-wrap');
+  if(!bar || !wrap) return;
+  const key = todayKey();
+  const rec = records[key] || {};
+
+  // Disciplines: any 4 of 5 count toward golden grain (steps only if it hit 10,000)
+  let discCount = 0;
+  const discs = rec.disciplines || [];
+  DISCIPLINES.forEach((d, i) => {
+    if(!discs[i] || !discs[i].done) return;
+    if(d.id === 'd3'){
+      if((parseInt(rec.steps) || 0) >= 10000) discCount++;
+    } else {
+      discCount++;
+    }
+  });
+  const discFilled = Math.min(discCount, 4);
+
+  // Meals: one tick per meal actually logged today, filled if green
+  const actual = rec.actualMeals || {};
+  const meals = Object.values(actual).filter(m => m !== null && m !== undefined);
+  const mealMax = meals.length;
+  const mealFilled = meals.filter(m => getFoodColor(m) === 'green').length;
+
+  // Deficit: 1 tick, only exists once at least one meal is logged
+  const deficitMax = mealMax > 0 ? 1 : 0;
+  let deficitFilled = 0;
+  if(deficitMax){
+    const dayDeficit = getDayDeficit(key);
+    if(dayDeficit !== null){
+      const required = calcDynamicDeficit().deficitPerDay;
+      if(dayDeficit >= required) deficitFilled = 1;
+    }
+  }
+
+  const activated = discCount > 0 || mealMax > 0;
+  if(!activated){
+    bar.style.width = '0%';
+    bar.classList.remove('full');
+    return;
+  }
+
+  const maxTicks = 4 + mealMax + deficitMax;
+  const filledTicks = discFilled + mealFilled + deficitFilled;
+  const pct = maxTicks > 0 ? (filledTicks / maxTicks) * 100 : 0;
+
+  bar.style.width = pct + '%';
+  bar.classList.toggle('full', maxTicks > 0 && filledTicks === maxTicks);
 }
 
 function countEarnedSeeds(){
@@ -7849,7 +7949,7 @@ init();
 
 // ── Version check: reload if GitHub has a newer build
 (function checkVersion(){
-  const CURRENT = 'mission-os-v77';
+  const CURRENT = 'mission-os-v79';
   // Only run on HTTPS (deployed app), not local file
   if(location.protocol !== 'https:') return;
   setTimeout(() => {
@@ -7886,7 +7986,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v77';
+const CACHE = 'mission-os-v79';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
