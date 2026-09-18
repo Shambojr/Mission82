@@ -1434,6 +1434,18 @@ html,body{background:var(--bg);font-family:var(--sans);-webkit-font-smoothing:an
   </div>
 </div>
 
+<!-- MEAL PLANNER — component breakdown sheet -->
+<div class="bottom-sheet" id="mp-breakdown-sheet" onclick="closeMpBreakdownSheet(event)">
+  <div class="bs-inner">
+    <div class="bs-handle"></div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--s3);">
+      <span style="font-family:var(--serif);font-size:20px;font-weight:300;color:var(--t1);" id="mp-breakdown-title">—</span>
+      <span style="font-family:var(--sans);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);cursor:pointer;" onclick="closeMpBreakdownSheet()">Done</span>
+    </div>
+    <div id="mp-breakdown-rows"></div>
+  </div>
+</div>
+
 <!-- RECORD -->
 <div class="screen" id="s-record">
 
@@ -2080,6 +2092,15 @@ const FOOD_DB = {
     {id:'sn04', name:'3 Dates + Water',             ml:'3 ഈന്തപ്പഴം',        cal:90,  pro:1, carb:24, fat:0, cat:'dates',  portion:'3 dates + water',                   travel:true, tgFriendly:true, weightLossFriendly:true},
   ],
 
+  // Hot beverage — used for both the morning and evening beverage slots
+  beverage: [
+    {id:'bv01', name:'Black Coffee',            ml:'കട്ടൻ കാപ്പി', cal:5,  pro:0, carb:1,  fat:0, cat:'coffee', portion:'1 cup, no sugar', travel:true, tgFriendly:true, weightLossFriendly:true},
+    {id:'bv02', name:'Black Tea (no sugar)',    ml:'കട്ടൻ ചായ',    cal:5,  pro:0, carb:1,  fat:0, cat:'tea',    portion:'1 cup, no sugar', travel:true, tgFriendly:true, weightLossFriendly:true},
+    {id:'bv03', name:'Tea (half sugar, milk)',  ml:'ചായ',          cal:60, pro:1, carb:9,  fat:2, cat:'tea',    portion:'1 cup, half sugar, light milk', travel:true, tgFriendly:true, weightLossFriendly:true},
+    {id:'bv04', name:'Green Tea',               ml:'ഗ്രീൻ ടീ',     cal:2,  pro:0, carb:0,  fat:0, cat:'tea',    portion:'1 cup, no sugar', travel:true, tgFriendly:true, weightLossFriendly:true},
+    {id:'bv05', name:'Coffee (half sugar, milk)',ml:'കാപ്പി',       cal:65, pro:1, carb:9,  fat:2, cat:'coffee', portion:'1 cup, half sugar, light milk', travel:true, tgFriendly:true, weightLossFriendly:true},
+  ],
+
   // Travel / Arabic options
   travel_meals: [
     {id:'tr01', name:'Al Faham + Salad + 1 Khubz', ml:'അൽ ഫഹം',            cal:480, pro:34, carb:28, fat:22, cat:'alfaham',  portion:'Quarter grilled chicken + salad (no mayo) + 1 khubz', travel:true, tgFriendly:true, weightLossFriendly:true},
@@ -2262,6 +2283,7 @@ let mission = null;
 let records = {};
 let meals = {};   // {dateKey: {breakfast, lunch_fish, lunch_thoran, lunch_sprouts, lunch_sweet, dinner_millet, dinner_salad, snack, locked:{}, travel:false}}
 let currentReplaceSlot = null;
+let currentBreakdownSlot = null;
 let currentReplaceDate = null;
 
 // ═══════════════════════════════════════════════
@@ -2567,6 +2589,8 @@ function generateMeal(dateKey, forTravel){
   }
 
   plan.snack = locked.snack || FOOD_DB.snack[0];
+  plan.beverage_am = locked.beverage_am || pickFromPool(FOOD_DB.beverage, getRecentCategories('beverage_am', 2));
+  plan.beverage_pm = locked.beverage_pm || pickFromPool(FOOD_DB.beverage, getRecentCategories('beverage_pm', 2));
   plan.travel = forTravel;
   plan.locked = locked;
 
@@ -2581,7 +2605,7 @@ function getMealPlan(dateKey){
 }
 function mealDayTotals(plan){
   if(!plan) return { cal:0, pro:0, carb:0, fat:0 };
-  const slots = ['breakfast','lunch_rice','lunch_fish','lunch_thoran','lunch_sprouts','lunch_sweet','lunch_moru','dinner_millet','dinner_salad','snack'];
+  const slots = ['breakfast','lunch_rice','lunch_fish','lunch_thoran','lunch_sprouts','lunch_sweet','lunch_moru','dinner_millet','dinner_salad','snack','beverage_am','beverage_pm'];
   return slots.reduce((t, s) => {
     const item = plan[s];
     if(!item) return t;
@@ -3468,6 +3492,17 @@ function confirmDbTray(){
   if(currentReplaceSlot && currentReplaceSlot.startsWith('__mp__')){
     const slotKey = currentReplaceSlot.replace('__mp__', '');
     saveMpSlotItem(slotKey, combined);
+    closeDbBrowser();
+    return;
+  }
+
+  // Meal planner breakdown — a single underlying component field
+  if(currentReplaceSlot && currentReplaceSlot.startsWith('__mpfield__')){
+    const field = currentReplaceSlot.replace('__mpfield__', '');
+    const base = {name:combined.name, cal:combined.cal, pro:combined.pro, carb:combined.carb, fat:combined.fat, tgFriendly:combined.tgFriendly===true, weightLossFriendly:combined.weightLossFriendly===true};
+    mpPlan[field] = base;
+    saveMpPlan();
+    renderMpBreakdownRows();
     closeDbBrowser();
     return;
   }
@@ -5981,8 +6016,8 @@ function onManualStepsInput(){
 const MP_SLOTS = [
   {key:'breakfast', label:'Breakfast'},
   {key:'lunch',     label:'Lunch'},
+  {key:'snacks',    label:'Snacks'},
   {key:'dinner',    label:'Dinner'},
-  {key:'snack',     label:'Snack'},
 ];
 
 let mpPlan = {};
@@ -6004,9 +6039,15 @@ function openMealPlanner(){
   const fullPlan = meals[key];
   mpPlan = {
     breakfast:     fullPlan.breakfast     || null,
+    beverage_am:   fullPlan.beverage_am   || null,
     lunch_rice:    fullPlan.lunch_rice    || null,
     lunch_fish:    fullPlan.lunch_fish    || null,
+    lunch_thoran:  fullPlan.lunch_thoran  || null,
+    lunch_moru:    fullPlan.lunch_moru    || null,
+    lunch_sweet:   fullPlan.lunch_sweet   || null,
+    beverage_pm:   fullPlan.beverage_pm   || null,
     dinner_millet: fullPlan.dinner_millet || null,
+    dinner_salad:  fullPlan.dinner_salad  || null,
     snack:         fullPlan.snack         || null,
     locked:        fullPlan.locked        || {},
     travel:        fullPlan.travel        || false,
@@ -6044,10 +6085,10 @@ function renderMpSlots(){
     const cal = item ? (item.cal || 0) : 0;
     const colorDot = item ? `<span class="food-dot ${getFoodColor(item)}" style="margin-right:4px;"></span>` : '';
     div.innerHTML = `
-      <div class="mp-slot-left" onclick="openMpSlotEdit('${slot.key}')">
+      <div class="mp-slot-left" onclick="openMpSlotTap('${slot.key}')">
         <div class="mp-slot-label">${slot.label}</div>
         <div class="mp-slot-dish ${item ? '' : 'empty'}" style="display:flex;align-items:center;">${colorDot}${item ? item.name : 'Tap to add'}</div>
-        <div class="mp-slot-add">${item ? 'Change →' : '+ Add dish'}</div>
+        <div class="mp-slot-add">${item ? 'Edit →' : '+ Add dish'}</div>
       </div>
       <div class="mp-slot-right">
         ${item ? `<div class="mp-slot-cal">${cal}</div>
@@ -6060,40 +6101,119 @@ function renderMpSlots(){
   updateMpTotals();
 }
 
+const MP_BREAKDOWN = {
+  breakfast: [
+    {label:'Dish',     field:'breakfast'},
+    {label:'Beverage', field:'beverage_am'},
+  ],
+  lunch: [
+    {label:'Rice',   field:'lunch_rice'},
+    {label:'Curry',  field:'lunch_fish'},
+    {label:'Thoran', field:'lunch_thoran'},
+    {label:'Moru',   field:'lunch_moru'},
+    {label:'Fruit',  field:'lunch_sweet'},
+  ],
+  dinner: [
+    {label:'Dish',  field:'dinner_millet'},
+    {label:'Salad', field:'dinner_salad'},
+  ],
+};
+
+function openMpSlotTap(slotKey){
+  if(slotKey === 'snacks'){ openMpSlotEdit('snacks'); return; }
+  openMpBreakdownSheet(slotKey);
+}
+
+function openMpBreakdownSheet(slotKey){
+  currentBreakdownSlot = slotKey;
+  const sheet = document.getElementById('mp-breakdown-sheet');
+  const title = document.getElementById('mp-breakdown-title');
+  if(title) title.textContent = MP_SLOTS.find(s => s.key === slotKey).label;
+  renderMpBreakdownRows();
+  if(sheet) sheet.classList.add('on');
+}
+
+function closeMpBreakdownSheet(event){
+  if(event && event.target !== event.currentTarget) return;
+  const sheet = document.getElementById('mp-breakdown-sheet');
+  if(sheet) sheet.classList.remove('on');
+  renderMpSlots(); // reflect any component edits on the main 4-row screen
+}
+
+function renderMpBreakdownRows(){
+  const container = document.getElementById('mp-breakdown-rows');
+  if(!container || !currentBreakdownSlot) return;
+  const rows = MP_BREAKDOWN[currentBreakdownSlot] || [];
+  container.innerHTML = '';
+  rows.forEach(row => {
+    const item = mpPlan[row.field] || null;
+    const cal = item ? (item.cal || 0) : 0;
+    const colorDot = item ? `<span class="food-dot ${getFoodColor(item)}" style="margin-right:4px;"></span>` : '';
+    const div = document.createElement('div');
+    div.className = 'mp-slot';
+    div.innerHTML = `
+      <div class="mp-slot-left" onclick="openMpFieldEdit('${row.field}')">
+        <div class="mp-slot-label">${row.label}</div>
+        <div class="mp-slot-dish ${item ? '' : 'empty'}" style="display:flex;align-items:center;">${colorDot}${item ? item.name : 'Tap to add'}</div>
+        <div class="mp-slot-add">${item ? 'Change →' : '+ Add dish'}</div>
+      </div>
+      <div class="mp-slot-right">
+        ${item ? `<div class="mp-slot-cal">${cal}</div>
+        <div style="font-family:var(--sans);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t4);">kcal</div>
+        <span class="mp-slot-clear" onclick="clearMpField('${row.field}')">Clear</span>` : ''}
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+function openMpFieldEdit(field){
+  const key = keyForOffset(1);
+  currentReplaceDate = key;
+  currentReplaceSlot = '__mpfield__' + field;
+  const dbOverlay = document.getElementById('db-overlay');
+  if(dbOverlay) dbOverlay.style.zIndex = '95';
+  openReplace(key, '__mpfield__' + field);
+}
+
+function clearMpField(field){
+  delete mpPlan[field];
+  saveMpPlan();
+  renderMpBreakdownRows();
+}
+
+function mergeItems(items, mergedName){
+  const parts = items.filter(Boolean);
+  if(parts.length === 0) return null;
+  if(parts.length === 1) return {
+    ...parts[0],
+    tgFriendly: parts[0].tgFriendly !== false,
+    weightLossFriendly: parts[0].weightLossFriendly !== false,
+  };
+  const cal  = parts.reduce((s,i) => s+(i.cal||0), 0);
+  const pro  = parts.reduce((s,i) => s+(i.pro||0), 0);
+  const carb = parts.reduce((s,i) => s+(i.carb||0), 0);
+  const fat  = parts.reduce((s,i) => s+(i.fat||0), 0);
+  return {
+    name: parts.map(i => i.name).join(' + '),
+    cal, pro, carb, fat,
+    tgFriendly: parts.every(i => i.tgFriendly !== false),
+    weightLossFriendly: parts.every(i => i.weightLossFriendly !== false),
+  };
+}
+
 function getMpSlotItem(slotKey){
-  if(slotKey === 'breakfast') return mpPlan.breakfast || null;
-  if(slotKey === 'lunch'){
-    // Planner overlay only manages lunch_fish and lunch_rice
-    const fish = mpPlan.lunch_fish;
-    const rice = mpPlan.lunch_rice;
-    if(!fish && !rice) return null;
-    const subItems = [rice, fish].filter(Boolean);
-    if(subItems.length === 1) return {
-      ...subItems[0],
-      tgFriendly: subItems[0].tgFriendly !== false,
-      weightLossFriendly: subItems[0].weightLossFriendly !== false,
-    };
-    const cal  = subItems.reduce((s,i) => s+(i.cal||0), 0);
-    const pro  = subItems.reduce((s,i) => s+(i.pro||0), 0);
-    const carb = subItems.reduce((s,i) => s+(i.carb||0), 0);
-    const fat  = subItems.reduce((s,i) => s+(i.fat||0), 0);
-    return {
-      name: subItems.map(i => i.name).join(' + '),
-      cal, pro, carb, fat,
-      tgFriendly: subItems.every(i => i.tgFriendly !== false),
-      weightLossFriendly: subItems.every(i => i.weightLossFriendly !== false),
-    };
-  }
-  if(slotKey === 'dinner') return mpPlan.dinner_millet || null;
-  if(slotKey === 'snack') return mpPlan.snack || null;
+  if(slotKey === 'breakfast') return mergeItems([mpPlan.breakfast, mpPlan.beverage_am]);
+  if(slotKey === 'lunch') return mergeItems([mpPlan.lunch_rice, mpPlan.lunch_fish, mpPlan.lunch_thoran, mpPlan.lunch_moru, mpPlan.lunch_sweet]);
+  if(slotKey === 'snacks') return mergeItems([mpPlan.beverage_pm]);
+  if(slotKey === 'dinner') return mergeItems([mpPlan.dinner_millet, mpPlan.dinner_salad]);
   return null;
 }
 
 function clearMpSlot(slotKey){
-  if(slotKey === 'breakfast') delete mpPlan.breakfast;
-  if(slotKey === 'lunch'){ delete mpPlan.lunch_fish; delete mpPlan.lunch_rice; }
-  if(slotKey === 'dinner') delete mpPlan.dinner_millet;
-  if(slotKey === 'snack') delete mpPlan.snack;
+  if(slotKey === 'breakfast'){ delete mpPlan.breakfast; delete mpPlan.beverage_am; }
+  if(slotKey === 'lunch'){ delete mpPlan.lunch_rice; delete mpPlan.lunch_fish; delete mpPlan.lunch_thoran; delete mpPlan.lunch_moru; delete mpPlan.lunch_sweet; }
+  if(slotKey === 'snacks'){ delete mpPlan.beverage_pm; }
+  if(slotKey === 'dinner'){ delete mpPlan.dinner_millet; delete mpPlan.dinner_salad; }
   saveMpPlan();
   renderMpSlots();
 }
@@ -6111,8 +6231,8 @@ function saveMpSlotItem(slotKey, item){
   const base = {name:item.name, cal:item.cal, pro:item.pro, carb:item.carb, fat:item.fat, tgFriendly:item.tgFriendly===true, weightLossFriendly:item.weightLossFriendly===true};
   if(slotKey === 'breakfast') mpPlan.breakfast = base;
   if(slotKey === 'lunch') mpPlan.lunch_fish = base;
+  if(slotKey === 'snacks') mpPlan.beverage_pm = base;
   if(slotKey === 'dinner') mpPlan.dinner_millet = base;
-  if(slotKey === 'snack') mpPlan.snack = base;
   saveMpPlan();
   renderMpSlots();
 }
@@ -6146,7 +6266,7 @@ function updateMpTotals(){
     const key = keyForOffset(1); // tomorrow
     const plan = meals[key];
     if(plan){
-      const slots = ['breakfast','lunch_fish','lunch_thoran','lunch_sprouts','dinner_millet','dinner_salad','snack'];
+      const slots = ['breakfast','lunch_fish','lunch_thoran','lunch_sprouts','lunch_sweet','lunch_moru','dinner_millet','dinner_salad','beverage_am','beverage_pm'];
       const items = slots.map(s => plan[s]).filter(Boolean);
       const greenCount = items.filter(i => getFoodColor(i) === 'green').length;
       const pct = items.length > 0 ? Math.round((greenCount / items.length) * 100) : 0;
@@ -7949,7 +8069,7 @@ init();
 
 // ── Version check: reload if GitHub has a newer build
 (function checkVersion(){
-  const CURRENT = 'mission-os-v79';
+  const CURRENT = 'mission-os-v82';
   // Only run on HTTPS (deployed app), not local file
   if(location.protocol !== 'https:') return;
   setTimeout(() => {
@@ -7986,7 +8106,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 if('serviceWorker' in navigator && (isHTTPS || isLocalhost)){
   const swCode = `
-const CACHE = 'mission-os-v79';
+const CACHE = 'mission-os-v82';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
